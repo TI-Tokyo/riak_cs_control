@@ -24,7 +24,7 @@
 csrf_token(ReqData, Context) ->
     case get_csrf_token(ReqData, Context) of
         undefined ->
-            binary_to_list(base64url:encode(crypto:rand_bytes(256)));
+            binary_to_list(base64url:encode(crypto:strong_rand_bytes(256)));
         Token ->
             Token
     end.

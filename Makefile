@@ -6,7 +6,7 @@ PKG_ID           = riak-cs-control-$(PKG_VERSION)
 PKG_BUILD        = 1
 BASE_DIR         = $(shell pwd)
 ERLANG_BIN       = $(shell dirname $(shell which erl))
-REBAR           ?= $(BASE_DIR)/rebar
+REBAR           ?= $(BASE_DIR)/rebar3
 OVERLAY_VARS    ?=
 
 .PHONY: rel deps test
@@ -14,26 +14,28 @@ OVERLAY_VARS    ?=
 all: deps compile
 
 compile:
-	@./rebar compile
+	@$(REBAR) compile
 
 deps:
-	@./rebar get-deps
+	@$(REBAR) upgrade
 
 clean:
-	@./rebar clean
+	@$(REBAR) clean
 
 distclean: clean
-	@./rebar delete-deps
+	@$(REBAR) clean -a
 	@rm -rf $(PKG_ID).tar.gz
 
 test: all
-	@./rebar skip_deps=true eunit
+	@$(REBAR) eunit
 
 ##
 ## Release targets
 ##
 rel: deps compile
-	@./rebar generate skip_deps=true $(OVERLAY_VARS)
+	rm -rf _build/rel/rel/riak_cs_control
+	$(REBAR) as rel release
+	cp -a _build/rel/rel/riak_cs_control rel/
 
 relclean:
 	rm -rf rel/riak-cs-control
@@ -41,15 +43,17 @@ relclean:
 ##
 ## Developer targets
 ##
+.PHONY : stage
+
 stage : rel
-	$(foreach dep,$(wildcard deps/*), rm -rf rel/riak-cs-control/lib/$(shell basename $(dep))-* && ln -sf $(abspath $(dep)) rel/riak-cs-control/lib;)
-	$(foreach app,$(wildcard apps/*), rm -rf rel/riak-cs-control/lib/$(shell basename $(app))-* && ln -sf $(abspath $(app)) rel/riak-cs-control/lib;)
+	$(foreach app,$(wildcard apps/*),               rm -rf rel/riak_cs_control/lib/$(shell basename $(app))* && ln -sf $(abspath $(app)) rel/riak_cs_control/lib;)
+	$(foreach dep,$(wildcard _build/default/lib/*), rm -rf rel/riak_cs_control/lib/$(shell basename $(dep))* && ln -sf $(abspath $(dep)) rel/riak_cs_control/lib;)
 
 ##
 ## Doc targets
 ##
 docs:
-	./rebar skip_deps=true doc
+	@$(REBAR) edoc
 
 APPS = kernel stdlib sasl erts ssl tools os_mon runtime_tools crypto inets \
 	xmerl webtool eunit syntax_tools compiler
