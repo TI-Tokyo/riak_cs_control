@@ -108,10 +108,9 @@ maybe_create_user(ReqData, Context) ->
     case Context#context.user of
         undefined ->
             Attributes = wrq:req_body(ReqData),
-            NewAttributes = riak_cs_control_formatting:format_incoming_user(Attributes),
-            case riak_cs_control_session:put_user(NewAttributes) of
-                {ok, Response} ->
-                    {true, Context#context{user=Response}};
+            case riak_cs_control_session:put_user(Attributes) of
+                {ok, UserData} ->
+                    {true, Context#context{user = UserData}};
                 _ ->
                     {false, Context}
             end;

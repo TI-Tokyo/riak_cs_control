@@ -90,8 +90,7 @@ from_json(ReqData, Context) ->
     case maybe_retrieve_user(Context, KeyId) of
         {true, NewContext} ->
             Attributes = wrq:req_body(ReqData),
-            NewAttributes = riak_cs_control_formatting:format_incoming_user(Attributes),
-            case riak_cs_control_session:put_user(KeyId, NewAttributes) of
+            case riak_cs_control_session:put_user(KeyId, Attributes) of
                 {ok, _Response} ->
                     Resource = "/users/" ++ KeyId,
                     NewReqData = wrq:set_resp_header("Location", Resource, ReqData),

@@ -14,11 +14,8 @@
 
 -behaviour(gen_server).
 
--type url() :: list().
--type request_type() :: multipart_get | get | put.
--type attributes() :: list().
--type response() :: list() | tuple().
--type body() :: list().
+-type keyid() :: binary().
+-type attributes() :: binary().
 
 %% API
 -export([start_link/0,
@@ -37,8 +34,12 @@
 
 -define(SERVER, ?MODULE).
 
--record(state, {}).
-
+-record(state, {cs_host :: binary(),
+                cs_port :: non_neg_integer(),
+                proto :: string(),
+                access_key_id :: binary(),
+                secret_access_key :: binary()
+               }).
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -46,15 +47,19 @@
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
+-spec get_users() -> {ok, [string()]} | {error, term()}.
 get_users() ->
-    gen_server:call(?MODULE, get_users, infinity).
+    gen_server:call(?MODULE, list_users, infinity).
 
+-spec get_user(keyid()) -> {ok, binary()} | {error, term()}.
 get_user(KeyId) ->
     gen_server:call(?MODULE, {get_user, KeyId}, infinity).
 
+-spec put_user(attributes()) -> {ok, binary()} | {error, term()}.
 put_user(Attributes) ->
     gen_server:call(?MODULE, {put_user, Attributes}, infinity).
 
+-spec put_user(keyid(), attributes()) -> {ok, binary()} | {error, term()}.
 put_user(KeyId, Attributes) ->
     gen_server:call(?MODULE, {put_user, KeyId, Attributes}, infinity).
 
@@ -63,47 +68,27 @@ put_user(KeyId, Attributes) ->
 %%%===================================================================
 
 init([]) ->
-    riak_cs_control_configuration:configure_s3_connection(),
-    {ok, #state{}}.
+    Host = riak_cs_control_configuration:cs_configuration(cs_host),
+    Port = riak_cs_control_configuration:cs_configuration(cs_port),
+    Proto = riak_cs_control_configuration:cs_configuration(cs_proto),
+    AdminKeyId = riak_cs_control_configuration:cs_configuration(cs_admin_key),
+    AdminKeySecret = riak_cs_control_configuration:cs_configuration(cs_admin_secret),
+    {ok, #state{cs_host = Host,
+                cs_port = Port,
+                proto = Proto,
+                access_key_id = AdminKeyId,
+                secret_access_key = AdminKeySecret}}.
 
-handle_call(get_users, _From, State) ->
-    case handle_request({multipart_get, "users"}) of
+handle_call(Request, _From, State = #state{cs_host = Host,
+                                           cs_port = Port,
+                                           proto = Proto}) ->
+    BaseUrl = io_lib:format("~s://~s:~b", [Proto, Host, Port]),
+    case handle_request(Request, BaseUrl, State) of
         {ok, Response} ->
-            Users = riak_cs_control_formatting:format_users(Response),
-            {reply, {ok, Users}, State};
+            {reply, {ok, Response}, State};
         Error ->
             {reply, Error, State}
-    end;
-
-handle_call({get_user, KeyId}, _From, State) ->
-    case handle_request({get, "user/" ++ KeyId}) of
-        {ok, Response} ->
-            User = riak_cs_control_formatting:format_user(Response),
-            {reply, {ok, User}, State};
-        Error ->
-            {reply, Error, State}
-    end;
-
-handle_call({put_user, Attributes}, _From, State) ->
-    case handle_request({put, "user", Attributes}) of
-        {ok, Response} ->
-            User = riak_cs_control_formatting:format_user(Response),
-            {reply, {ok, User}, State};
-        Error ->
-            {reply, Error, State}
-    end;
-
-handle_call({put_user, KeyId, Attributes}, _From, State) ->
-    case handle_request({put, "user/" ++ KeyId, Attributes}) of
-        {ok, Response} ->
-            User = riak_cs_control_formatting:format_user(Response),
-            {reply, {ok, User}, State};
-        Error ->
-            {reply, Error, State}
-    end;
-
-handle_call(_Request, _From, State) ->
-    {reply, ok, State}.
+    end.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
@@ -121,61 +106,133 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-%% @doc Perform a put request to Riak CS.
--spec put_request(url(), body()) -> {ok, response()} | {error, term()}.
-put_request(Url, Body) ->
-    try
-        Response = erlcloud_s3:put_object(
-            riak_cs_control_configuration:administration_bucket_name(),
-            Url,
-            Body,
-            [{return_response, true}],
-            [{"content-type", "application/json"}]),
-        {ok, Response}
-    catch
-        error:Reason -> {error, Reason}
-    end.
-
-%% @doc Perform a get request to Riak CS.
--spec get_request(url()) -> {ok, response()} | {error, term()}.
-get_request(Url) ->
-    try
-        Response = erlcloud_s3:get_object(
-            riak_cs_control_configuration:administration_bucket_name(),
-            Url,
-            [{accept, "application/json"}]),
-        {ok, Response}
-    catch
-        error:Reason -> {error, Reason}
-    end.
-
-%% @doc Empty decoded JSON placeholder.
--spec empty_response() -> {struct, list()}.
-empty_response() -> {struct, []}.
-
 %% @doc Handle get/put requets.
--spec handle_request({request_type(), url()} |
-                     {request_type(), url(), attributes()}) ->
-    {ok, response()} | {error, term()}.
-handle_request({multipart_get, Url}) ->
-    case get_request(Url) of
-        {ok, Content} ->
-            {ok, riak_cs_control_multipart:parse_multipart_response(Content)};
-        _ ->
-            {ok, []}
-    end;
-handle_request({get, Url}) ->
-    case get_request(Url) of
-        {ok, Content} ->
-            Body = proplists:get_value(content, Content),
-            {ok, mochijson2:decode(Body)};
-        _ ->
-            {ok, empty_response()}
-    end;
-handle_request({put, Url, Body}) ->
-    case put_request(Url, Body) of
-        {ok, {_ResponseHeaders, ResponseBody}} ->
-            {ok, mochijson2:decode(ResponseBody)};
-        {error, Error} ->
-            {error, Error}
+handle_request(list_users, BaseUrl, State) ->
+    list_users(BaseUrl, State);
+handle_request({get_user, KeyId}, BaseUrl, State) ->
+    get_user(BaseUrl, KeyId, State);
+handle_request({put_user, KeyId, User}, BaseUrl, State) ->
+    #{<<"user">> := UserItems} = mochijson2:decode(User, [{format, map}]),
+    update_user(BaseUrl, KeyId, UserItems, State);
+handle_request({put_user, User}, BaseUrl, State) ->
+    #{<<"user">> := #{<<"email">> := Email,
+                      <<"name">> := Name}} = mochijson2:decode(User, [{format, map}]),
+    create_user(BaseUrl, Email, Name, State).
+
+
+
+get_user(BaseUrl, KeyId, #state{access_key_id = AdmKeyId,
+                                secret_access_key = AdmSAK}) ->
+    Resource = "/riak-cs/user/" ++ KeyId,
+    Url = BaseUrl ++ Resource,
+    Headers = make_headers(AdmKeyId, AdmSAK, get, [], [], Resource)
+        ++ [{"accept", "application/json"}],
+    case httpc:request(get, {Url, Headers},
+                       [], [{full_result, false}]) of
+        {ok, {200, Body}} ->
+            {ok, mochijson2:decode(Body, [{format, map}])};
+        {ok, {_, Non200, Body}} ->
+            lager:warning("get_user(~s) failed with code ~b: ~s", [KeyId, Non200, Body]),
+            {error, Body}
     end.
+
+create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
+                                             secret_access_key = SAK}) ->
+    ReqBody = iolist_to_binary(
+                mochijson2:encode(#{<<"email">> => EmailAddr,
+                                    <<"name">> => Name})),
+    ContentType = "application/json",
+    CMD5 = binary_to_list(base64:encode(crypto:hash(md5, ReqBody))),
+    Resource = "/riak-cs/user",
+    Url = BaseUrl ++ Resource,
+    Headers = make_headers(KeyId, SAK, post, CMD5, ContentType, Resource)
+        ++ [{"accept", "application/json"}],
+    case httpc:request(post, {Url, Headers, ContentType, ReqBody},
+                       [], [{full_result, false}]) of
+        {ok, {201, Body}} ->
+            {ok, mochijson2:decode(Body)};
+        {ok, {409, _Body}} ->
+            {error, user_already_exists};
+        {ok, {Non200, Body}} ->
+            lager:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
+            {error, Body}
+    end.
+
+update_user(BaseUrl, KeyId, UserItems, #state{access_key_id = AdmKeyId,
+                                              secret_access_key = AdmSAK}) ->
+    ReqBody = iolist_to_binary(mochijson2:encode(UserItems)),
+    Resource = io_lib:format("/riak-cs/user/~s", [KeyId]),
+    Url = BaseUrl ++ Resource,
+    ContentType = "application/json",
+    CMD5 = binary_to_list(base64:encode(crypto:hash(md5, ReqBody))),
+    Headers = make_headers(AdmKeyId, AdmSAK,
+                           put, CMD5, ContentType, Resource)
+        ++ [{"accept", "application/json"}],
+    case httpc:request(put, {Url, Headers, ContentType, ReqBody},
+                       [], [{full_result, false}]) of
+        {ok, {200, RespBody}} ->
+            {ok, mochijson2:decode(RespBody)};
+        {ok, {Non200, RespBody}} ->
+            lager:warning("update_user(~s) failed with code ~b: ~s", [KeyId, Non200, RespBody]),
+            {error, RespBody}
+    end.
+
+list_users(BaseUrl, #state{access_key_id = AdmKeyId,
+                           secret_access_key = AdmSAK}) ->
+    Resource = "/riak-cs/users",
+    Url = BaseUrl ++ Resource,
+    Headers = make_headers(AdmKeyId, AdmSAK, get, [], [], Resource)
+        ++ [{"accept", "application/json"}],
+    case httpc:request(get, {Url, Headers},
+                       [], [{full_result, false}]) of
+        {ok, {200, Body}} ->
+            Parts =
+                %% split a series of multipart documents
+                case re:split(Body, "\r\n--.+\r\nContent-Type: application/json\r\n\r\n") of
+                    Many = [_|_] ->
+                        lists:droplast(Many);
+                    [] ->
+                        []
+                end,
+            Decoded = [mochijson2:decode(P) || P <- Parts, P =/= <<>>],
+            {ok, lists:append(Decoded)};
+        {ok, {Non200, Body}} ->
+            lager:warning("list_users failed with code ~b: ~p", [Non200, Body]),
+            {error, Body}
+    end.
+
+
+make_headers(AccessKeyId, SecretAccessKey,
+             Method, ContentMD5, ContentType, Resource) ->
+    Date = iso_8601_format_now(),
+    [{"authorization", make_authorization(
+                         AccessKeyId, SecretAccessKey, Method,
+                         ContentMD5, ContentType, Date, [],
+                         "", Resource)},
+     {"date", Date},
+     {"accept", "application/json"}
+    ]   ++ [{"content-md5", ContentMD5} || ContentMD5 =/= []]
+        ++ [{"content-type", ContentType} || ContentType =/= []].
+
+make_authorization(AccessKeyId, SecretAccessKey, Method, ContentMD5, ContentType, Date, AmzHeaders,
+                   Host, Resource) ->
+    StringToSign = [string:to_upper(atom_to_list(Method)), $\n,
+                    ContentMD5, $\n,
+                    ContentType, $\n,
+                    Date, $\n,
+                    AmzHeaders,
+                    case Host of "" -> ""; _ -> [$/, Host] end,
+                    Resource,
+                    []
+                   ],
+    lager:debug("STS:  ~p", [StringToSign]),
+    Signature = base64:encode(crypto:hmac(sha, SecretAccessKey, StringToSign)),
+    ["AWS ", AccessKeyId, $:, Signature].
+
+iso_8601_format_now() ->
+    {{Y, Mo, D}, {H, Mi, S}} = calendar:universal_time(),
+    iso_8601_format(Y, Mo, D, H, Mi, S).
+iso_8601_format(Year, Month, Day, Hour, Min, Sec) ->
+    lists:flatten(
+      io_lib:format("~4.10.0B-~2.10.0B-~2.10.0BT~2.10.0B:~2.10.0B:~2.10.0B.000Z",
+                    [Year, Month, Day, Hour, Min, Sec])).
