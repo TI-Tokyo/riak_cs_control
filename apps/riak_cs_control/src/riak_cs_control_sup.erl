@@ -26,16 +26,13 @@ start_link() ->
 
 %% @doc supervisor callback.
 init([]) ->
-    RiakCsControlSession={riak_cs_control_session,
-                          {riak_cs_control_session, start_link, []},
-                          permanent,
-                          5000,
-                          worker,
-                          [riak_cs_control_session]},
+    RiakCsControlSession = #{id => riak_cs_control_session,
+                             start => {riak_cs_control_session, start_link, []}},
 
     Ip = case os:getenv("WEBMACHINE_IP") of
-        false -> "0.0.0.0";
-        Any -> Any end,
+             false -> "0.0.0.0";
+             Any -> Any
+         end,
 
     Port = riak_cs_control_configuration:cs_configuration(port),
 
@@ -52,12 +49,11 @@ init([]) ->
                  {log_dir, "priv/log"},
                  {dispatch, Dispatch}],
 
-    Web = {http,
-           {webmachine_mochiweb, start, [WebConfig]},
-           permanent, 5000, worker, [mochiweb_socket_server]},
+    Web = #{id => http,
+            start => {webmachine_mochiweb, start, [WebConfig]}},
 
     Processes = [Web, RiakCsControlSession],
 
-    lager:info("Application listening on port ~p", [Port]),
+    lager:info("Application listening on port ~b", [Port]),
 
     {ok, {{one_for_one, 10, 10}, Processes}}.
