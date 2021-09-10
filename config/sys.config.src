@@ -3,24 +3,19 @@
     %% Riak CS Control
     {riak_cs_control, [
        %% What port to run the application on.
-       {port, {{port}} },
+       {port, ${CS_CONTROL_PORT} },
 
        %% Instance of Riak CS you wish to talk to.
-       {cs_hostname, "{{cs_hostname}}" },
-       {cs_port, {{cs_port}} },
-       {cs_protocol, "{{cs_protocol}}" },
-
-       %% Proxy information; necessary if you are using s3.amazonaws.com as
-       %% your hostname.
-       {cs_proxy_host, "{{cs_proxy_host}}" },
-       {cs_proxy_port, {{cs_proxy_port}} },
+       {cs_host, "${CS_HOSTNAME}" },
+       {cs_port, ${CS_PORT} },
+       {cs_proto, "${CS_PROTOCOL}" },
 
        %% Credentials you want the application to run as.
-       {cs_admin_key, "{{cs_admin_key}}" },
-       {cs_admin_secret, "{{cs_admin_secret}}" },
+       {cs_admin_key, "${CS_ADMIN_KEY}" },
+       {cs_admin_secret, "${CS_ADMIN_SECRET}" },
 
        %% Specify the bucket name for administration options.
-       {cs_administration_bucket, "{{cs_administration_bucket}}" }
+       {cs_administration_bucket, "${CS_ADMINISTRATION_BUCKET}" }
     ]},
 
     {lager, [
@@ -37,14 +32,14 @@
        {handlers, [
                    {lager_console_backend, info},
                    {lager_file_backend, [
-                                         {"{{platform_log_dir}}/error.log", error, 10485760, "$D0", 5},
-                                         {"{{platform_log_dir}}/console.log", info, 10485760, "$D0", 5}
+                                         {"error.log", error, 10485760, "$D0", 5},
+                                         {"console.log", info, 10485760, "$D0", 5}
                                         ]}
                   ]},
 
        %% Whether to write a crash log, and where.
        %% Commented/omitted/undefined means no crash logger.
-       {crash_log, "{{platform_log_dir}}/crash.log"},
+       {crash_log, "crash.log"},
 
        %% Maximum size in bytes of events in the crash log - defaults to 65536
        {crash_log_msg_size, 65536},
