@@ -11,8 +11,6 @@
                   inets,
                   crypto,
                   lager,
-                  erlcloud,
-                  erlydtl,
                   mochiweb,
                   webmachine
                  ]},

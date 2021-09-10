@@ -14,8 +14,8 @@
 
 -behaviour(gen_server).
 
--type keyid() :: binary().
--type attributes() :: binary().
+-type keyid() :: string().
+-type attributes() :: string().
 
 %% API
 -export([start_link/0,
@@ -208,20 +208,22 @@ make_headers(AccessKeyId, SecretAccessKey,
     [{"authorization", make_authorization(
                          AccessKeyId, SecretAccessKey, Method,
                          ContentMD5, ContentType, Date, [],
-                         "", Resource)},
+                         Resource)},
      {"date", Date},
      {"accept", "application/json"}
     ]   ++ [{"content-md5", ContentMD5} || ContentMD5 =/= []]
         ++ [{"content-type", ContentType} || ContentType =/= []].
 
-make_authorization(AccessKeyId, SecretAccessKey, Method, ContentMD5, ContentType, Date, AmzHeaders,
-                   Host, Resource) ->
+make_authorization(AccessKeyId, SecretAccessKey,
+                   Method, ContentMD5, ContentType,
+                   Date, AmzHeaders,
+                   Resource) ->
     StringToSign = [string:to_upper(atom_to_list(Method)), $\n,
                     ContentMD5, $\n,
                     ContentType, $\n,
                     Date, $\n,
                     AmzHeaders,
-                    case Host of "" -> ""; _ -> [$/, Host] end,
+                    "",
                     Resource,
                     []
                    ],
