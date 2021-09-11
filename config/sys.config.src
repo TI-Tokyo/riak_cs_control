@@ -6,16 +6,13 @@
        {port, ${CS_CONTROL_PORT} },
 
        %% Instance of Riak CS you wish to talk to.
-       {cs_host, "${CS_HOSTNAME}" },
+       {cs_host, "${CS_HOST}" },
        {cs_port, ${CS_PORT} },
-       {cs_proto, "${CS_PROTOCOL}" },
+       {cs_proto, "${CS_PROTO}" },
 
        %% Credentials you want the application to run as.
        {cs_admin_key, "${CS_ADMIN_KEY}" },
-       {cs_admin_secret, "${CS_ADMIN_SECRET}" },
-
-       %% Specify the bucket name for administration options.
-       {cs_administration_bucket, "${CS_ADMINISTRATION_BUCKET}" }
+       {cs_admin_secret, "${CS_ADMIN_SECRET}" }
     ]},
 
     {lager, [
