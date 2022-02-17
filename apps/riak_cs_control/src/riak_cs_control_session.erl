@@ -34,6 +34,8 @@
 
 -define(SERVER, ?MODULE).
 
+-define(DEFAULT_ADMIN_KEY, "admin-key").
+
 -record(state, {cs_host :: binary(),
                 cs_port :: non_neg_integer(),
                 proto :: string(),
@@ -136,6 +138,24 @@ get_user(BaseUrl, KeyId, #state{access_key_id = AdmKeyId,
             {error, Body}
     end.
 
+create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}) ->
+    ReqBody = iolist_to_binary(
+                mochijson2:encode(#{<<"email">> => EmailAddr,
+                                    <<"name">> => Name})),
+    ContentType = "application/json",
+    Resource = "/riak-cs/user",
+    Url = BaseUrl ++ Resource,
+    Headers = [{"accept", "application/json"}],
+    case httpc:request(post, {Url, Headers, ContentType, ReqBody},
+                       [], [{full_result, false}]) of
+        {ok, {201, Body}} ->
+            {ok, mochijson2:decode(Body)};
+        {ok, {409, _Body}} ->
+            {error, user_already_exists};
+        {ok, {Non200, Body}} ->
+            lager:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
+            {error, Body}
+    end;
 create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
                                              secret_access_key = SAK}) ->
     ReqBody = iolist_to_binary(
