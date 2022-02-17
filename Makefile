@@ -17,7 +17,7 @@ compile:
 	@$(REBAR) compile
 
 deps:
-	@$(REBAR) upgrade
+	@$(REBAR) upgrade --all
 
 clean:
 	@$(REBAR) clean
@@ -32,7 +32,7 @@ test: all
 ##
 ## Release targets
 ##
-rel: deps compile
+rel: compile
 	rm -rf _build/rel/rel/riak_cs_control
 	$(REBAR) as rel release
 	cp -a _build/rel/rel/riak_cs_control rel/
