@@ -54,6 +54,6 @@ init([]) ->
 
     Processes = [Web, RiakCsControlSession],
 
-    lager:info("Application listening on port ~b", [Port]),
+    logger:info("Application listening on port ~b", [Port]),
 
     {ok, {{one_for_one, 10, 10}, Processes}}.

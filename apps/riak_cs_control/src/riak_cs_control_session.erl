@@ -134,7 +134,7 @@ get_user(BaseUrl, KeyId, #state{access_key_id = AdmKeyId,
         {ok, {200, Body}} ->
             {ok, mochijson2:decode(Body, [{format, map}])};
         {ok, {_, Non200, Body}} ->
-            lager:warning("get_user(~s) failed with code ~b: ~s", [KeyId, Non200, Body]),
+            logger:warning("get_user(~s) failed with code ~b: ~s", [KeyId, Non200, Body]),
             {error, Body}
     end.
 
@@ -153,7 +153,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
-            lager:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
+            logger:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
             {error, Body}
     end;
 create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
@@ -174,7 +174,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
-            lager:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
+            logger:warning("create_user(~s) failed with code ~b: ~s", [EmailAddr, Non200, Body]),
             {error, Body}
     end.
 
@@ -193,7 +193,7 @@ update_user(BaseUrl, KeyId, UserItems, #state{access_key_id = AdmKeyId,
         {ok, {200, RespBody}} ->
             {ok, mochijson2:decode(RespBody)};
         {ok, {Non200, RespBody}} ->
-            lager:warning("update_user(~s) failed with code ~b: ~s", [KeyId, Non200, RespBody]),
+            logger:warning("update_user(~s) failed with code ~b: ~s", [KeyId, Non200, RespBody]),
             {error, RespBody}
     end.
 
@@ -217,7 +217,7 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
             Decoded = [mochijson2:decode(P) || P <- Parts, P =/= <<>>],
             {ok, lists:append(Decoded)};
         {ok, {Non200, Body}} ->
-            lager:warning("list_users failed with code ~b: ~p", [Non200, Body]),
+            logger:warning("list_users failed with code ~b: ~p", [Non200, Body]),
             {error, Body}
     end.
 
@@ -247,7 +247,7 @@ make_authorization(AccessKeyId, SecretAccessKey,
                     Resource,
                     []
                    ],
-    lager:debug("STS:  ~p", [StringToSign]),
+    logger:debug("STS:  ~p", [StringToSign]),
     Signature = base64:encode(crypto:hmac(sha, SecretAccessKey, StringToSign)),
     ["AWS ", AccessKeyId, $:, Signature].
 

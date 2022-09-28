@@ -1,0 +1,6 @@
+rel/riak_cs_control/lib usr/lib/riak_cs_control
+rel/riak_cs_control/share usr/lib/riak_cs_control
+rel/riak_cs_control/erts* usr/lib/riak_cs_control
+rel/riak_cs_control/releases usr/lib/riak_cs_control
+rel/riak_cs_control/usr/bin/riak_cs_control usr/sbin
+rel/riak_cs_control/bin usr/lib/riak_cs_control

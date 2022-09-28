@@ -1,26 +1,11 @@
 {"1.2.0",
-[{<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},2},
- {<<"lager">>,
-  {git,"https://github.com/erlang-lager/lager.git",
-       {ref,"22e62f28e5afabe90a6f31bcde367a2b5799fc94"}},
-  1},
- {<<"lager_syslog">>,
-  {git,"https://github.com/TI-Tokyo/lager_syslog.git",
-       {ref,"e9117a7e54de35c714fa8d1e6c054854c7c697df"}},
-  0},
- {<<"mochiweb">>,{pkg,<<"mochiweb">>,<<"2.20.1">>},0},
- {<<"syslog">>,
-  {git,"https://github.com/TI-Tokyo/erlang-syslog",
-       {ref,"14bef508623260a78563d529ccd08e9c259b839e"}},
-  1},
+[{<<"mochiweb">>,{pkg,<<"mochiweb">>,<<"2.20.1">>},0},
  {<<"webmachine">>,{pkg,<<"webmachine">>,<<"1.11.1">>},0}]}.
 [
 {pkg_hash,[
- {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>},
  {<<"mochiweb">>, <<"E4DBD0ED716F076366ECF62ADA5755A844E1D95C781E8C77DF1D4114BE868CDF">>},
  {<<"webmachine">>, <<"422BEAD629F3D6C10FB0F24BE4CEE9648338F90099072AE091FADF86BA70C53F">>}]},
 {pkg_hash_ext,[
- {<<"goldrush">>, <<"99CB4128CFFCB3227581E5D4D803D5413FA643F4EB96523F77D9E6937D994CEB">>},
  {<<"mochiweb">>, <<"D1AEEE7870470D2FA9EAE0B3D5AB6C33801AA2D82B10E9DADE885C5C921B36AA">>},
  {<<"webmachine">>, <<"4914961217736701CADA1345D7C79C6DB50A636CF7BC6C757DE923B7C7D70B21">>}]}
 ].
