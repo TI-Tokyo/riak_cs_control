@@ -1,10 +1,10 @@
 Source: riak-cs-control
 Section: net
-Priority: extra
+Priority: optional
 Maintainer: riak_cs_control-packaging@tiot.jp
-Build-Depends: debhelper (>= 7), devscripts, g++, dh-make, autoconf, automake
+Build-Depends: debhelper (>= 7), devscripts, dh-make
 Standards-Version: 3.9.3
-Homepage: tiot.jp
+Homepage: https://tiot.jp
 
 Package: riak-cs-control
 Architecture: any

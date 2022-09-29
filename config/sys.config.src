@@ -15,11 +15,11 @@
     ]},
 
  {kernel,
-     [{logger_level, ${KERNEL_LOGGER_LEVEL}},
+     [{logger_level, ${LOGGER_LEVEL}},
       {logger,
           [{handler,default,logger_std_h,
                #{config =>
-                     #{type => standard_io},
+                     #{file => "/var/log/riak-cs-control/console.log"},
                  filters =>
                      [{no_sasl,
                           {fun logger_filters:domain/2,
@@ -31,7 +31,7 @@
                                 msg,"\n"]}}}},
            {handler,sasl,logger_std_h,
                #{config =>
-                     #{type => standard_error},
+                     #{file => "/var/log/riak-cs-control/sasl.log"},
                  filter_default => stop,
                  filters =>
                      [{sasl_here,

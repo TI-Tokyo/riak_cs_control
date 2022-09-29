@@ -1,4 +1,4 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: riak-cs-control
-Upstream-Contact: Riak CS packaging <riak_ts@tiot.jp>
+Upstream-Contact: Riak CS Maintainer <riak_cs@tiot.jp>
 License: Apache-2.0

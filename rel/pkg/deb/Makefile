@@ -13,7 +13,7 @@ default:
 
 	cd $(BASE_DIR)/rel/pkg/out/$(PKG_ID); \
 	(mkdir -p _build/default && cd _build/default && for d in lib; do ln -fs $(BASE_DIR)/_build/default/$$d; done); \
-	dch  --create --package riak_cs_control -v "$(TAR_VERSION)" \
+	dch  --create --package riak-cs-control -v "$(TAR_VERSION)" \
              "Build from $(PKG_ID)";\
 	debuild --prepend-path=$(ERLANG_BIN) \
 			-e REVISION=$(PKG_VERSION) \
