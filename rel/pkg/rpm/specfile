@@ -18,34 +18,32 @@
 ##
 ## -------------------------------------------------------------------
 
-Name: riak_cs_control
+Name: riak-cs-control
 Version: %{_version}
 Release: %{_release}%{?dist}
 License: "Apache 2.0"
 Group: Development/Libraries
 Source: %{_tarname}
-URL: "tiot.jp"
-Vendor: "Riak TS"
-Packager: "Riak TS Package Maint" <"riak_cs_packaging@tiot.jp">
+URL: "https://tiot.jp"
+Vendor: "Riak CS Control"
+Packager: "Riak CS Maintainer" <"riak_cs_packaging@tiot.jp">
 BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
-Summary: "Riak TS is a SQL-speaking, timeseries-optimised, Riak-based distributed data store"
-BuildRequires: systemd gcc-c++ pam-devel autoconf automake libtool cmake ncurses-devel openssl-devel
+Summary: "A Web interface to Riak CS cluster"
+BuildRequires: systemd
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
 
 %description
-"Riak TS is a write-optimized, NoSQL data store based on Riak"
+"Riak CS Control provides a Web interface to list and create users in a Riak CS cluster"
 
 %define debug_package %{nil}
 %define __prelink_undo_cmd /bin/cat prelink library
 
-%define platform_data_dir %{_localstatedir}/lib/riak_cs_control
-%define platform_base_dir %{_libdir}/riak_cs_control
+%define platform_base_dir %{_libdir}/riak-cs-control
 %define platform_bin_dir %{platform_base_dir}/bin
 %define platform_lib_dir %{platform_base_dir}/lib
-%define platform_log_dir %{_localstatedir}/log/riak_cs_control
-
+%define platform_log_dir %{_localstatedir}/log/riak-cs-control
 
 %prep
 %setup -q -n %{_tarname_base} -c %{_tarname_base}
@@ -53,43 +51,43 @@ Requires(postun): systemd
 %define _build_id_links none
 
 %build
+(mkdir -p _build/default/lib && cd _build/default/lib && for d in ../../../../../../../../_build/default/lib/*; do ln -sf $d; done)
 make rel-rpm
-rm -rf rel/riak_cs_control/lib/*/c_src rel/riak_cs_control/lib/*/src
+rm -rf rel/riak_cs_control/lib/*/src
 
 %install
 %define relpath %{_builddir}/%{buildsubdir}/rel/riak_cs_control
-%define buildroot_lib %{buildroot}%{_libdir}/riak_cs_control
-%define buildroot_bin %{buildroot_lib}/bin
+%define buildroot_lib %{buildroot}%{_libdir}/riak-cs-control
+%define buildroot_etc %{buildroot}%{_sysconfdir}
 %define buildroot_sbin %{buildroot}%{_sbindir}
+%define buildroot_bin %{buildroot_lib}/bin
 %define buildroot_unit %{buildroot}%{_unitdir}
 %define buildroot_run %{buildroot}%{_rundir}
 %define buildroot_man %{buildroot}%{_mandir}
 
 mkdir -p \
-  %{buildroot_etc} \
   %{buildroot_lib} \
-  %{buildroot_bin} \
   %{buildroot_sbin} \
+  %{buildroot_bin} \
+  %{buildroot_etc} \
   %{buildroot_unit} \
   %{buildroot_man} \
-  %{buildroot_run}/riak_cs_control \
-  %{buildroot}%{_localstatedir}/lib/riak_cs_control \
-  %{buildroot}%{_localstatedir}/log/riak_cs_control
+  %{buildroot_run} \
+  %{buildroot_etc}/systemd/system/riak-cs-control.service.d \
+  %{buildroot}%{_localstatedir}/log/riak-cs-control
 
 cp -R %{relpath}/lib       %{buildroot_lib}
 cp -R %{relpath}/erts-*    %{buildroot_lib}
 cp -R %{relpath}/releases  %{buildroot_lib}
-cp -R %{relpath}/share     %{buildroot_lib}
-cp rel/pkg/rpm/%{name}.service %{buildroot_unit}
-
+cp -a %{relpath}/usr/bin/riak-cs-control %{buildroot_sbin}
+cp -a rel/pkg/rpm/%{name}.service %{buildroot_unit}
+cp -a rel/pkg/rpm/env.conf %{buildroot_etc}/systemd/system/riak-cs-control.service.d
 if [ -d %{relpath}/bin ]; then \
    cd %{relpath}/bin
    find . -type f -exec install -Dm 0755 {} %{buildroot_bin}/{} \;
    cd -
 fi
-
 cp -a %{_builddir}/%{buildsubdir}/doc/man/man1 %{buildroot_man}
-cp %{relpath}/bin/riak_cs_control %{buildroot}%{_sbindir}
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
@@ -100,12 +98,6 @@ export QA_RPATHS=3
 %preun
 %systemd_preun %{name}.service
 
-# Only on uninstall, not upgrades
-if [ "$1" = 0 ] ; then
-   /sbin/service riak_cs_control stop > /dev/null 2>&1
-fi
-exit 0
-
 %postun
 %systemd_postun %{name}.service
 
@@ -113,10 +105,11 @@ exit 0
 %files
 %defattr(-,root,root)
 %{_libdir}/*
+%{_sbindir}/riak-cs-control
+%{_sysconfdir}/systemd/system/riak-cs-control.service.d/env.conf
 %{_unitdir}/%{name}.service
-%{_sbindir}/*
 %{_mandir}/*
-%{_localstatedir}/log/riak_cs_control
+%{_localstatedir}/log/riak-cs-control
 
 %clean
 rm -rf %{buildroot}

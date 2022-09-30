@@ -1,0 +1,26 @@
+#!/bin/sh
+
+RUNNER_GEN_DIR={{platform_gen_dir}}
+RELX_RIAK={{platform_bin_dir}}/riak_cs_control
+export PID_DIR={{pid_dir}}
+
+PID_FILE=$PID_DIR/riak-cs-control
+
+mkdir -p $PID_DIR
+
+case "$1" in
+    start|foreground)
+        $RELX_RIAK $*
+        test -r $PID_FILE && exit 0
+        ;;
+    console)
+        $RELX_RIAK $*
+        ;;
+    stop)
+        $RELX_RIAK $* \
+            && rm -f $PID_FILE
+        ;;
+    *)
+        $RELX_RIAK $*
+        ;;
+esac

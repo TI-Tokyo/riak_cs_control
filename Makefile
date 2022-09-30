@@ -52,6 +52,18 @@ rel: compile
 # freebsd tar won't write to stdout, so:
 	@tar  -c -f rel.tar --exclude '*/.git/*' -C _build/rel/rel riak_cs_control && tar -x -f rel.tar -C rel && rm rel.tar
 
+rel-rpm: compile
+	@$(REBAR) as rpm release
+	@cp -a _build/rpm/rel/riak_cs_control rel/
+
+rel-deb: compile
+	@$(REBAR) as deb release
+	@cp -a _build/deb/rel/riak_cs_control rel/
+
+rel-fbsdng: compile
+	@$(REBAR) as fbsdng release
+	@cp -a _build/fbsdng/rel/riak_cs_control rel/
+
 relclean:
 	@rm -rf $(REL_DIR)
 	@rm -rf rel/riak_cs_control

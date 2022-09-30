@@ -17,7 +17,7 @@ ROOTDIR := debian/riak-cs-control
 ## note that it is necessary to use overlay_vars relative to .. as
 ## the generate command EXECUTES in rel/
 build:
-	make rel
+	make rel-deb
 	rm -rf rel/riak_cs_control/lib/*/c_src rel/riak_cs_control/lib/*/src
 	touch build
 
