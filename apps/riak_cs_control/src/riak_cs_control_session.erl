@@ -248,7 +248,7 @@ make_authorization(AccessKeyId, SecretAccessKey,
                     []
                    ],
     logger:debug("STS:  ~p", [StringToSign]),
-    Signature = base64:encode(crypto:hmac(sha, SecretAccessKey, StringToSign)),
+    Signature = base64:encode(crypto:mac(hmac, sha, SecretAccessKey, StringToSign)),
     ["AWS ", AccessKeyId, $:, Signature].
 
 iso_8601_format_now() ->
