@@ -1,6 +1,7 @@
 %% -------------------------------------------------------------------
 %%
 %% Copyright (c) 2007-2012 Basho Technologies, Inc.  All Rights Reserved.
+%%               2021-2023 TI Tokyo    All Rights Reserved.
 %%
 %% -------------------------------------------------------------------
 
@@ -30,11 +31,13 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
--record(context, {users=undefined,user=undefined}).
+-record(context, {users = undefined,
+                  user = undefined}).
 
 %% @doc Initialize the resource.
 init([]) ->
-    {ok, #context{users=undefined,user=undefined}}.
+    {ok, #context{users = undefined,
+                  user = undefined}}.
 
 %% @doc Return the routes this module should respond to.
 routes() ->
