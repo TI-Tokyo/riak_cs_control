@@ -34,7 +34,7 @@
 
 -define(SERVER, ?MODULE).
 
--define(DEFAULT_ADMIN_KEY, "admin-key").
+-define(DEFAULT_ADMIN_KEY, <<"admin-key">>).
 
 -record(state, {cs_host :: binary(),
                 cs_port :: non_neg_integer(),
