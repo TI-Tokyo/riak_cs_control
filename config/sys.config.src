@@ -19,7 +19,7 @@
       {logger,
           [{handler,default,logger_std_h,
                #{config =>
-                     #{file => "/var/log/riak-cs-control/console.log"},
+                     #{file => "${LOG_DIR}/console.log"},
                  filters =>
                      [{no_sasl,
                           {fun logger_filters:domain/2,
@@ -31,7 +31,7 @@
                                 msg,"\n"]}}}},
            {handler,sasl,logger_std_h,
                #{config =>
-                     #{file => "/var/log/riak-cs-control/sasl.log"},
+                     #{file => "${LOG_DIR}/sasl.log"},
                  filter_default => stop,
                  filters =>
                      [{sasl_here,
