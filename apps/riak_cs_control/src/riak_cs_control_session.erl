@@ -114,11 +114,11 @@ handle_request(list_users, BaseUrl, State) ->
 handle_request({get_user, KeyId}, BaseUrl, State) ->
     get_user(BaseUrl, KeyId, State);
 handle_request({put_user, KeyId, User}, BaseUrl, State) ->
-    #{<<"user">> := UserItems} = mochijson2:decode(User, [{format, map}]),
+    #{<<"user">> := UserItems} = jsx:decode(User),
     update_user(BaseUrl, KeyId, UserItems, State);
 handle_request({put_user, User}, BaseUrl, State) ->
     #{<<"user">> := #{<<"email">> := Email,
-                      <<"name">> := Name}} = mochijson2:decode(User, [{format, map}]),
+                      <<"name">> := Name}} = jsx:decode(User),
     create_user(BaseUrl, Email, Name, State).
 
 
@@ -132,16 +132,15 @@ get_user(BaseUrl, KeyId, #state{access_key_id = AdmKeyId,
     case httpc:request(get, {Url, Headers},
                        [], [{full_result, false}]) of
         {ok, {200, Body}} ->
-            {ok, mochijson2:decode(Body, [{format, map}])};
+            {ok, jsx:decode(Body)};
         {ok, {_, Non200, Body}} ->
             logger:warning("get_user(~s) failed with code ~b: ~s", [KeyId, Non200, Body]),
             {error, Body}
     end.
 
 create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}) ->
-    ReqBody = iolist_to_binary(
-                mochijson2:encode(#{<<"email">> => EmailAddr,
-                                    <<"name">> => Name})),
+    ReqBody = jsx:encode(#{<<"email">> => EmailAddr,
+                             <<"name">> => Name}),
     ContentType = "application/json",
     Resource = "/riak-cs/user",
     Url = BaseUrl ++ Resource,
@@ -149,7 +148,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}
     case httpc:request(post, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {201, Body}} ->
-            {ok, mochijson2:decode(Body)};
+            {ok, jsx:decode(Body)};
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
@@ -158,9 +157,8 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}
     end;
 create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
                                              secret_access_key = SAK}) ->
-    ReqBody = iolist_to_binary(
-                mochijson2:encode(#{<<"email">> => EmailAddr,
-                                    <<"name">> => Name})),
+    ReqBody = jsx:encode(#{<<"email">> => EmailAddr,
+                           <<"name">> => Name}),
     ContentType = "application/json",
     CMD5 = binary_to_list(base64:encode(crypto:hash(md5, ReqBody))),
     Resource = "/riak-cs/user",
@@ -170,7 +168,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
     case httpc:request(post, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {201, Body}} ->
-            {ok, mochijson2:decode(Body)};
+            {ok, jsx:decode(Body)};
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
@@ -180,7 +178,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
 
 update_user(BaseUrl, KeyId, UserItems, #state{access_key_id = AdmKeyId,
                                               secret_access_key = AdmSAK}) ->
-    ReqBody = iolist_to_binary(mochijson2:encode(UserItems)),
+    ReqBody = jsx:encode(UserItems),
     Resource = io_lib:format("/riak-cs/user/~s", [KeyId]),
     Url = BaseUrl ++ Resource,
     ContentType = "application/json",
@@ -191,7 +189,7 @@ update_user(BaseUrl, KeyId, UserItems, #state{access_key_id = AdmKeyId,
     case httpc:request(put, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {200, RespBody}} ->
-            {ok, mochijson2:decode(RespBody)};
+            {ok, jsx:decode(RespBody)};
         {ok, {Non200, RespBody}} ->
             logger:warning("update_user(~s) failed with code ~b: ~s", [KeyId, Non200, RespBody]),
             {error, RespBody}
@@ -214,7 +212,7 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
                     [] ->
                         []
                 end,
-            Decoded = [mochijson2:decode(P) || P <- Parts, P =/= <<>>],
+            Decoded = [jsx:decode(P) || P <- Parts, P =/= <<>>],
             {ok, lists:append(Decoded)};
         {ok, {Non200, Body}} ->
             logger:warning("list_users failed with code ~b: ~p", [Non200, Body]),

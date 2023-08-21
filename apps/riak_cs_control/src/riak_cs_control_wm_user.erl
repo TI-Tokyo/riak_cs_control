@@ -107,11 +107,11 @@ to_json(ReqData, Context) ->
     case maybe_retrieve_user(Context, key_id(ReqData)) of
         {true, NewContext} ->
             User = NewContext#context.user,
-            Response = mochijson2:encode({struct, [{user, User}]}),
+            Response = jsx:encode([{user, User}]),
             {Response, ReqData, NewContext};
-        {false, Context} ->
-            Response = mochijson2:encode({struct, []}),
-            {Response, ReqData, Context}
+        {false, NewContext} ->
+            Response = jsx:encode([]),
+            {Response, ReqData, NewContext}
     end.
 
 -ifdef(TEST).

@@ -55,8 +55,7 @@ post_is_create(ReqData, Context) ->
 %% @doc Extract key out of response from riak-cs.
 -spec extract_key_id({term(), list()}) -> list().
 extract_key_id(User) ->
-    {struct, UserDetails} = User,
-    KeyId = proplists:get_value(key_id, UserDetails, <<"">>),
+    KeyId = proplists:get_value(key_id, User, <<"">>),
     binary_to_list(KeyId).
 
 %% @doc Attempt to create the user if possible, and generate the path
@@ -87,7 +86,7 @@ from_json(ReqData, Context) ->
     case maybe_create_user(ReqData, Context) of
         {true, NewContext} ->
             User = NewContext#context.user,
-            Response = mochijson2:encode({struct, [{user, User}]}),
+            Response = jsx:encode([{user, User}]),
             NewReqData = wrq:set_resp_body(Response, ReqData),
             {true, NewReqData, NewContext};
         {false, Context} ->
@@ -138,11 +137,11 @@ to_json(ReqData, Context) ->
     case maybe_retrieve_users(Context) of
         {true, NewContext} ->
             Users = NewContext#context.users,
-            Response = mochijson2:encode({struct, [{users, Users}]}),
+            Response = jsx:encode([{users, Users}]),
             {Response, ReqData, NewContext};
-        {false, Context} ->
-            Response = mochijson2:encode({struct, [{users, []}]}),
-            {Response, ReqData, Context}
+        {false, NewContext} ->
+            Response = jsx:encode([{users, []}]),
+            {Response, ReqData, NewContext}
     end.
 
 -ifdef(TEST).
