@@ -68,8 +68,8 @@ create_path(ReqData, Context) ->
             Resource = "/users/" ++ KeyId,
             NewReqData = wrq:set_resp_header("Location", Resource, ReqData),
             {Resource, NewReqData, NewContext};
-        {false, Context} ->
-            {"/users", ReqData, Context}
+        {false, NewContext} ->
+            {"/users", ReqData, NewContext}
     end.
 
 %% @doc Provide respones in JSON only.
@@ -89,8 +89,8 @@ from_json(ReqData, Context) ->
             Response = jsx:encode([{user, User}]),
             NewReqData = wrq:set_resp_body(Response, ReqData),
             {true, NewReqData, NewContext};
-        {false, Context} ->
-            {{halt, 409}, ReqData, Context}
+        {false, NewContext} ->
+            {{halt, 409}, ReqData, NewContext}
     end.
 
 %% @doc Return true if we were able to retrieve the user.
@@ -98,8 +98,8 @@ resource_exists(ReqData, Context) ->
     case maybe_retrieve_users(Context) of
         {true, NewContext} ->
             {true, ReqData, NewContext};
-        {false, Context} ->
-            {false, ReqData, Context}
+        {false, NewContext} ->
+            {false, ReqData, NewContext}
     end.
 
 %% @doc Attempt to create user and stash in the context if possible.
