@@ -34,12 +34,11 @@ init([]) ->
              Any -> Any
          end,
 
-    Port = riak_cs_control_configuration:cs_configuration(port),
+    Port = riak_cs_control_configuration:get(port),
 
     Resources = [riak_cs_control_wm_user,
                  riak_cs_control_wm_users,
                  riak_cs_control_wm_asset],
-
     Dispatch = lists:flatten([Module:routes() || Module <- Resources]),
 
     WebConfig = [

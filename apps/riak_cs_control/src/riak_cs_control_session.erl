@@ -70,11 +70,11 @@ put_user(KeyId, Attributes) ->
 %%%===================================================================
 
 init([]) ->
-    Host = riak_cs_control_configuration:cs_configuration(cs_host),
-    Port = riak_cs_control_configuration:cs_configuration(cs_port),
-    Proto = riak_cs_control_configuration:cs_configuration(cs_proto),
-    AdminKeyId = riak_cs_control_configuration:cs_configuration(cs_admin_key),
-    AdminKeySecret = riak_cs_control_configuration:cs_configuration(cs_admin_secret),
+    Host = riak_cs_control_configuration:get(cs_host),
+    Port = riak_cs_control_configuration:get(cs_port),
+    Proto = riak_cs_control_configuration:get(cs_proto),
+    AdminKeyId = riak_cs_control_configuration:get(cs_admin_key),
+    AdminKeySecret = riak_cs_control_configuration:get(cs_admin_secret),
     {ok, #state{cs_host = Host,
                 cs_port = Port,
                 proto = Proto,

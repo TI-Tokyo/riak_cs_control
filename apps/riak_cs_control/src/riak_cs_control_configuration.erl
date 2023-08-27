@@ -12,18 +12,18 @@
 -module(riak_cs_control_configuration).
 -author('Christopher Meiklejohn <cmeiklejohn@basho.com>').
 
--export([cs_configuration/1,
-         cs_configuration/2]).
+-export([get/1,
+         get/2]).
 
 %% @doc Return one configuration value from the environment.
--spec cs_configuration(term()) -> term().
-cs_configuration(Attribute) ->
+-spec get(atom()) -> term().
+get(Attribute) ->
     {ok, Value} = application:get_env(riak_cs_control, Attribute),
     Value.
 
 %% @doc Return one configuration value from the environment with default.
--spec cs_configuration(term(), term()) -> term().
-cs_configuration(Attribute, Default) ->
+-spec get(atom(), term()) -> term().
+get(Attribute, Default) ->
     case application:get_env(riak_cs_control, Attribute) of
         {ok, Value} ->
             Value;
