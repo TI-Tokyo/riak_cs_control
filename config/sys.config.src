@@ -10,8 +10,8 @@
        {cs_proto, "${CS_PROTO}" },
 
        %% Credentials you want the application to run as.
-       {cs_admin_key, "${CS_ADMIN_KEY}" },
-       {cs_admin_secret, "${CS_ADMIN_SECRET}" }
+       {cs_admin_key, <<"${CS_ADMIN_KEY}" >>},
+       {cs_admin_secret, <<"${CS_ADMIN_SECRET}">> }
     ]},
 
  {kernel,
