@@ -201,18 +201,18 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
     Url = BaseUrl ++ Resource,
     Headers = make_headers(AdmKeyId, AdmSAK, get, [], [], Resource)
         ++ [{"accept", "application/json"}],
-    case httpc:request(get, {Url, Headers},
-                       [], [{full_result, false}]) of
-        {ok, {200, Body}} ->
+    case httpc:request(get, {Url, Headers}, [], []) of
+        {ok, {{_, 200, _}, _RespHeaders, Body}} ->
             Parts =
                 %% split a series of multipart documents
-                case re:split(Body, "\r\n--.+\r\nContent-Type: application/json\r\n\r\n") of
-                    Many = [_|_] ->
-                        lists:droplast(Many);
+                case re:run(Body, "(?:\r\n--.+\r\nContent-Type: application/json\r\n\r\n(.+)\r\n--.+)+",
+                            [{capture, all_but_first, binary}]) of
+                    {match, Many} ->
+                        Many;
                     [] ->
                         []
                 end,
-            Decoded = [jsx:decode(P) || P <- Parts, P =/= <<>>],
+            Decoded = [jsx:decode(P) || P <- Parts],
             {ok, lists:append(Decoded)};
         {ok, {Non200, Body}} ->
             logger:warning("list_users failed with code ~b: ~p", [Non200, Body]),
@@ -245,7 +245,7 @@ make_authorization(AccessKeyId, SecretAccessKey,
                     Resource,
                     []
                    ],
-    logger:debug("STS:  ~p", [StringToSign]),
+    %% logger:debug("STS:  ~p", [StringToSign]),
     Signature = base64:encode(crypto:mac(hmac, sha, SecretAccessKey, StringToSign)),
     ["AWS ", AccessKeyId, $:, Signature].
 
