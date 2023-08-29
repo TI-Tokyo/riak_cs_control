@@ -203,16 +203,10 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
         ++ [{"accept", "application/json"}],
     case httpc:request(get, {Url, Headers}, [], []) of
         {ok, {{_, 200, _}, _RespHeaders, Body}} ->
-            Parts =
-                %% split a series of multipart documents
-                case re:run(Body, "(?:\r\n--.+\r\nContent-Type: application/json\r\n\r\n(.+)\r\n--.+)+",
-                            [{capture, all_but_first, binary}]) of
-                    {match, Many} ->
-                        Many;
-                    [] ->
-                        []
-                end,
-            Decoded = [jsx:decode(P) || P <- Parts],
+            Lines = lists:filter(
+                      fun(<<"[", _/binary>>) -> true; (_) -> false end,
+                      re:split(Body, "\r\n")),
+            Decoded = [jsx:decode(P) || P <- Lines],
             {ok, lists:append(Decoded)};
         {ok, {Non200, Body}} ->
             logger:warning("list_users failed with code ~b: ~p", [Non200, Body]),
