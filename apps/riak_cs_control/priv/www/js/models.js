@@ -40,6 +40,7 @@ minispade.register('models', function() {
         email: DS.attr("string"),
         key_id: DS.attr("string"),
         key_secret: DS.attr("string"),
+        arn: DS.attr("string"),
         display_name: DS.attr("string"),
         new_key_secret: DS.attr("boolean"),
 

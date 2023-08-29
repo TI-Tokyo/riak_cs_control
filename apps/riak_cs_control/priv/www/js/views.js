@@ -20,6 +20,7 @@ minispade.register('views', function() {
         nameBinding: 'content.name',
         emailBinding: 'content.email',
         keyIdBinding: 'content.key_id',
+        arnBinding: 'content.arn',
 
         isAdminBinding: 'content.isAdmin',
         isDisabledBinding: 'content.isDisabled',
