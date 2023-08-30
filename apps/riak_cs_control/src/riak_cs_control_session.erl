@@ -132,7 +132,7 @@ get_user(BaseUrl, KeyId, #state{access_key_id = AdmKeyId,
     case httpc:request(get, {Url, Headers},
                        [], [{full_result, false}]) of
         {ok, {200, Body}} ->
-            {ok, jsx:decode(Body)};
+            {ok, jsx:decode(list_to_binary(Body))};
         {ok, {_, Non200, Body}} ->
             logger:warning("get_user(~s) failed with code ~b: ~s", [KeyId, Non200, Body]),
             {error, Body}
@@ -148,7 +148,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = ?DEFAULT_ADMIN_KEY}
     case httpc:request(post, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {201, Body}} ->
-            {ok, jsx:decode(Body)};
+            {ok, jsx:decode(list_to_binary(Body))};
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
@@ -168,7 +168,7 @@ create_user(BaseUrl, EmailAddr, Name, #state{access_key_id = KeyId,
     case httpc:request(post, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {201, Body}} ->
-            {ok, jsx:decode(Body)};
+            {ok, jsx:decode(list_to_binary(Body))};
         {ok, {409, _Body}} ->
             {error, user_already_exists};
         {ok, {Non200, Body}} ->
@@ -189,7 +189,7 @@ update_user(BaseUrl, KeyId, UserItems, #state{access_key_id = AdmKeyId,
     case httpc:request(put, {Url, Headers, ContentType, ReqBody},
                        [], [{full_result, false}]) of
         {ok, {200, RespBody}} ->
-            {ok, jsx:decode(RespBody)};
+            {ok, jsx:decode(list_to_binary(RespBody))};
         {ok, {Non200, RespBody}} ->
             logger:warning("update_user(~s) failed with code ~b: ~s", [KeyId, Non200, RespBody]),
             {error, RespBody}

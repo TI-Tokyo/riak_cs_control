@@ -89,7 +89,7 @@ from_json(ReqData, Context) ->
     case maybe_create_user(ReqData, Context) of
         {true, NewContext} ->
             User = NewContext#context.user,
-            Response = jsx:encode([{user, User}]),
+            Response = jsx:encode(User),
             NewReqData = wrq:set_resp_body(Response, ReqData),
             {true, NewReqData, NewContext};
         {false, NewContext} ->
@@ -112,7 +112,7 @@ maybe_create_user(ReqData, Context) ->
             Attributes = wrq:req_body(ReqData),
             case riak_cs_control_session:put_user(Attributes) of
                 {ok, UserData} ->
-                    {true, Context#context{user = UserData}};
+                    {true, Context#context{user = maps:to_list(UserData)}};
                 _ ->
                     {false, Context}
             end;
