@@ -17,7 +17,7 @@ minispade.register('views', function() {
 
         classNameBindings: ['isDisabled:disabled', 'isAdmin:admin'],
 
-        cidBinding: 'content.id',
+        cidBinding: 'content.cid',
         nameBinding: 'content.name',
         emailBinding: 'content.email',
         keyIdBinding: 'content.key_id',

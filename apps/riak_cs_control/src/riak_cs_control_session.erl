@@ -217,11 +217,13 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
 stringify(#{<<"attached_policies">> := PP,
             <<"buckets">> := BB,
             <<"tags">> := TT,
-            <<"create_date">> := Created} = A) ->
+            <<"create_date">> := Created,
+            <<"id">> := CId} = A) ->
     A#{<<"attached_policies">> => iolist_to_binary(lists:join(", ", as_list(PP))),
        <<"buckets">> => iolist_to_binary(lists:join(", ", as_list(BB))),
        <<"tags">> => iolist_to_binary(lists:join(", ", as_list(TT))),
-       <<"create_date">> => list_to_binary(calendar:system_time_to_rfc3339(Created, [{unit, millisecond}]))}.
+       <<"create_date">> => list_to_binary(calendar:system_time_to_rfc3339(Created, [{unit, millisecond}])),
+       <<"cid">> => CId}.
 as_list(<<>>) -> [];
 as_list(null) -> [];
 as_list(A) -> A.

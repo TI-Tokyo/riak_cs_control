@@ -737,9 +737,8 @@ table {
 }
 .display-item {
     border: 0;
-//    padding: 5px 10px;
     display: inline-block;
-//    margin: 5px 0 5px;
+    white-space: nowrap;
 }
 .display-item.green {
     color: #599c2c;
