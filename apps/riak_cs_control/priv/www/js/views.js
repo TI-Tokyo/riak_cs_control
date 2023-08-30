@@ -17,10 +17,15 @@ minispade.register('views', function() {
 
         classNameBindings: ['isDisabled:disabled', 'isAdmin:admin'],
 
+        cidBinding: 'content.id',
         nameBinding: 'content.name',
         emailBinding: 'content.email',
         keyIdBinding: 'content.key_id',
         arnBinding: 'content.arn',
+        bucketsBinding: 'content.buckets',
+        attached_policiesBinding: 'content.attached_policies',
+        tagsBinding: 'content.tags',
+        create_dateBinding: 'content.create_date',
 
         isAdminBinding: 'content.isAdmin',
         isDisabledBinding: 'content.isDisabled',

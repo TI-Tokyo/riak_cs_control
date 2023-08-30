@@ -206,12 +206,27 @@ list_users(BaseUrl, #state{access_key_id = AdmKeyId,
             Lines = lists:filter(
                       fun(<<"[", _/binary>>) -> true; (_) -> false end,
                       re:split(Body, "\r\n")),
-            Decoded = [jsx:decode(P) || P <- Lines],
-            {ok, lists:append(Decoded)};
+            Decoded0 = lists:flatten([jsx:decode(P) || P <- Lines]),
+            Decoded = [stringify(A) || A <- Decoded0],
+            {ok, Decoded};
         {ok, {Non200, Body}} ->
             logger:warning("list_users failed with code ~b: ~p", [Non200, Body]),
             {error, Body}
     end.
+
+stringify(#{<<"attached_policies">> := PP,
+            <<"buckets">> := BB,
+            <<"tags">> := TT,
+            <<"create_date">> := Created} = A) ->
+    A#{<<"attached_policies">> => iolist_to_binary(lists:join(", ", as_list(PP))),
+       <<"buckets">> => iolist_to_binary(lists:join(", ", as_list(BB))),
+       <<"tags">> => iolist_to_binary(lists:join(", ", as_list(TT))),
+       <<"create_date">> => list_to_binary(calendar:system_time_to_rfc3339(Created, [{unit, millisecond}]))}.
+as_list(<<>>) -> [];
+as_list(null) -> [];
+as_list(A) -> A.
+
+
 
 
 make_headers(AccessKeyId, SecretAccessKey,

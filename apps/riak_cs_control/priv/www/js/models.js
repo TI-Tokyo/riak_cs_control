@@ -36,12 +36,18 @@ minispade.register('models', function() {
     RiakCsControl.store = RiakCsControl.Store.create();
 
     RiakCsControl.User = DS.Model.extend({
+        cid: DS.attr("string"),
         name: DS.attr("string"),
+        path: DS.attr("string"),
         email: DS.attr("string"),
         key_id: DS.attr("string"),
         key_secret: DS.attr("string"),
         arn: DS.attr("string"),
+        attached_policies: DS.attr("string"),
+        tags: DS.attr("string"),
         display_name: DS.attr("string"),
+        buckets: DS.attr("string"),
+        create_date: DS.attr("string"),
         new_key_secret: DS.attr("boolean"),
 
         admin: DS.attr("boolean"),

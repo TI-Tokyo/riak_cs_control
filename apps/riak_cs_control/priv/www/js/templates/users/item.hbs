@@ -13,13 +13,23 @@
 
     <td>
       <h3>{{name}}</h3>
-      <span class="black-title">EMAIL ADDRESS:</span>{{email}}<br>
-      <span class="black-title">ARN:</span>{{arn}}
+      <div class="aligned">
+        <div align="right"><span class="black-title">ID:</span></div> <div>{{cid}}</div>
+        <div align="right"><span class="black-title">ARN:</span></div> <div>{{arn}}</div>
+        <div align="right"><span class="black-title">EMAIL:</span></div> <div>{{email}}</div>
+        <div align="right"><span class="black-title">PATH:</span></div> <div>{{path}}</div>
+        <div align="right"><span class="black-title">CREATED:</span></div> <div>{{create_date}}</div>
+        <div align="right"><span class="black-title">BUCKETS:</span></div> <div>{{buckets}}</div>
+      </div>
     </td>
 
-    <td>
-      <span class="black-title">ACCESS KEY ID:</span><span class="display-item gray">{{keyId}}</span><br>
-      <span class="black-title">KEY SECRET:</span><span class="display-item gray">{{keySecret}}</span>
+    <td align="left">
+      <div class="aligned">
+        <div align="right"><span class="black-title">ACCESS KEY ID:</span></div> <div><span class="display-item gray">{{keyId}}</span></div>
+        <div align="right"><span class="black-title">KEY SECRET:</span></div> <div><span class="display-item gray">{{keySecret}}</span></div>
+        <div align="right"><span class="black-title">POLICIES:</span></div> <div>{{attached_policies}}</div>
+        <div align="right"><span class="black-title">TAGS:</span></div> <div>{{tags}}</div>
+      </div>
     </td>
 
     <td class="button-container white-border-left">
