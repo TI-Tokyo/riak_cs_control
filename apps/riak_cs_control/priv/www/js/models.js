@@ -59,11 +59,11 @@ minispade.register('models', function() {
         }.property('status'),
 
         isNormal: function() {
-            return this.get('admin') === false;
+            return this.get('name') !== "admin";
         }.property('admin'),
 
         isAdmin: function() {
-            return this.get('admin');
+            return this.get('name') === "admin";
         }.property('admin'),
 
         disable: function() {
