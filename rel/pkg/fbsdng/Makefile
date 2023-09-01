@@ -76,7 +76,6 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/riak_cs_control/bin $(PLIB_DIR);
 	mkdir -p $(PLIB_DIR)
 	cp -R rel/riak_cs_control/lib $(PLIB_DIR)
-	cp -R rel/riak_cs_control/share $(PLIB_DIR)
 	cp -R rel/riak_cs_control/erts-* $(PLIB_DIR)
 	(cd $(PLIB_DIR) && ln -s erts-* erts)
 	cp -R rel/riak_cs_control/releases $(PLIB_DIR)
