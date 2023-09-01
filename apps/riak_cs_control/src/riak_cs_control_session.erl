@@ -57,7 +57,7 @@ get_users() ->
 get_user(KeyId) ->
     gen_server:call(?MODULE, {get_user, KeyId}, infinity).
 
--spec put_user(attributes()) -> {ok, binary()} | {error, term()}.
+-spec put_user(attributes()) -> {ok, #{}} | {error, term()}.
 put_user(Attributes) ->
     gen_server:call(?MODULE, {put_user, Attributes}, infinity).
 

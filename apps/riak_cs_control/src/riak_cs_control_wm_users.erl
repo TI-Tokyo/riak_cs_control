@@ -56,7 +56,6 @@ post_is_create(ReqData, Context) ->
     {true, ReqData, Context}.
 
 %% @doc Extract key out of response from riak-cs.
--spec extract_key_id({term(), list()}) -> list().
 extract_key_id(User) ->
     KeyId = proplists:get_value(key_id, User, <<"">>),
     binary_to_list(KeyId).
