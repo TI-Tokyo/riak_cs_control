@@ -17,7 +17,7 @@ PKG_SHORT_VERSION = $(PKG_VERSION)
 
 # Recursive assignment of ERTS version
 # We will know this after building the rel
-ERTS_PATH = $(shell ls $(BUILDDIR)/rel/riak_cs_control | egrep -o "erts-.*")
+ERTS_PATH = $(shell ls $(BUILDDIR)/rel/riak_cs_control | ggrep -E -o "erts-.*")
 
 build: packing_list_files
 	@echo "Building package $(PKGNAME)"
