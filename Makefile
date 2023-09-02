@@ -62,15 +62,15 @@ dialyzer: compile
 ##
 rel: compile
 	@$(REBAR) as rel release
-	@cp -a _build/rel/rel/riak_cs_control rel/
+	@cp -a _build/rel/rel/riak-cs-control rel/
 
 rel-rpm: compile
 	@$(REBAR) as rpm release
-	@cp -a _build/rpm/rel/riak_cs_control rel/
+	@cp -a _build/rpm/rel/riak-cs-control rel/
 
 rel-deb: compile
 	@$(REBAR) as deb release
-	@cp -a _build/deb/rel/riak_cs_control rel/
+	@cp -a _build/deb/rel/riak-cs-control rel/
 
 rel-fbsdng: compile
 	@$(REBAR) as fbsdng release

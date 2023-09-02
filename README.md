@@ -14,11 +14,16 @@ CS_HOST          # 127.0.0.1
 CS_PORT          # 8080
 CS_PROTO         # http
 CS_CONTROL_PORT  # 8090
-CS_ADMIN_KEY
-CS_ADMIN_SECRET
+CS_ADMIN_KEY     # admin-key
+CS_ADMIN_SECRET  # admin-secret
 LOG_DIR          # ./log
 LOGGER_LEVEL     # info
 ```
+
+When installed from a package and started via `systemctl` or `service`
+these variables can be set in
+/etc/systemd/system/riak-cs-control.service.d (on all Linuxes with
+systemd) and /usr/local/etc/riak-cs-control/config (on FreeBSD).
 
 ## Running
 

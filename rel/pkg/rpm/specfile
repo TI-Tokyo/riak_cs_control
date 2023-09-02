@@ -42,7 +42,6 @@ Requires(postun): systemd
 
 %define platform_base_dir %{_libdir}/riak-cs-control
 %define platform_bin_dir %{platform_base_dir}/bin
-%define platform_lib_dir %{platform_base_dir}/lib
 %define platform_log_dir %{_localstatedir}/log/riak-cs-control
 
 %prep
@@ -51,12 +50,17 @@ Requires(postun): systemd
 %define _build_id_links none
 
 %build
+
+# symlink fetched deps and plugins
 (mkdir -p _build/default/lib && cd _build/default/lib && for d in ../../../../../../../../_build/default/lib/*; do ln -sf $d; done)
+(mkdir -p _build/default/plugins && cd _build/default/plugins && for d in ../../../../../../../../_build/default/plugins/*; do ln -sf $d; done)
+
 make rel-rpm
-rm -rf rel/riak_cs_control/lib/*/src
+# remove sources
+rm -rf rel/riak-cs-control/{lib,plugins}/*/src
 
 %install
-%define relpath %{_builddir}/%{buildsubdir}/rel/riak_cs_control
+%define relpath %{_builddir}/%{buildsubdir}/rel/riak-cs-control
 %define buildroot_lib %{buildroot}%{_libdir}/riak-cs-control
 %define buildroot_etc %{buildroot}%{_sysconfdir}
 %define buildroot_sbin %{buildroot}%{_sbindir}
