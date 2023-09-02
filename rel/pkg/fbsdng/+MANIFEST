@@ -10,7 +10,7 @@ prefix: "/usr/local"
 categories: ["databases"]
 desc: "Riak CS Control is Web interface for Riak CS"
 scripts: {
-  pre-install: "if [ ! -d /var/log/riak_cs_control ]; then mkdir /var/log/riak_cs_control; fi"
-  post-install: "(cd /usr/local/lib/riak_cs_control; ln -s erts-* erts)"
-  pre-deinstall: "rm -f /usr/local/lib/riak_cs_control/erts"
+  pre-install: "if [ ! -d /var/log/riak-cs-control ]; then mkdir /var/log/riak-cs-control; fi"
+  post-install: "(cd /usr/local/lib/riak-cs-control; ln -s erts-* erts)"
+  pre-deinstall: "rm -f /usr/local/lib/riak-cs-control/erts"
 }

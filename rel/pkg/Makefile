@@ -7,7 +7,6 @@ MAKE = make  # maybe redefined as gmake for freebsd
 
 OS            = $(shell uname -s)
 ERLANG_BIN   ?= $(shell dirname $(shell which erl))
-DEPS_DIR     ?= deps
 
 ##
 ## Support RPM and Debian based linux systems
@@ -66,11 +65,7 @@ ARCH          = $(shell uname -m)
 BUILDDIR      = fbsdbuild
 PKGNG         = $(shell uname -r | awk -F. '{ print ($$1 > 9) ? "true" : "false" }')
 MAKE          = gmake
-ifeq ($(PKGNG),true)        # FreeBSD 10.0 or greater
 PKGERDIR      = fbsdng
-else                        # Older FreeBSD pkg_add
-PKGERDIR      = fbsd
-endif
 endif
 
 ifeq ($(OS),SunOS)         # Solaris flavors
@@ -94,17 +89,9 @@ endif
 
 DATE          = $(shell date +%Y-%m-%d)
 
-# Default the package build version to 1 if not already set
-PKG_BUILD    ?= 1
-
-.PHONY: ostype varcheck
+.PHONY: ostype
 
 ## Call platform dependent makefile
-ostype: varcheck
+ostype:
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
-	$(MAKE) -C $(BASE_DIR)/rel/pkg/out/$(PKG_ID) -f $(BASE_DIR)/rel/pkg/$(PKGERDIR)/Makefile
-
-## Check required settings before continuing
-varcheck:
-	$(if $(PKG_VERSION),,$(error "Variable PKG_VERSION must be set and exported, see basho/node_package readme"))
-	$(if $(PKG_ID),,$(error "Variable PKG_ID must be set and exported, see basho/node_package readme"))
+	(cd $(BASE_DIR)/rel/pkg/out/riak_cs_control && $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)

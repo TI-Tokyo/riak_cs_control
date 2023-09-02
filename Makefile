@@ -11,6 +11,20 @@ REL_DIR         ?= _build/default/rel
 
 .PHONY: rel compile test
 
+## Version and naming variables for distribution and packaging
+
+REPO_TAG 	:= $(shell git describe --tags)
+
+# Split off repo name
+# Changes to 1.0.3 or 1.1.0pre1-27-g1170096 from example above
+REVISION = $(shell echo $(REPO_TAG) | sed -e 's/^$(REPO)-//')
+
+# Primary version identifier, strip off commmit information
+# Changes to 1.0.3 or 1.1.0pre1 from example above
+MAJOR_VERSION	?= $(shell echo $(REVISION) | sed -e 's/\([0-9.]*\)-.*/\1/')
+
+PKG_ID := "$(REPO_TAG)-OTP$(OTP_VER)"
+
 all: compile
 
 compile:
@@ -32,7 +46,6 @@ test: all
 .PHONY : stage
 
 stage : rel
-	$(foreach app,$(wildcard apps/*),               rm -rf rel/riak_cs_control/lib/$(shell basename $(app))* && ln -sf $(abspath $(app)) rel/riak_cs_control/lib;)
 	$(foreach dep,$(wildcard _build/default/lib/*), rm -rf rel/riak_cs_control/lib/$(shell basename $(dep))* && ln -sf $(abspath $(dep)) rel/riak_cs_control/lib;)
 
 ##
@@ -49,8 +62,7 @@ dialyzer: compile
 ##
 rel: compile
 	@$(REBAR) as rel release
-# freebsd tar won't write to stdout, so:
-	@tar  -c -f rel.tar --exclude '*/.git/*' -C _build/rel/rel riak_cs_control && tar -x -f rel.tar -C rel && rm rel.tar
+	@cp -a _build/rel/rel/riak_cs_control rel/
 
 rel-rpm: compile
 	@$(REBAR) as rpm release
@@ -62,27 +74,11 @@ rel-deb: compile
 
 rel-fbsdng: compile
 	@$(REBAR) as fbsdng release
-	@cp -a _build/fbsdng/rel/riak_cs_control rel/
+	@cp -a _build/fbsdng/rel/riak-cs-control rel/
 
 relclean:
 	@rm -rf $(REL_DIR)
 	@rm -rf rel/riak_cs_control
-
-##
-## Version and naming variables for distribution and packaging
-##
-
-REPO_TAG 	:= $(shell git describe --tags)
-
-# Split off repo name
-# Changes to 1.0.3 or 1.1.0pre1-27-g1170096 from example above
-REVISION = $(shell echo $(REPO_TAG) | sed -e 's/^$(REPO)-//')
-
-# Primary version identifier, strip off commmit information
-# Changes to 1.0.3 or 1.1.0pre1 from example above
-MAJOR_VERSION	?= $(shell echo $(REVISION) | sed -e 's/\([0-9.]*\)-.*/\1/')
-
-PKG_ID := "$(REPO_TAG)-OTP$(OTP_VER)"
 
 ##
 ## Packaging targets
@@ -93,8 +89,8 @@ PKG_ID := "$(REPO_TAG)-OTP$(OTP_VER)"
 PKG_VERSION = $(shell echo $(PKG_ID) | sed -e 's/^$(REPO)-//')
 
 package:
-	mkdir -p rel/pkg/out/$(PKG_ID)
-	git archive --format=tar HEAD | gzip >rel/pkg/out/$(PKG_ID).tar.gz
+	mkdir -p rel/pkg/out/riak_cs_control
+	git archive --format=tar HEAD | tar -x -C rel/pkg/out/riak_cs_control
 	$(MAKE) -f rel/pkg/Makefile
 
 packageclean:
