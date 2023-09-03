@@ -1,6 +1,6 @@
-rel/riak_cs_control/lib usr/lib/riak-cs-control
-rel/riak_cs_control/erts* usr/lib/riak-cs-control
-rel/riak_cs_control/releases usr/lib/riak-cs-control
-rel/riak_cs_control/bin usr/lib/riak-cs-control
-rel/riak_cs_control/usr/bin/riak-cs-control usr/sbin
+rel/riak-cs-control/lib usr/lib/riak-cs-control
+rel/riak-cs-control/erts* usr/lib/riak-cs-control
+rel/riak-cs-control/releases usr/lib/riak-cs-control
+rel/riak-cs-control/bin usr/lib/riak-cs-control
+rel/riak-cs-control/usr/bin/riak-cs-control usr/sbin
 rel/pkg/deb/debian/env.conf etc/systemd/system/riak-cs-control.service.d
