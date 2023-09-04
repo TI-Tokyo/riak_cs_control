@@ -63,30 +63,32 @@ rm -rf rel/riak-cs-control/{lib,plugins}/*/src
 %define relpath %{_builddir}/%{buildsubdir}/rel/riak-cs-control
 %define buildroot_lib %{buildroot}%{_libdir}/riak-cs-control
 %define buildroot_etc %{buildroot}%{_sysconfdir}
-%define buildroot_sbin %{buildroot}%{_sbindir}
 %define buildroot_bin %{buildroot_lib}/bin
 %define buildroot_unit %{buildroot}%{_unitdir}
 %define buildroot_run %{buildroot}%{_rundir}
 %define buildroot_man %{buildroot}%{_mandir}
+%define buildroot_var %{buildroot}%{_localstatedir}/lib/riak-cs-control
+
 
 mkdir -p \
   %{buildroot_lib} \
-  %{buildroot_sbin} \
   %{buildroot_bin} \
   %{buildroot_etc} \
   %{buildroot_unit} \
   %{buildroot_man} \
   %{buildroot_run} \
+  %{buildroot_var} \
   %{buildroot_etc}/systemd/system/riak-cs-control.service.d \
   %{buildroot}%{_localstatedir}/log/riak-cs-control
 
-cp -R %{relpath}/lib       %{buildroot_lib}
-cp -R %{relpath}/etc       %{buildroot_etc}
-cp -R %{relpath}/erts-*    %{buildroot_lib}
-cp -R %{relpath}/releases  %{buildroot_lib}
-cp -a %{relpath}/usr/bin/riak-cs-control %{buildroot_sbin}
+cp -R %{relpath}/lib         %{buildroot_lib}
+mkdir %{buildroot_etc}/riak-cs-control
+cp    %{relpath}/etc/config  %{buildroot_etc}/riak-cs-control
+cp -R %{relpath}/erts-*      %{buildroot_lib}
+cp -R %{relpath}/releases    %{buildroot_var}
 cp -a rel/pkg/rpm/%{name}.service %{buildroot_unit}
 cp -a rel/pkg/rpm/env.conf %{buildroot_etc}/systemd/system/riak-cs-control.service.d
+
 if [ -d %{relpath}/bin ]; then \
    cd %{relpath}/bin
    find . -type f -exec install -Dm 0755 {} %{buildroot_bin}/{} \;
@@ -98,6 +100,28 @@ cp -a %{_builddir}/%{buildsubdir}/doc/man/man1 %{buildroot_man}
 # RPM releases
 export QA_RPATHS=3
 
+%pre
+if ! getent group riak_cs_control >/dev/null 2>&1; then
+   groupadd -r riak_cs_control
+fi
+
+if getent passwd riak_cs_control >/dev/null 2>&1; then
+   usermod -d %{_localstatedir}/lib/riak-cs-control riak_cs_control || true
+else
+   useradd -r -g riak_cs_control \
+           --home %{_localstatedir}/lib/riak-cs-control \
+           --comment "Riak CS Control User" \
+           --shell /bin/bash \
+           riak_cs_control
+fi
+
+%post
+# relx-generated launcher script wants to write to its ../releases,
+# which is under /usr and shouldn't ever be written into, so:
+(cd %{_libdir}/riak-cs-control && \
+ ln -s %{_localstatedir}/lib/riak-cs-control/releases)
+
+
 %systemd_post %{name}.service
 
 %preun
@@ -105,16 +129,24 @@ export QA_RPATHS=3
 
 %postun
 %systemd_postun %{name}.service
+userdel riak_cs_user
+groupdel riak_cs_user
+rm %{_libdir}/riak-cs-control/releases
+rmdir %{_libdir}/riak-cs-control
+
 
 # Man pages are optional and might be missing, read from file
+
 %files
 %defattr(-,root,root)
 %{_libdir}/*
-%{_sbindir}/riak-cs-control
+%{_sysconfdir}/riak-cs-control/config
 %{_sysconfdir}/systemd/system/riak-cs-control.service.d/env.conf
 %{_unitdir}/%{name}.service
 %{_mandir}/*
-%{_localstatedir}/log/riak-cs-control
 
+%defattr(-,riak_cs_control,riak_cs_control)
+%{_localstatedir}/log/riak-cs-control
+%{_localstatedir}/lib/riak-cs-control
 %clean
 rm -rf %{buildroot}
