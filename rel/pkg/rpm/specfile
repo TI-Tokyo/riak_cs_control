@@ -81,6 +81,7 @@ mkdir -p \
   %{buildroot}%{_localstatedir}/log/riak-cs-control
 
 cp -R %{relpath}/lib       %{buildroot_lib}
+cp -R %{relpath}/etc       %{buildroot_etc}
 cp -R %{relpath}/erts-*    %{buildroot_lib}
 cp -R %{relpath}/releases  %{buildroot_lib}
 cp -a %{relpath}/usr/bin/riak-cs-control %{buildroot_sbin}
