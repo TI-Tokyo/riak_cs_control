@@ -15,7 +15,7 @@
     ]},
 
  {kernel,
-     [{logger_level, ${LOGGER_LEVEL:-info}},
+     [{logger_level, ${LOG_LEVEL:-info}},
       {logger,
           [{handler,default,logger_std_h,
                #{config =>

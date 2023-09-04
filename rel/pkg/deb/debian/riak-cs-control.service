@@ -2,8 +2,9 @@
 Description=Riak CS Web Interface
 
 [Service]
-ExecStart=/usr/sbin/riak-cs-control foreground
-ExecStop=/usr/sbin/riak-cs-control stop
+User=riak_cs_control
+ExecStart=/usr/lib/riak-cs-control/bin/riak-cs-control foreground
+ExecStop=/usr/lib/riak-cs-control/bin/riak-cs-control stop
 Type=simple
 PIDFile=/run/riak-cs-control
 

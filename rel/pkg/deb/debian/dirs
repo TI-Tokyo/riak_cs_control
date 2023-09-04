@@ -1,1 +1,3 @@
+var/lib/riak-cs-control
 var/log/riak-cs-control
+etc/riak-cs-control

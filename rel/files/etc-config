@@ -5,4 +5,4 @@ CS_CONTROL_PORT=8090
 CS_ADMIN_KEY=admin-key
 CS_ADMIN_SECRET=admin-secret
 LOG_DIR={{platform_log_dir}}
-LOGGER_LEVEL={{log_level}}
+LOG_LEVEL={{log_level}}

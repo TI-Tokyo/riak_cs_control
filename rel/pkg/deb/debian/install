@@ -2,5 +2,5 @@ rel/riak-cs-control/lib usr/lib/riak-cs-control
 rel/riak-cs-control/erts* usr/lib/riak-cs-control
 rel/riak-cs-control/releases usr/lib/riak-cs-control
 rel/riak-cs-control/bin usr/lib/riak-cs-control
-rel/riak-cs-control/usr/bin/riak-cs-control usr/sbin
 rel/pkg/deb/debian/env.conf etc/systemd/system/riak-cs-control.service.d
+rel/riak-cs-control/etc/* etc/riak-cs-control
