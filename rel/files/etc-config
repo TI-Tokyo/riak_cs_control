@@ -4,5 +4,7 @@ CS_PROTO=http
 CS_CONTROL_PORT=8090
 CS_ADMIN_KEY=admin-key
 CS_ADMIN_SECRET=admin-secret
-LOG_DIR={{platform_log_dir}}
 LOG_LEVEL={{log_level}}
+
+# not supposed to be modified when Riak CS is installed from a package
+LOG_DIR={{platform_log_dir}}

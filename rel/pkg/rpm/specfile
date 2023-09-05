@@ -120,7 +120,8 @@ fi
 # which is under /usr and shouldn't ever be written into, so:
 (cd %{_libdir}/riak-cs-control && \
  ln -s %{_localstatedir}/lib/riak-cs-control/releases)
-
+mkdir /run/riak-cs-control
+chown riak_cs_control:riak_cs_control /run/riak-cs-control
 
 %systemd_post %{name}.service
 
@@ -129,10 +130,17 @@ fi
 
 %postun
 %systemd_postun %{name}.service
-userdel riak_cs_user
-groupdel riak_cs_user
+if getent passwd riak_cs_control >/dev/null; then
+   pkill -u riak_cs_control || true
+   deluser --quiet --system riak_cs_control
+fi
+if getent group riak_cs_control >/dev/null; then
+   delgroup --quiet --system --only-if-empty riak_cs_control || true
+fi
+
 rm %{_libdir}/riak-cs-control/releases
 rmdir %{_libdir}/riak-cs-control
+rm -rf /run/riak-cs-control
 
 
 # Man pages are optional and might be missing, read from file

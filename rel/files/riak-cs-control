@@ -12,40 +12,6 @@ PID_FILE=$PID_DIR/riak-cs-control
 
 mkdir -p $PID_DIR
 
-# centos7-based distros have a su that contacts pam and prints the "Last logged in" message
-if [ "`cat /etc/redhat-release 2>&1`" = "CentOS Stream release 7" ] ||
-   [ "`cat /etc/system-release 2>&1`" = "Amazon Linux release 2 (Karoo)" ]; then
-    COPTION="--session-command"
-else
-    COPTION="-c"
-fi
-
-function maybe_su {
-    if [[ $EUID -ne 0 ]]; then
-        $*
-    else
-	# if we are executing an admin command that spins up a
-	# (hidden) node to then execute custom erlang code via -eval,
-	# we need to cd to a dir containing the erlang cookie
-	# (previously implicitly done by su -, which option we have
-	# removed in order to allow any env vars to be available for
-	# the ultimate invocation of riak/riak-cs/stanchion)
-	cd "{{platform_base_dir}}"
-	# freebsd su is fairly limited, so:
-	mkdir -p "$RUNNER_GEN_DIR"
-	chown riak_cs_control:riak_cs_control "$RUNNER_GEN_DIR"
-	f=`mktemp "$RUNNER_GEN_DIR"/su_piggy-XXXXXXX`
-	cat >"$f" <<EOF
-#!/bin/sh
-$*
-EOF
-	chmod +x "$f"
-	chown riak_cs_control:riak_cs_control "$f"
-	su riak_cs_control $COPTION "$f"
-        rm -f "$f"
-    fi
-}
-
 case "$1" in
     stop)
         maybe_su $RELX_RIAK $* \
