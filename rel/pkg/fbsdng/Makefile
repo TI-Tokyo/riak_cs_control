@@ -1,6 +1,7 @@
 export
 
 BUILDDIR        = $(shell pwd)
+MOTHERTOPDIR    = $(BUILDDIR)/../../../..
 BUILD_STAGE_DIR = $(BUILDDIR)/$(PKG_ID)
 
 # Where we install things (based on vars.config)
@@ -8,9 +9,10 @@ BUILD_STAGE_DIR = $(BUILDDIR)/$(PKG_ID)
 PMAN_DIR         = $(BUILD_STAGE_DIR)/usr/local/man
 PBIN_DIR         = $(BUILD_STAGE_DIR)/usr/local/lib/riak-cs-control/bin
 PLIB_DIR         = $(BUILD_STAGE_DIR)/usr/local/lib/riak-cs-control
-PETC_DIR         = $(BUILD_STAGE_DIR)/usr/local/etc
-PUSRBIN_DIR      = $(BUILD_STAGE_DIR)/usr/local/bin
+PRUN_DIR         = $(BUILD_STAGE_DIR)/run/riak-cs-control
+PETC_DIR         = $(BUILD_STAGE_DIR)/usr/local/etc/riak-cs-control
 # /var based dirs
+PVAR_DIR         = $(BUILD_STAGE_DIR)/usr/local/var/lib/riak-cs-control
 PLOG_DIR         = $(BUILD_STAGE_DIR)/var/log/riak-cs-control
 
 PKGNAME = $(PKG_VERSION)-$(OSNAME)-$(ARCH).tbz
@@ -20,7 +22,7 @@ PKG_SHORT_VERSION = $(PKG_VERSION)
 # We will know this after building the rel
 ERTS_PATH = $(shell ls $(BUILDDIR)/rel/riak-cs-control | ggrep -E -o "erts-.*")
 
-build: packing_list_files
+build: link_deps packing_list_files
 	@echo "Building package $(PKGNAME)"
 
 	cd $(BUILD_STAGE_DIR) && \
@@ -31,6 +33,14 @@ build: packing_list_files
 		for f in *.pkg; do \
 		shasum -a 256 $${f} > $${f}.sha \
 	; done
+
+link_deps:
+	(cd $(BUILDDIR) && \
+	  (mkdir -p _build/default/lib && \
+	    cd _build/default/lib && for d in $(MOTHERTOPDIR)/_build/default/lib/*; do ln -s $$d; done) && \
+	  (mkdir -p _build/default/plugins && \
+	    cd _build/default/plugins && for d in $(MOTHERTOPDIR)/_build/default/plugins/*; do ln -s $$d; done) \
+	)
 
 packing_list_files: $(BUILD_STAGE_DIR)
 	mv ${BUILDDIR}/rel/pkg/fbsdng/+MANIFEST ${BUILD_STAGE_DIR}
@@ -61,7 +71,11 @@ packing_list_files: $(BUILD_STAGE_DIR)
 
 	cd $(BUILD_STAGE_DIR) && \
 		echo "directories: {" >> +MANIFEST && \
+		echo "  /usr/local/etc/riak-cs-control: \"y\"," >> +MANIFEST && \
 		echo "  /usr/local/lib/riak-cs-control: \"y\"," >> +MANIFEST && \
+		echo "  /usr/local/var/lib/riak-cs-control: \"y\"," >> +MANIFEST && \
+		echo "  /run/riak-cs-control: \"y\"," >> +MANIFEST && \
+		echo "  /var/log/riak-cs-control: \"y\"," >> +MANIFEST && \
 		echo " }" >> +MANIFEST
 
 # Copy the app rel directory to the staging directory to build our
@@ -71,17 +85,16 @@ packing_list_files: $(BUILD_STAGE_DIR)
 $(BUILD_STAGE_DIR): buildrel
 	@echo "Copying rel directory to staging directory"
 	mkdir -p $@
-	mkdir -p $(PBIN_DIR) $(PUSRBIN_DIR)
-	cp -R rel/riak-cs-control/usr/bin/riak-cs-control $(PUSRBIN_DIR)
+	mkdir -p $(PBIN_DIR) $(PVAR_DIR) $(PRUN_DIR) $(PLOG_DIR)
 	cp -R rel/riak-cs-control/bin $(PLIB_DIR);
 	mkdir -p $(PLIB_DIR)
 	cp -R rel/riak-cs-control/lib $(PLIB_DIR)
 	cp -R rel/riak-cs-control/erts-* $(PLIB_DIR)
 	(cd $(PLIB_DIR) && ln -s erts-* erts)
-	cp -R rel/riak-cs-control/releases $(PLIB_DIR)
 	mkdir -p ${BUILD_STAGE_DIR}/usr/local/etc/rc.d
 	mkdir -p ${BUILD_STAGE_DIR}/usr/local/etc/riak-cs-control
-	cp rel/riak-cs-control/etc/config $(PETC_DIR)/riak-cs-control
+	cp rel/riak-cs-control/etc/config $(PETC_DIR)
+	cp -R rel/riak-cs-control/releases $(PVAR_DIR)
 
 # Build the release we need to package
 #  * Ensure all binaries are executable
