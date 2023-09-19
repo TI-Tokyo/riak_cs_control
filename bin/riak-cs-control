@@ -1,0 +1,7 @@
+#!/bin/sh
+
+PORT=${RCSC_PORT:-8090}
+a=$(dirname $0)/../www
+DIR=${RCSC_DOCROOT:-$a/../www}
+
+python -m http.server $PORT --directory $DIR
