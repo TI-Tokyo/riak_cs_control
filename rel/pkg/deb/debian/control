@@ -2,12 +2,12 @@ Source: riak-cs-control
 Section: net
 Priority: optional
 Maintainer: riak_cs_control-packaging@tiot.jp
-Build-Depends: debhelper (>= 7), devscripts, dh-make
+Build-Depends: debhelper (>= 7), devscripts, dh-make, nodejs, yarnpkg, python3
 Standards-Version: 3.9.3
 Homepage: https://tiot.jp
 
 Package: riak-cs-control
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}, python3
 Homepage: tiot.jp
 Description: Riak CS Web Interface

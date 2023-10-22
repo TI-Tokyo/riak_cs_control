@@ -1,3 +1,2 @@
-var/lib/riak-cs-control
-var/log/riak-cs-control
-etc/riak-cs-control
+var/lib/rcsc_www
+bin/riak-cs-control

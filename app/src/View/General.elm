@@ -49,7 +49,7 @@ cardContent m =
 
 withStars s =
     let l = String.length s in
-    (String.left 8 s) ++ (String.repeat (l-12) "*") ++ (String.right 4 s)
+    (String.left 5 s) ++ (String.repeat (l-9) "*") ++ (String.right 4 s)
 
 cardActions =
     Just <|

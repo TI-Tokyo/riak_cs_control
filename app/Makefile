@@ -1,12 +1,13 @@
 all: build
 
 WWW_DEST = build
+YARN     = $(shell which yarn || which yarnpkg)
 
 clean:
 	rm -rf $(WWW_DEST)/*
 
 deps:
-	@yarn add -D parcel elm webpack elm-webpack-loader \
+	@$(YARN) add -D parcel elm webpack elm-webpack-loader \
 	  html-webpack-plugin copy-webpack-plugin \
 	  html-loader postcss webpack-merge \
 	  @webcomponents/webcomponentsjs \
@@ -17,6 +18,6 @@ deps:
 
 build: deps
 	@mkdir -p $(WWW_DEST)
-	yarn run build
+	@$(YARN) run build
 
 .PHONY: clean deps build

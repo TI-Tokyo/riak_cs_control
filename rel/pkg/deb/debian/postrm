@@ -3,19 +3,7 @@ set -e
 
 case "$1" in
     purge)
-        rm -rf /etc/systemd/system/riak-cs-control.service.d
-        rm -rf /var/log/riak-cs-control
-        rm -rf /var/lib/riak-cs-control
-        rm -rf /var/run/riak-cs-control
-
-        # Remove User & Group, killing any process owned by them
-        if getent passwd riak_cs_control >/dev/null; then
-                pkill -u riak_cs_control || true
-                deluser --quiet --system riak_cs_control
-        fi
-        if getent group riak_cs_control >/dev/null; then
-                delgroup --quiet --system --only-if-empty riak_cs_control || true
-        fi
+        pkill -u riak_cs_control || true
     ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)

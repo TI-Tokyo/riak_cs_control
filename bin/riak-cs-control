@@ -1,7 +1,9 @@
 #!/bin/sh
 
 PORT=${RCSC_PORT:-8090}
-set_me_from_distro_packaging=$(dirname $0)/../www
-DIR=${RCSC_DOCROOT:-$set_me_from_distro_packaging/../www}
 
-python -m http.server $PORT --directory $DIR
+a=$set_me_from_distro_packaging
+a1=${a:-$RCSC_DOCROOT}
+D=${a1:-$(basename)/../www}
+
+python3 -m http.server $PORT --directory $D

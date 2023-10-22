@@ -68,4 +68,6 @@ DATE          = $(shell date +%Y-%m-%d)
 ## Call platform dependent makefile
 ostype:
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported"))
-	(cd $(BASE_DIR)/rel/pkg/out && $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)
+	(cd $(BASE_DIR)/rel/pkg/out/$(PKG_ID) && \
+	  tar xzf ../$(PKG_ID).tar.gz && \
+	  $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)
