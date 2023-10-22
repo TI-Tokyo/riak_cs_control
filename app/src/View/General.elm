@@ -44,7 +44,6 @@ cardContent m =
     "     Riak CS url: " ++ m.c.csUrl ++ "\n" ++
     "    Admin Key id: " ++ (withStars m.c.csAdminKey) ++ "\n" ++
     "Admin key secret: " ++ (withStars m.c.csAdminSecret) ++ "\n" ++
-    "          Region: " ++ m.c.region ++ "\n" ++
     "         Version: " ++ m.s.serverInfo.version ++ "\n" ++
     "          Uptime: " ++ m.s.serverInfo.uptime
 
