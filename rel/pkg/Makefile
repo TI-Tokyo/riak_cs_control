@@ -19,13 +19,6 @@ ISAMZ         = $(shell cat /etc/system-release 2> /dev/null)
 ISDEB         = $(shell cat /etc/debian_version 2> /dev/null)
 ISSLES        = $(shell cat /etc/SuSE-release 2> /dev/null)
 
-ISALPINE      = $(shell cat /etc/alpine-release 2> /dev/null)
-ifneq ($(ISALPINE),)
-all:
-	@echo "For instructions on how to build for Alpine Linux, see https://github.com/TI-Tokyo/riak-alpine-builds"
-	@exit 1
-endif
-
 ifneq ($(ISAMZ),)
 OSNAME        = Amazon
 PKGERDIR      = rpm
@@ -74,5 +67,5 @@ DATE          = $(shell date +%Y-%m-%d)
 
 ## Call platform dependent makefile
 ostype:
-	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
-	(cd $(BASE_DIR)/rel/pkg/out/riak_cs_control && $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)
+	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported"))
+	(cd $(BASE_DIR)/rel/pkg/out && $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)
