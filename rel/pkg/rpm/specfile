@@ -1,6 +1,7 @@
 ## -------------------------------------------------------------------
 ##
-## Copyright (c) 2014 Basho Technologies, Inc., 2022 TI Tokyo
+## Copyright (c) 2014 Basho Technologies, Inc.,
+##               2022,2023 TI Tokyo
 ##
 ## This file is provided to you under the Apache License,
 ## Version 2.0 (the "License"); you may not use this file
@@ -20,29 +21,24 @@
 
 Name: riak-cs-control
 Version: %{_version}
-Release: %{_release}%{?dist}
+Release: %{_version}%{?dist}
 License: "Apache 2.0"
 Group: Development/Libraries
 Source: %{_tarname}
 URL: "https://tiot.jp"
 Vendor: "Riak CS Control"
-Packager: "Riak CS Maintainer" <"riak_cs_packaging@tiot.jp">
+Packager: "Riak CS Control Maintainer" <"riak_cs_control_packaging@tiot.jp">
 BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
 Summary: "A Web interface to Riak CS cluster"
-BuildRequires: systemd
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
+BuildRequires: nodejs yarnpkg
+Requires(post): python3
 
 %description
 "Riak CS Control provides a Web interface to list and create users in a Riak CS cluster"
 
 %define debug_package %{nil}
-%define __prelink_undo_cmd /bin/cat prelink library
 
-%define platform_base_dir %{_libdir}/riak-cs-control
 %define platform_bin_dir %{platform_base_dir}/bin
-%define platform_log_dir %{_localstatedir}/log/riak-cs-control
 
 %prep
 %setup -q -n %{_tarname_base} -c %{_tarname_base}
@@ -50,111 +46,34 @@ Requires(postun): systemd
 %define _build_id_links none
 
 %build
-
-# symlink fetched deps and plugins
-(mkdir -p _build/default/lib && cd _build/default/lib && for d in ../../../../../../../../_build/default/lib/*; do ln -sf $d; done)
-(mkdir -p _build/default/plugins && cd _build/default/plugins && for d in ../../../../../../../../_build/default/plugins/*; do ln -sf $d; done)
-
-make rel-rpm
-# remove sources
-rm -rf rel/riak-cs-control/{lib,plugins}/*/src
+make rel
+sed -i 's|.set_me_from_distro_packaging|/var/lib/rcsc_www|' rel/out/bin/riak-cs-control
 
 %install
 %define relpath %{_builddir}/%{buildsubdir}/rel/riak-cs-control
-%define buildroot_lib %{buildroot}%{_libdir}/riak-cs-control
-%define buildroot_etc %{buildroot}%{_sysconfdir}
-%define buildroot_bin %{buildroot_lib}/bin
-%define buildroot_unit %{buildroot}%{_unitdir}
-%define buildroot_run %{buildroot}%{_rundir}
+%define buildroot_bin %{buildroot}%{_bindir}
+%define buildroot_var %{buildroot}%{_sharedstatedir}
 %define buildroot_man %{buildroot}%{_mandir}
-%define buildroot_var %{buildroot}%{_localstatedir}/lib/riak-cs-control
 
 
 mkdir -p \
-  %{buildroot_lib} \
   %{buildroot_bin} \
-  %{buildroot_etc} \
-  %{buildroot_unit} \
   %{buildroot_man} \
-  %{buildroot_run} \
-  %{buildroot_var} \
-  %{buildroot_etc}/systemd/system/riak-cs-control.service.d \
-  %{buildroot}%{_localstatedir}/log/riak-cs-control
+  %{buildroot_var}
 
-cp -R %{relpath}/lib         %{buildroot_lib}
-mkdir %{buildroot_etc}/riak-cs-control
-cp    %{relpath}/etc/config  %{buildroot_etc}/riak-cs-control
-cp -R %{relpath}/erts-*      %{buildroot_lib}
-cp -R %{relpath}/releases    %{buildroot_var}
-cp -a rel/pkg/rpm/%{name}.service %{buildroot_unit}
-cp -a rel/pkg/rpm/env.conf %{buildroot_etc}/systemd/system/riak-cs-control.service.d
-
-if [ -d %{relpath}/bin ]; then \
-   cd %{relpath}/bin
-   find . -type f -exec install -Dm 0755 {} %{buildroot_bin}/{} \;
-   cd -
-fi
+cp -R rel/out/www %{buildroot_var}/rcsc_www
+cp -R rel/out/bin/riak-cs-control %{buildroot_bin}
 cp -a %{_builddir}/%{buildsubdir}/doc/man/man1 %{buildroot_man}
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
 export QA_RPATHS=3
 
-%pre
-if ! getent group riak_cs_control >/dev/null 2>&1; then
-   groupadd -r riak_cs_control
-fi
-
-if getent passwd riak_cs_control >/dev/null 2>&1; then
-   usermod -d %{_localstatedir}/lib/riak-cs-control riak_cs_control || true
-else
-   useradd -r -g riak_cs_control \
-           --home %{_localstatedir}/lib/riak-cs-control \
-           --comment "Riak CS Control User" \
-           --shell /bin/bash \
-           riak_cs_control
-fi
-
-%post
-# relx-generated launcher script wants to write to its ../releases,
-# which is under /usr and shouldn't ever be written into, so:
-(cd %{_libdir}/riak-cs-control && \
- ln -s %{_localstatedir}/lib/riak-cs-control/releases)
-mkdir /run/riak-cs-control
-chown riak_cs_control:riak_cs_control /run/riak-cs-control
-
-%systemd_post %{name}.service
-
-%preun
-%systemd_preun %{name}.service
-
-%postun
-%systemd_postun %{name}.service
-if getent passwd riak_cs_control >/dev/null; then
-   pkill -u riak_cs_control || true
-   deluser --quiet --system riak_cs_control
-fi
-if getent group riak_cs_control >/dev/null; then
-   delgroup --quiet --system --only-if-empty riak_cs_control || true
-fi
-
-rm %{_libdir}/riak-cs-control/releases
-rmdir %{_libdir}/riak-cs-control
-rm -rf /run/riak-cs-control
-
-
-# Man pages are optional and might be missing, read from file
-
 %files
 %defattr(-,root,root)
-%{_libdir}/*
-%{_sysconfdir}/riak-cs-control/config
-%{_sysconfdir}/systemd/system/riak-cs-control.service.d/env.conf
-%{_unitdir}/%{name}.service
+%{_bindir}/riak-cs-control
 %{_mandir}/*
+%{_localstatedir}/lib/rcsc_www
 
-%defattr(-,riak_cs_control,riak_cs_control)
-%{_localstatedir}/log/riak-cs-control
-%{_localstatedir}/lib/riak-cs-control
 %clean
 rm -rf %{buildroot}
