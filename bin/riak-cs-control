@@ -6,4 +6,4 @@ a=$set_me_from_distro_packaging
 a1=${a:-$RCSC_DOCROOT}
 D=${a1:-$(basename)/../www}
 
-python3 -m http.server $PORT --directory $D
+(cd "$D" && python3 -m http.server $PORT)

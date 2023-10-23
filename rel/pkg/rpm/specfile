@@ -30,7 +30,6 @@ Vendor: "Riak CS Control"
 Packager: "Riak CS Control Maintainer" <"riak_cs_control_packaging@tiot.jp">
 BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
 Summary: "A Web interface to Riak CS cluster"
-BuildRequires: nodejs yarnpkg
 Requires(post): python3
 
 %description
@@ -46,8 +45,7 @@ Requires(post): python3
 %define _build_id_links none
 
 %build
-make rel
-sed -i 's|.set_me_from_distro_packaging|/var/lib/rcsc_www|' rel/out/bin/riak-cs-control
+sed -i 's|.set_me_from_distro_packaging|/var/lib/rcsc_www|' bin/riak-cs-control
 
 %install
 %define relpath %{_builddir}/%{buildsubdir}/rel/riak-cs-control
@@ -61,9 +59,9 @@ mkdir -p \
   %{buildroot_man} \
   %{buildroot_var}
 
-cp -R rel/out/www %{buildroot_var}/rcsc_www
-cp -R rel/out/bin/riak-cs-control %{buildroot_bin}
-cp -a %{_builddir}/%{buildsubdir}/doc/man/man1 %{buildroot_man}
+cp -R www %{buildroot_var}/rcsc_www
+cp -R bin/riak-cs-control %{buildroot_bin}
+cp -a doc/man/man1 %{buildroot_man}
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases

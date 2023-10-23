@@ -4,6 +4,7 @@ PWD = $(shell pwd)
 PKG_VERSION_NO_H ?= $(shell echo $(PKG_VERSION) | tr - .)
 
 default:
+	tar czf $(PKG_ID).tar.gz bin www doc && rm -rf bin www
 	rpmbuild --define "_rpmfilename %%{NAME}-%%{VERSION}$(DISTRO).%%{ARCH}.rpm" \
 		--define '_topdir $(BASE_DIR)/rel/pkg/out/' \
 		--define '_sourcedir $(BASE_DIR)/rel/pkg/out/' \

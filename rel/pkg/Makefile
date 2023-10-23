@@ -1,12 +1,8 @@
-##
-## Export all variables to sub-invocation
-##
 export
 
 MAKE = make  # maybe redefined as gmake for freebsd
 
 OS            = $(shell uname -s)
-ERLANG_BIN   ?= $(shell dirname $(shell which erl))
 
 ##
 ## Support RPM and Debian based linux systems
@@ -44,14 +40,6 @@ endif  # rpm
 endif  # amazon
 endif  # linux
 
-ifeq ($(OS),Darwin)          # OSX
-OSNAME        = OSX
-ARCH          = $(shell file `which erlc` | grep -c x86_64 2> /dev/null | awk \
-                       '{if ($$1 == "0") {print "i386"} else {print "x86_64"}}')
-PKGERDIR      = osx
-BUILDDIR      = osxbuild
-endif
-
 ifeq ($(OS),FreeBSD)
 OSNAME        = FreeBSD
 ARCH          = $(shell uname -m)
@@ -68,6 +56,4 @@ DATE          = $(shell date +%Y-%m-%d)
 ## Call platform dependent makefile
 ostype:
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported"))
-	(cd $(BASE_DIR)/rel/pkg/out/$(PKG_ID) && \
-	  tar xzf ../$(PKG_ID).tar.gz && \
-	  $(MAKE) -f rel/pkg/$(PKGERDIR)/Makefile)
+	$(MAKE) -C out -f ../$(PKGERDIR)/Makefile
