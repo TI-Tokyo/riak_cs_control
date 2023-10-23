@@ -19,14 +19,15 @@ rel: compile
 	@mkdir -p rel/out/www rel/out/bin
 	@cp -a app/build/* rel/out/www
 	@cp -a bin/riak-cs-control rel/out/bin
+	@echo "Release generated in rel/out"
 
 package:
+	echo "Assuming `make rel` has been run."
 	rm -rf rel/pkg/out
-	mkdir -p rel/pkg/out/$(PKG_ID)
-	git archive --format=tar HEAD | gzip >rel/pkg/out/$(PKG_ID).tar.gz
-	$(MAKE) -f rel/pkg/Makefile
+	cp -a rel/out rel/pkg
+	$(MAKE) -C rel/pkg
 
 
-.PHONY: all compile clean distclean
+.PHONY: all compile clean package
 
 export PKG_VERSION PKG_ID BASE_DIR

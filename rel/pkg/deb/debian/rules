@@ -7,13 +7,10 @@ export DH_VERBOSE=1
 ROOTDIR := debian/riak-cs-control
 
 build:
-	make rel
-	cd rel/out && mv www rcsc_www
-	sed -i 's|.set_me_from_distro_packaging|/var/lib/rcsc_www|' rel/out/bin/riak-cs-control
+	mv www rcsc_www
+	sed -i 's|.set_me_from_distro_packaging|/var/lib/rcsc_www|' bin/riak-cs-control
 
 clean:
-	dh_clean
-	rm -rf rel/out
 
 install:
 	dh_testdir

@@ -1,2 +1,2 @@
-rel/out/bin/riak-cs-control usr/bin/
-rel/out/rcsc_www var/lib/
+bin/riak-cs-control usr/bin/
+rcsc_www var/lib/
