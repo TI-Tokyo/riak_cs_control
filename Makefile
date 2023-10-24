@@ -25,6 +25,7 @@ package:
 	echo "Assuming `make rel` has been run."
 	rm -rf rel/pkg/out
 	cp -a rel/out rel/pkg
+	cp -a doc rel/pkg/out
 	$(MAKE) -C rel/pkg
 
 
