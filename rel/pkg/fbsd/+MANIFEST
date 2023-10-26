@@ -1,0 +1,13 @@
+name: "riak_cs_control"
+origin: "databases"
+comment: "Riak CS Web Interface"
+licenses: ["Apache 2"]
+licenselogic: "single"
+arch: "freebsd:13:x86:64"
+www: "https://tiot.jp"
+maintainer: "packaging@tiot.jp"
+prefix: "/usr/local"
+categories: ["databases"]
+desc: "Riak CS Control is Web interface for Riak CS"
+scripts: {
+}

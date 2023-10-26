@@ -46,7 +46,7 @@ ARCH          = $(shell uname -m)
 BUILDDIR      = fbsdbuild
 PKGNG         = $(shell uname -r | awk -F. '{ print ($$1 > 9) ? "true" : "false" }')
 MAKE          = gmake
-PKGERDIR      = fbsdng
+PKGERDIR      = fbsd
 endif
 
 DATE          = $(shell date +%Y-%m-%d)
