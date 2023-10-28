@@ -45,6 +45,7 @@ cardContent m =
     "    Admin Key id: " ++ (withStars m.c.csAdminKey) ++ "\n" ++
     "Admin key secret: " ++ (withStars m.c.csAdminSecret) ++ "\n" ++
     "         Version: " ++ m.s.serverInfo.version ++ "\n" ++
+    "  System Version: " ++ m.s.serverInfo.systemVersion ++ "\n" ++
     "          Uptime: " ++ m.s.serverInfo.uptime
 
 withStars s =

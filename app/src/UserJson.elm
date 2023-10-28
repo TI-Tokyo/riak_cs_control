@@ -15,6 +15,7 @@ import Util
 decodeServerInfo =
     succeed ServerInfo
         |> required "version" string
+        |> required "system_version" string
         |> required "uptime" string
 
 

@@ -19,7 +19,7 @@ init f =
         haveCreds = f.csAdminSecret /= "" && f.csAdminKey /= ""
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
         state = State [] [] [] {} Snackbar.initialQueue Msg.General
-                    { version = "---", uptime = "---" }
+                    { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     "" Name True
                     False "" "/" "" Nothing False Nothing Nothing [] []

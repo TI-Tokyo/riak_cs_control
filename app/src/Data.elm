@@ -3,6 +3,7 @@ module Data exposing (..)
 
 type alias ServerInfo =
     { version : String
+    , systemVersion : String
     , uptime : String
     }
 
