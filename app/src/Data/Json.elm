@@ -1,10 +1,10 @@
-module UserJson exposing
+module Data.Json exposing
     ( decodeServerInfo
     , decodeList
     , seriallyDecodeMultipartUsers
     )
 
-import Data exposing (..)
+import Data.Struct exposing (..)
 import Json.Decode as D exposing (succeed, list, string, int, map, oneOf, nullable)
 import Json.Decode.Pipeline exposing (required, optional, hardcoded)
 import Iso8601

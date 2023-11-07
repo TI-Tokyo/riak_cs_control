@@ -13,8 +13,8 @@ module Request.Aws exposing
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Data exposing (User, Role, Policy, DiskUsage)
-import AwsXml
+import Data.Struct exposing (User, Role, Policy, DiskUsage)
+import Data.Xml
 import Request.Signature as Signature
 import Util exposing (hash)
 
@@ -31,17 +31,17 @@ import Crypto.Hash
 listUsers : Model -> Cmd Msg
 listUsers m =
     iamCall m "ListUsers" []
-        (Http.Xml.expectXml GotUserList AwsXml.decodeUsers)
+        (Http.Xml.expectXml GotUserList Data.Xml.decodeUsers)
 
 listPolicies : Model -> Cmd Msg
 listPolicies m =
     iamCall m "ListPolicies" []
-        (Http.Xml.expectXml GotPolicyList AwsXml.decodePolicies)
+        (Http.Xml.expectXml GotPolicyList Data.Xml.decodePolicies)
 
 listRoles : Model -> Cmd Msg
 listRoles m =
     iamCall m "ListRoles" []
-        (Http.Xml.expectXml GotRoleList AwsXml.decodeRoles)
+        (Http.Xml.expectXml GotRoleList Data.Xml.decodeRoles)
 
 createPolicy : Model -> Cmd Msg
 createPolicy m =
@@ -52,13 +52,13 @@ createPolicy m =
          ] ++ (maybeAdd "Description" m.s.newPolicyDescription)
            ++ (maybeAddTags m.s.newPolicyTags)
         )
-        (Http.Xml.expectXml PolicyCreated AwsXml.decodePolicyCreated)
+        (Http.Xml.expectXml PolicyCreated Data.Xml.decodePolicyCreated)
 
 deletePolicy : Model -> String -> Cmd Msg
 deletePolicy m a =
     iamCall m "DeletePolicy"
         [ ("PolicyArn", a) ]
-        (Http.Xml.expectXml PolicyDeleted AwsXml.decodeEmptySuccessResponse)
+        (Http.Xml.expectXml PolicyDeleted Data.Xml.decodeEmptySuccessResponse)
 
 createRole : Model -> Cmd Msg
 createRole m =
@@ -71,13 +71,13 @@ createRole m =
            ++ (maybeAdd "PermissionsBoundary" m.s.newRolePermissionsBoundary)
            ++ (maybeAddTags m.s.newRoleTags)
         )
-        (Http.Xml.expectXml RoleCreated AwsXml.decodeRoleCreated)
+        (Http.Xml.expectXml RoleCreated Data.Xml.decodeRoleCreated)
 
 deleteRole : Model -> String -> Cmd Msg
 deleteRole m a =
     iamCall m "DeleteRole"
         [ ("RoleName", a) ]
-        (Http.Xml.expectXml RoleDeleted AwsXml.decodeEmptySuccessResponse)
+        (Http.Xml.expectXml RoleDeleted Data.Xml.decodeEmptySuccessResponse)
 
 
 attachUserPolicy : Model -> String -> Cmd Msg
@@ -90,7 +90,7 @@ attachUserPolicy m a =
         [ ("UserName", u.userName)
         , ("PolicyArn", a)
         ]
-        (Http.Xml.expectXml UserPolicyAttached AwsXml.decodeEmptySuccessResponse)
+        (Http.Xml.expectXml UserPolicyAttached Data.Xml.decodeEmptySuccessResponse)
 
 detachUserPolicy : Model -> String -> Cmd Msg
 detachUserPolicy m a =
@@ -102,7 +102,7 @@ detachUserPolicy m a =
         [ ("UserName", u.userName)
         , ("PolicyArn", a)
         ]
-        (Http.Xml.expectXml UserPolicyDetached AwsXml.decodeEmptySuccessResponse)
+        (Http.Xml.expectXml UserPolicyDetached Data.Xml.decodeEmptySuccessResponse)
 
 
 

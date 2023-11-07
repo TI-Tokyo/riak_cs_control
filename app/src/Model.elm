@@ -8,11 +8,11 @@ module Model exposing
     , policyByName
     )
 
-import Data exposing (..)
-import Time
-import Material.Snackbar as Snackbar
+import Data.Struct exposing (..)
 import Msg
 
+import Time
+import Material.Snackbar as Snackbar
 
 type alias Model =
     { c : Config
@@ -96,14 +96,14 @@ type alias State =
     , newRoleTags : List Tag
     }
 
-userByArn : Model -> String -> Data.User
+userByArn : Model -> String -> Data.Struct.User
 userByArn m a =
     case List.filter (\u -> u.arn == a) m.s.users of
-        [] -> Data.dummyUser
+        [] -> Data.Struct.dummyUser
         u :: _ -> u
 
-policyByName : Model -> String -> Data.Policy
+policyByName : Model -> String -> Data.Struct.Policy
 policyByName m a =
     case List.filter (\p -> p.policyName == a) m.s.policies of
-        [] -> Data.dummyPolicy
+        [] -> Data.Struct.dummyPolicy
         p :: _ -> p

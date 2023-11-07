@@ -4,13 +4,15 @@ import Model exposing (..)
 import Msg exposing (Msg(..))
 import Request.Aws
 import Request.Rcs
-import Data
-import UserJson
-import Json.Decode
-import Util
-import Http
+import Data.Struct
+import Data.Json
 import View.Common
+import Util
+
+import Json.Decode
+import Http
 import Material.Snackbar as Snackbar
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg m =
@@ -49,7 +51,7 @@ update msg m =
             (m, Request.Rcs.listUsers m)
         GotUserListMultipart (Ok usersRaw) ->
             let
-                users = UserJson.seriallyDecodeMultipartUsers usersRaw
+                users = Data.Json.seriallyDecodeMultipartUsers usersRaw
                 s_ = m.s
             in
                 ({m | s = {s_ | users = users}}, Cmd.none)
@@ -113,25 +115,25 @@ update msg m =
         EditedUserNameChanged s ->
             let
                 s_ = m.s
-                u_ = Maybe.withDefault Data.dummyUser m.s.openEditUserDialogFor
+                u_ = Maybe.withDefault Data.Struct.dummyUser m.s.openEditUserDialogFor
             in
                 ({m | s = {s_ | openEditUserDialogFor = Just {u_ | userName = s}}}, Cmd.none)
         EditedUserEmailChanged s ->
             let
                 s_ = m.s
-                u_ = Maybe.withDefault Data.dummyUser m.s.openEditUserDialogFor
+                u_ = Maybe.withDefault Data.Struct.dummyUser m.s.openEditUserDialogFor
             in
                 ({m | s = {s_ | openEditUserDialogFor = Just {u_ | email = s}}}, Cmd.none)
         EditedUserPathChanged s ->
             let
                 s_ = m.s
-                u_ = Maybe.withDefault Data.dummyUser m.s.openEditUserDialogFor
+                u_ = Maybe.withDefault Data.Struct.dummyUser m.s.openEditUserDialogFor
             in
                 ({m | s = {s_ | openEditUserDialogFor = Just {u_ | path = s}}}, Cmd.none)
         EditedUserStatusChanged ->
             let
                 s_ = m.s
-                u_ = Maybe.withDefault Data.dummyUser m.s.openEditUserDialogFor
+                u_ = Maybe.withDefault Data.Struct.dummyUser m.s.openEditUserDialogFor
             in
                 ({m | s = {s_ | openEditUserDialogFor = Just {u_ | status = toggleStatus u_.status}}}, Cmd.none)
         EditedUserRegenerateKeyChanged ->

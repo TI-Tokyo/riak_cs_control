@@ -1,6 +1,7 @@
 module Msg exposing (Msg(..), Tab(..))
 
-import Data exposing (User, Role, Policy, DiskUsage, ServerInfo)
+import Data.Struct exposing (User, Role, Policy, DiskUsage, ServerInfo, RequestId)
+
 import Http
 import Time
 import Material.Snackbar as Snackbar
@@ -29,22 +30,22 @@ type Msg
     | UpdateUser
     | AttachUserPolicyBatch
     | DetachUserPolicyBatch
-    | UserPolicyAttached (Result Http.Error Data.RequestId)
-    | UserPolicyDetached (Result Http.Error Data.RequestId)
+    | UserPolicyAttached (Result Http.Error RequestId)
+    | UserPolicyDetached (Result Http.Error RequestId)
     -- Policies
     | ListPolicies
     | GotPolicyList (Result Http.Error (List Policy))
     | CreatePolicy
     | PolicyCreated (Result Http.Error Policy)
     | DeletePolicy String
-    | PolicyDeleted (Result Http.Error Data.RequestId)
+    | PolicyDeleted (Result Http.Error RequestId)
     -- Roles
     | ListRoles
     | GotRoleList (Result Http.Error (List Role))
     | CreateRole
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
-    | RoleDeleted (Result Http.Error Data.RequestId)
+    | RoleDeleted (Result Http.Error RequestId)
     -- DiskUsage
     | GetDiskUsage
     | GotDiskUsage (Result Http.Error DiskUsage)

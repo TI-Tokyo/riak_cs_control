@@ -2,8 +2,9 @@ module View.Role exposing (makeContent)
 
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
+import Data.Struct
+import View.Common
 import Util
-import Data
 
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (style, src)
@@ -18,7 +19,6 @@ import Material.Dialog as Dialog
 import Material.Typography as Typography
 import Material.Select as Select
 import Material.Select.Item as SelectItem
-import View.Common
 
 
 makeContent m =

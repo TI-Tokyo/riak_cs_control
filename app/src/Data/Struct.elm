@@ -1,4 +1,4 @@
-module Data exposing (..)
+module Data.Struct exposing (..)
 
 
 type alias ServerInfo =

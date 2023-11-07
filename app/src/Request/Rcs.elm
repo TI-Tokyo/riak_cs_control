@@ -7,8 +7,8 @@ module Request.Rcs exposing
     )
 
 import Model exposing (Model)
-import Data exposing (User)
-import UserJson
+import Data.Struct exposing (User)
+import Data.Json
 import Msg exposing (Msg(..))
 import Request.Signature as Signature
 import Util exposing (hash)
@@ -44,7 +44,7 @@ getServerInfo m =
         Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "info" ] []
             |> HttpBuilder.get
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
-            |> HttpBuilder.withExpect (Http.expectJson GotServerInfo UserJson.decodeServerInfo)
+            |> HttpBuilder.withExpect (Http.expectJson GotServerInfo Data.Json.decodeServerInfo)
             |> HttpBuilder.request
 
 
@@ -100,7 +100,7 @@ createUser m  =
 updateUser : Model -> Cmd Msg
 updateUser m  =
     let
-        u = Maybe.withDefault Data.dummyUser m.s.openEditUserDialogFor
+        u = Maybe.withDefault Data.Struct.dummyUser m.s.openEditUserDialogFor
         json = Json.Encode.object [ ("id", Json.Encode.string u.userId)
                                   , ("name", Json.Encode.string u.userName)
                                   , ("email", Json.Encode.string u.email)

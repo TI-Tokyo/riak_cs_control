@@ -2,6 +2,7 @@ module View.Policy exposing (makeContent)
 
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
+import View.Common
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -17,7 +18,6 @@ import Material.Dialog as Dialog
 import Material.Select as Select
 import Material.Select.Item as SelectItem
 import Material.Typography as Typography
-import View.Common
 
 
 makeContent m =

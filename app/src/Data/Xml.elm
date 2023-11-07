@@ -1,4 +1,4 @@
-module AwsXml exposing
+module Data.Xml exposing
     ( decodeUsers
     , decodeRoles
     , decodePolicies
@@ -7,7 +7,7 @@ module AwsXml exposing
     , decodeEmptySuccessResponse
     )
 
-import Data exposing (..)
+import Data.Struct exposing (..)
 import Xml.Decode as D exposing (..)
 
 

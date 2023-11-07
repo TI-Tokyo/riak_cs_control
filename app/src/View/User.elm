@@ -2,7 +2,8 @@ module View.User exposing (makeContent)
 
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
-import Data
+import Data.Struct
+import View.Common
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -20,7 +21,6 @@ import Material.List as List
 import Material.List.Item as ListItem
 import Material.Switch as Switch
 import Material.Checkbox as Checkbox
-import View.Common
 
 makeContent m =
     Html.div View.Common.topContentStyle

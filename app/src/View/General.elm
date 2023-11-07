@@ -2,8 +2,8 @@ module View.General exposing (makeContent)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-
 import View.Common
+
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (attribute, style)
 import Html.Events exposing (onClick, onInput)

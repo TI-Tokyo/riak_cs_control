@@ -1,5 +1,13 @@
 module View exposing (view)
 
+import View.General
+import View.User
+import View.Role
+import View.Policy
+import View.DiskUsage
+import Model exposing (Model)
+import Msg exposing (Msg(..))
+
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (style, attribute, src)
 import Material.TopAppBar as TopAppBar
@@ -14,13 +22,6 @@ import Material.Dialog as Dialog
 import Material.Icons as Filled
 import Material.Icons.Outlined as Outlined
 
-import View.General
-import View.User
-import View.Role
-import View.Policy
-import View.DiskUsage
-import Model exposing (Model)
-import Msg exposing (Msg(..))
 
 view : Model -> Html Msg
 view m =
