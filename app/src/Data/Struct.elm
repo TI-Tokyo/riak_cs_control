@@ -61,6 +61,11 @@ type alias Tag =
     , value : String
     }
 
+type alias Usage =
+    { objects : Int
+    , bytes : Int
+    }
+
 type alias User =
     { arn : String
     , path : String

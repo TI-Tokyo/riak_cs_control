@@ -4,6 +4,7 @@ module Request.Rcs exposing
     , createUser
     , deleteUser
     , updateUser
+    , getUsage
     )
 
 import Model exposing (Model)
@@ -148,6 +149,28 @@ deleteUser m a =
             |> HttpBuilder.delete
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
             |> HttpBuilder.withExpect (Http.expectWhatever UserDeleted)
+            |> HttpBuilder.request
+
+
+getUsage : Model -> String -> Time.Posix -> Time.Posix -> Cmd Msg
+getUsage m k t0 t9 =
+    let
+        cmd5 = md5b64 ""
+        date = rfc1123Date m.t
+        ct = "application/json"
+        stdHeaders =
+            [ ("accept", ct)
+            , ("content-md5", cmd5)
+            , ("content-type", ct)
+            , ("x-amz-date", date)
+            ]
+        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/info"
+        authHeader = ("Authorization", makeAuthHeader m sig)
+    in
+        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "usage", k, "bj", rfc1123Date t0, rfc1123Date t9 ] []
+            |> HttpBuilder.get
+            |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
+            |> HttpBuilder.withExpect (Http.expectJson GotUsage Data.Json.decodeUsage)
             |> HttpBuilder.request
 
 

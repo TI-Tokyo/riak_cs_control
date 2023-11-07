@@ -71,6 +71,17 @@ update msg m =
             , Cmd.none
             )
 
+        GetUsage k ->
+            (m, Request.Rcs.getUsage m k m.t (Util.timeBefore m.t (24*60*60)))
+        GotUsage (Ok usage) ->
+            (m, Cmd.none)
+        GotUsage (Err err) ->
+            let s_ = m.s in
+            ( {m | s = {s_ | usageStats = [], msgQueue = Snackbar.addMessage
+                            (Snackbar.message ("Failed to fetch usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
+            , Cmd.none
+            )
+
         ShowCreateUserDialog ->
             let s_ = m.s in
             ({m | s = {s_ | createUserDialogShown = True}}, Cmd.none)

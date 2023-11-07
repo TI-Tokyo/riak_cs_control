@@ -43,3 +43,7 @@ pprintJson a =
             }
     in
     Result.withDefault "(bad json)" (Json.Print.prettyString cfg a)
+
+
+timeBefore t a =
+    (Time.posixToMillis t - a * 1000) |> Time.millisToPosix

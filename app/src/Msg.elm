@@ -1,6 +1,11 @@
 module Msg exposing (Msg(..), Tab(..))
 
-import Data.Struct exposing (User, Role, Policy, DiskUsage, ServerInfo, RequestId)
+import Data.Struct exposing
+    ( User, Role, Policy
+    , DiskUsage, ServerInfo
+    , Usage
+    , RequestId
+    )
 
 import Http
 import Time
@@ -32,6 +37,9 @@ type Msg
     | DetachUserPolicyBatch
     | UserPolicyAttached (Result Http.Error RequestId)
     | UserPolicyDetached (Result Http.Error RequestId)
+    -- Usage
+    | GetUsage String
+    | GotUsage (Result Http.Error Usage)
     -- Policies
     | ListPolicies
     | GotPolicyList (Result Http.Error (List Policy))

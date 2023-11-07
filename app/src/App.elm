@@ -18,7 +18,7 @@ init f =
     let
         haveCreds = f.csAdminSecret /= "" && f.csAdminKey /= ""
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
-        state = State [] [] [] {} Snackbar.initialQueue Msg.General
+        state = State [] [] [] [] {} Snackbar.initialQueue Msg.General
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     "" Name True

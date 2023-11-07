@@ -2,6 +2,7 @@ module Data.Json exposing
     ( decodeServerInfo
     , decodeList
     , seriallyDecodeMultipartUsers
+    , decodeUsage
     )
 
 import Data.Struct exposing (..)
@@ -118,3 +119,9 @@ permFromString a =
         "WRITE_ACP" -> WRITE_ACP
         "FULL_CONTROL" -> FULL_CONTROL
         _ -> INVALID
+
+
+decodeUsage =
+    succeed Usage
+        |> required "Objects" int
+        |> required "Bytes" int
