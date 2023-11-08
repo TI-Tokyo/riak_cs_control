@@ -5,7 +5,6 @@ module Data.Xml exposing
     , decodeRoleCreated
     , decodePolicyCreated
     , decodeEmptySuccessResponse
-    , decodeUsageStats
     )
 
 import Data.Struct exposing (..)
@@ -148,10 +147,3 @@ tag =
     succeed Tag
         |> requiredPath ["Name"] (single string)
         |> requiredPath ["Value"] (single string)
-
-
--- Storage Usage
-decodeUsageStats =
-    succeed Usage
-        |> requiredPath ["Objects"] (single int)
-        |> requiredPath ["Bytes"] (single int)

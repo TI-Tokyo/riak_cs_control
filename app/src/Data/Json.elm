@@ -71,7 +71,7 @@ bucket =
     succeed Bucket
         |> required "name" string
         |> required "last_action" string
-        |> required "create_date" int
+        |> required "creation_date" int
         |> required "modification_time" int
         |> required "acl" (nullable acl)
 
@@ -121,7 +121,16 @@ permFromString a =
         _ -> INVALID
 
 
-decodeUsage =
-    succeed Usage
+decodeUsage k =
+    succeed UsagePerUser
+        |> hardcoded k  -- this is how we thread the keyId
+        |> required "Storage" storage
+storage =
+    succeed UsageStorage
+        |> required "Samples" samples
+samples =
+    list sample
+sample =
+    succeed UsageStorageSample
         |> required "Objects" int
         |> required "Bytes" int

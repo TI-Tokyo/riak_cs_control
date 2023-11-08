@@ -63,7 +63,7 @@ makeSubTab m =
                 Msg.Users -> {a = m.s.userFilterValue, b = m.s.userSortBy, c = UserFilterChanged, d = UserSortByFieldChanged, e = UserSortOrderChanged, f = "Name", g = ["CreateDate"], h = m.s.userSortOrder}
                 Msg.Policies -> {a = m.s.policyFilterValue, b = m.s.policySortBy, c = PolicyFilterChanged, d = PolicySortByFieldChanged, e = PolicySortOrderChanged, f = "Name", g = ["CreateDate", "AttachmentCount"], h = m.s.policySortOrder}
                 Msg.Roles -> {a = m.s.roleFilterValue, b = m.s.roleSortBy, c = RoleFilterChanged, d = RoleSortByFieldChanged, e = RoleSortOrderChanged, f = "Name", g = ["CreateDate", "RoleLastUsed"], h = m.s.roleSortOrder}
-                Msg.DiskUsage -> {a = "", b = Unsorted, c = DiskUsageFilterChanged, d = DiskUsageSortByFieldChanged, e = NoOp, f = "", g = [], h = True}
+                Msg.Usage -> {a = "", b = Unsorted, c = UsageFilterChanged, d = UsageSortByFieldChanged, e = NoOp, f = "", g = [], h = True}
         sortOrderText =
             \o -> if o then "Asc" else "Desc"
     in

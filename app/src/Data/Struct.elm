@@ -1,5 +1,8 @@
 module Data.Struct exposing (..)
 
+import Dict exposing (Dict)
+import Time
+
 
 type alias ServerInfo =
     { version : String
@@ -61,9 +64,24 @@ type alias Tag =
     , value : String
     }
 
-type alias Usage =
+type alias UsageStorageSample =
     { objects : Int
     , bytes : Int
+    }
+
+type alias UsageStorage =
+    { samples : List UsageStorageSample
+    }
+
+type alias UsagePerUser =
+    { keyId : String
+    , storage : UsageStorage
+    }
+
+type alias Usage =
+    { dateFrom : Time.Posix
+    , dateTo : Time.Posix
+    , stats : Dict String UsagePerUser
     }
 
 type alias User =
@@ -139,9 +157,6 @@ type alias RoleLastUsed =
     { lastUsedDate : String
     , region : String
     }
-
-type alias DiskUsage =
-    {}
 
 
 type alias RequestId =

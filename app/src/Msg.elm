@@ -2,7 +2,7 @@ module Msg exposing (Msg(..), Tab(..))
 
 import Data.Struct exposing
     ( User, Role, Policy
-    , DiskUsage, ServerInfo
+    , UsagePerUser, ServerInfo
     , Usage
     , RequestId
     )
@@ -16,7 +16,7 @@ type Tab
     | Users
     | Roles
     | Policies
-    | DiskUsage
+    | Usage
 
 type Msg
     = NoOp
@@ -37,9 +37,6 @@ type Msg
     | DetachUserPolicyBatch
     | UserPolicyAttached (Result Http.Error RequestId)
     | UserPolicyDetached (Result Http.Error RequestId)
-    -- Usage
-    | GetUsage String
-    | GotUsage (Result Http.Error Usage)
     -- Policies
     | ListPolicies
     | GotPolicyList (Result Http.Error (List Policy))
@@ -54,9 +51,10 @@ type Msg
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
-    -- DiskUsage
-    | GetDiskUsage
-    | GotDiskUsage (Result Http.Error DiskUsage)
+    -- Usage
+    | GetAllUsage
+    | GetUsage String
+    | GotUsage (Result Http.Error UsagePerUser)
     -- UI interactions
     | TabClicked Tab
     | ShowConfigDialog
@@ -115,9 +113,9 @@ type Msg
     | NewRoleMaxSessionDurationChanged Int
     | CreateRoleCancelled
 
-    -- disk usage
-    | DiskUsageFilterChanged String
-    | DiskUsageSortByFieldChanged String
+    -- usage
+    | UsageFilterChanged String
+    | UsageSortByFieldChanged String
 
     -- misc
     | SnackbarClosed Snackbar.MessageId

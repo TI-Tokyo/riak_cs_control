@@ -41,8 +41,7 @@ type alias State =
     { users : List User
     , roles : List Role
     , policies : List Policy
-    , usageStats : List (String, Usage)
-    , diskUsage : DiskUsage
+    , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
     , activeTab : Msg.Tab
 

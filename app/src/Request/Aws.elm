@@ -2,7 +2,6 @@ module Request.Aws exposing
     ( listUsers
     , listRoles
     , listPolicies
-    , getDiskUsage
     , createRole
     , createPolicy
     , deleteRole
@@ -13,7 +12,7 @@ module Request.Aws exposing
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Data.Struct exposing (User, Role, Policy, DiskUsage)
+import Data.Struct exposing (User, Role, Policy)
 import Data.Xml
 import Request.Signature as Signature
 import Util exposing (hash)
@@ -136,11 +135,6 @@ maybeAddTags tt =
 formatTags tt =
     -- this will need to be reworked. Need examples.
     String.join ";" (List.map (\t -> t.name ++ "=" ++ t.value) tt)
-
-
-getDiskUsage : Model -> Cmd Msg
-getDiskUsage m =
-    Cmd.none
 
 
 makeStdHeaders m hashedPayload =

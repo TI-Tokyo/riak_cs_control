@@ -14,6 +14,7 @@ import Msg exposing (Msg(..))
 import Request.Signature as Signature
 import Util exposing (hash)
 
+import Iso8601
 import Http
 import HttpBuilder
 import Url.Builder
@@ -164,13 +165,18 @@ getUsage m k t0 t9 =
             , ("content-type", ct)
             , ("x-amz-date", date)
             ]
-        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/info"
+        path = Url.Builder.absolute [ "riak-cs", "usage", k, "bj" ]
+            []
+        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) path
         authHeader = ("Authorization", makeAuthHeader m sig)
     in
-        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "usage", k, "bj", rfc1123Date t0, rfc1123Date t9 ] []
+        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "usage", k, "bj" ]
+            [ Url.Builder.string "s" (Iso8601.fromTime t0)
+            , Url.Builder.string "e" (Iso8601.fromTime t9)
+            ]
             |> HttpBuilder.get
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
-            |> HttpBuilder.withExpect (Http.expectJson GotUsage Data.Json.decodeUsage)
+            |> HttpBuilder.withExpect (Http.expectJson GotUsage (Data.Json.decodeUsage k))
             |> HttpBuilder.request
 
 

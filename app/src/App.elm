@@ -1,8 +1,10 @@
 module App exposing (init, subscriptions, Flags)
 
 import Model exposing (..)
+import Data.Struct
 import Msg exposing (Msg(..))
 import Time
+import Dict exposing (Dict)
 import Task
 import Material.Snackbar as Snackbar
 
@@ -13,12 +15,17 @@ type alias Flags =
     , csRegion : String
     }
 
+emptyUsage =
+    Data.Struct.Usage (Time.millisToPosix 0) (Time.millisToPosix 0) Dict.empty
+
 init : Flags -> (Model, Cmd Msg)
 init f =
     let
         haveCreds = f.csAdminSecret /= "" && f.csAdminKey /= ""
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
-        state = State [] [] [] [] {} Snackbar.initialQueue Msg.General
+        state = State
+                    [] [] [] emptyUsage
+                    Snackbar.initialQueue Msg.General
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     "" Name True

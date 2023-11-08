@@ -4,7 +4,7 @@ import View.General
 import View.User
 import View.Role
 import View.Policy
-import View.DiskUsage
+import View.Usage
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 
@@ -61,7 +61,7 @@ listWhat m =
         Msg.Users -> ListUsers
         Msg.Roles -> ListRoles
         Msg.Policies -> ListPolicies
-        Msg.DiskUsage -> GetDiskUsage
+        Msg.Usage -> GetAllUsage
 
 
 makeTabs m =
@@ -93,10 +93,10 @@ makeTabs m =
                     { label = "Roles", icon = Nothing }
               , Tab.tab
                     (Tab.config
-                    |> Tab.setActive (m.s.activeTab == Msg.DiskUsage)
-                    |> Tab.setOnClick (TabClicked Msg.DiskUsage)
+                    |> Tab.setActive (m.s.activeTab == Msg.Usage)
+                    |> Tab.setOnClick (TabClicked Msg.Usage)
                     )
-                    { label = "Disk Usage", icon = Nothing }
+                    { label = "Usage", icon = Nothing }
               ]
     ]
 
@@ -107,4 +107,4 @@ makeContents m =
         Msg.Users -> View.User.makeContent m
         Msg.Roles -> View.Role.makeContent m
         Msg.Policies -> View.Policy.makeContent m
-        Msg.DiskUsage -> View.DiskUsage.makeContent m
+        Msg.Usage -> View.Usage.makeContent m

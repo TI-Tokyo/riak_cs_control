@@ -9,6 +9,7 @@ import Data.Json
 import View.Common
 import Util
 
+import Dict exposing (Dict)
 import Json.Decode
 import Http
 import Material.Snackbar as Snackbar
@@ -68,17 +69,6 @@ update msg m =
             let s_ = m.s in
             ( {m | s = {s_ | users = [], msgQueue = Snackbar.addMessage
                             (Snackbar.message ("Failed to fetch users: " ++ (explainHttpError err))) m.s.msgQueue}}
-            , Cmd.none
-            )
-
-        GetUsage k ->
-            (m, Request.Rcs.getUsage m k m.t (Util.timeBefore m.t (24*60*60)))
-        GotUsage (Ok usage) ->
-            (m, Cmd.none)
-        GotUsage (Err err) ->
-            let s_ = m.s in
-            ( {m | s = {s_ | usageStats = [], msgQueue = Snackbar.addMessage
-                            (Snackbar.message ("Failed to fetch usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
             , Cmd.none
             )
 
@@ -332,25 +322,37 @@ update msg m =
             )
 
 
-        -- Disk Usage
+        -- Usage
         ------------------------------
-        DiskUsageFilterChanged s ->
+        UsageFilterChanged s ->
             (m, Cmd.none)
-        DiskUsageSortByFieldChanged s ->
+        UsageSortByFieldChanged s ->
             (m, Cmd.none)
 
-        GetDiskUsage ->
-            (m, Request.Aws.getDiskUsage m)
-        GotDiskUsage (Ok a) ->
-            let s_ = m.s in
-            ({m | s = { s_ | diskUsage = a}}, Cmd.none)
-
-        GotDiskUsage (Err err) ->
-            let s_ = m.s in
-            ( {m | s = {s_ | roles = [], msgQueue = Snackbar.addMessage
-                            (Snackbar.message ("Failed to get disk usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
-            , Cmd.none
-            )
+        GetAllUsage ->
+            (m, (List.map
+                     (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
+                     m.s.users) |> Cmd.batch)
+        GetUsage k ->
+            (m, Request.Rcs.getUsage m k m.s.usage.dateFrom m.s.usage.dateTo)
+        GotUsage (Ok i) ->
+            let
+                s_ = m.s
+                usage_ = s_.usage
+                stats_ = usage_.stats
+            in
+                ({m | s = {s_ | usage = {usage_ | stats = Dict.insert i.keyId i stats_}}}
+                 , Cmd.none
+                 )
+        GotUsage (Err err) ->
+            let
+                s_ = m.s
+                usage_ = s_.usage
+            in
+                ( {m | s = {s_ | usage = {usage_ | stats = Dict.empty}, msgQueue = Snackbar.addMessage
+                                (Snackbar.message ("Failed to fetch usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
+                , Cmd.none
+                )
 
         -- Admin creds
         ------------------------------
@@ -406,7 +408,11 @@ refreshTabMsg m t =
         Msg.Users -> Cmd.batch [Request.Rcs.listUsers m, Request.Aws.listPolicies m]
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
-        Msg.DiskUsage -> Request.Aws.getDiskUsage m
+        Msg.Usage ->
+            (List.map
+                 (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
+                 m.s.users)
+                |> Cmd.batch
 
 
 explainHttpError a =

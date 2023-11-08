@@ -1,7 +1,6 @@
 module Request.Signature exposing (v2, v4)
 
 import Model exposing (Model)
-import Iso8601
 import Url
 import Util exposing (hash, hmacHex, hmacBase64)
 import Crypto.HMAC
