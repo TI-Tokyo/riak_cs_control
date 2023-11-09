@@ -9,7 +9,10 @@ import Data.Json
 import View.Common
 import Util
 
+
+import Time
 import Dict exposing (Dict)
+import Iso8601
 import Json.Decode
 import Http
 import Material.Snackbar as Snackbar
@@ -329,6 +332,33 @@ update msg m =
         UsageSortByFieldChanged s ->
             (m, Cmd.none)
 
+        UsageDateFromChanged s ->
+            let
+                s_ = m.s
+                usage_ = s_.usage
+            in
+                case Iso8601.toTime s of
+                    Ok t ->
+                        ({m | s = {s_ | usage = {usage_ | dateFrom = t}}}, Cmd.none)
+                    Err _ ->
+                        ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+                                        (Snackbar.message "Invalid date") m.s.msgQueue}}
+                        , Cmd.none
+                        )
+        UsageDateToChanged s ->
+            let
+                s_ = m.s
+                usage_ = s_.usage
+            in
+                case Iso8601.toTime s of
+                    Ok t ->
+                        ({m | s = {s_ | usage = {usage_ | dateTo = t}}}, Cmd.none)
+                    Err _ ->
+                        ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+                                        (Snackbar.message "Invalid date") m.s.msgQueue}}
+                        , Cmd.none
+                        )
+
         GetAllUsage ->
             (m, (List.map
                      (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
@@ -395,7 +425,15 @@ update msg m =
                 ({m | s = {s_ | msgQueue = b}}, Cmd.none)
 
         Tick a ->
-            ({m | t = a}, Cmd.none)
+            if Time.posixToMillis m.t == 0 then
+                let
+                    s_ = m.s
+                    usage_ = s_.usage
+                    oneDayEarlier = \x -> (Time.posixToMillis x) - 24 * 3600 * 1000 |> Time.millisToPosix
+                in
+                    ({m | t = a, s = {s_ | usage = {usage_ | dateFrom = oneDayEarlier a, dateTo = a}}}, Cmd.none)
+            else
+                ({ m | t = a}, Cmd.none)
 
         NoOp ->
             (m, Cmd.none)

@@ -82,7 +82,7 @@ deleteRole m a =
 attachUserPolicy : Model -> String -> Cmd Msg
 attachUserPolicy m a =
     let
-        u = Model.userByArn m
+        u = Model.userBy m .arn
             (Maybe.withDefault "" m.s.openAttachUserPoliciesDialogFor)
     in
     iamCall m "AttachUserPolicy"
@@ -94,7 +94,7 @@ attachUserPolicy m a =
 detachUserPolicy : Model -> String -> Cmd Msg
 detachUserPolicy m a =
     let
-        u = Model.userByArn m
+        u = Model.userBy m .arn
             (Maybe.withDefault "" m.s.openEditUserPoliciesDialogFor)
     in
     iamCall m "DetachUserPolicy"

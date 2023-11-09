@@ -279,7 +279,7 @@ makeEditUserDialog m =
 makeEditUserPoliciesDialog m =
     case m.s.openEditUserPoliciesDialogFor of
         Just arn ->
-            let u = Model.userByArn m arn in
+            let u = Model.userBy m .arn arn in
             [ Dialog.confirmation
                   (Dialog.config
                   |> Dialog.setOpen True
@@ -327,7 +327,7 @@ makeAttachUserPolicyDialog m =
     case m.s.openAttachUserPoliciesDialogFor of
         Just arn ->
             let
-                u = Model.userByArn m arn
+                u = Model.userBy m .arn arn
                 pp = List.map .arn m.s.policies
             in
             [ Dialog.confirmation

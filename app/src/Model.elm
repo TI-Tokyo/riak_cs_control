@@ -4,7 +4,7 @@ module Model exposing
     , State
     , SortByField(..)
     , SortOrder
-    , userByArn
+    , userBy
     , policyByName
     )
 
@@ -94,11 +94,14 @@ type alias State =
     , newRolePermissionsBoundary : Maybe String
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
+
+    -- usage
     }
 
-userByArn : Model -> String -> Data.Struct.User
-userByArn m a =
-    case List.filter (\u -> u.arn == a) m.s.users of
+
+userBy : Model -> (User -> String) -> String -> Data.Struct.User
+userBy m by a =
+    case List.filter (\u -> a == by u) m.s.users of
         [] -> Data.Struct.dummyUser
         u :: _ -> u
 

@@ -116,6 +116,8 @@ type Msg
     -- usage
     | UsageFilterChanged String
     | UsageSortByFieldChanged String
+    | UsageDateFromChanged String
+    | UsageDateToChanged String
 
     -- misc
     | SnackbarClosed Snackbar.MessageId
