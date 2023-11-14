@@ -6,11 +6,13 @@ module Model exposing
     , SortOrder
     , userBy
     , policyByName
+    , updateBucketStats
     )
 
 import Data.Struct exposing (..)
 import Msg
 
+import Dict
 import Time
 import Material.Snackbar as Snackbar
 
@@ -41,6 +43,7 @@ type alias State =
     { users : List User
     , roles : List Role
     , policies : List Policy
+    , bucketStats : BucketStats
     , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
     , activeTab : Msg.Tab
@@ -110,3 +113,17 @@ policyByName m a =
     case List.filter (\p -> p.policyName == a) m.s.policies of
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
+
+--updateBucketStats : BucketStats -> BucketContentsItem -> BucketStats
+updateBucketStats ss si =
+    let
+        stats0 = case Dict.get si.userName ss of
+                     Nothing ->
+                         BucketStatsItem 0 0 0
+                     Just s ->
+                         s
+        stats9 = {stats0 | totalBuckets = stats0.totalBuckets + 1,
+                           totalObjects = stats0.totalObjects + List.length si.contents,
+                           totalSize = stats0.totalSize + (List.foldl (\c q -> c.size + q) 0 si.contents)}
+    in
+        Dict.insert si.userName stats9 ss

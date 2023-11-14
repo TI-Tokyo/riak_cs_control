@@ -2,8 +2,9 @@ module Msg exposing (Msg(..), Tab(..))
 
 import Data.Struct exposing
     ( User, Role, Policy
-    , UsagePerUser, ServerInfo
-    , Usage
+    , ServerInfo
+    , UsagePerUser, Usage
+    , BucketContents
     , RequestId
     )
 
@@ -21,9 +22,12 @@ type Tab
 type Msg
     = NoOp
     | Discard String
+
     -- General
+    ----------
     | GetServerInfo
     | GotServerInfo (Result Http.Error ServerInfo)
+
     -- Users
     | ListUsers
     | GotUserList (Result Http.Error (List User))
@@ -33,10 +37,14 @@ type Msg
     | DeleteUser String
     | UserDeleted (Result Http.Error ())
     | UpdateUser
+    | ListAllBuckets
+    | ListBucket String
+    | GotBucketList (Result Http.Error BucketContents)
     | AttachUserPolicyBatch
     | DetachUserPolicyBatch
     | UserPolicyAttached (Result Http.Error RequestId)
     | UserPolicyDetached (Result Http.Error RequestId)
+
     -- Policies
     | ListPolicies
     | GotPolicyList (Result Http.Error (List Policy))
@@ -44,6 +52,7 @@ type Msg
     | PolicyCreated (Result Http.Error Policy)
     | DeletePolicy String
     | PolicyDeleted (Result Http.Error RequestId)
+
     -- Roles
     | ListRoles
     | GotRoleList (Result Http.Error (List Role))
@@ -51,11 +60,14 @@ type Msg
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
+
     -- Usage
     | GetAllUsage
     | GetUsage String
     | GotUsage (Result Http.Error UsagePerUser)
+
     -- UI interactions
+    ------------------
     | TabClicked Tab
     | ShowConfigDialog
     | ConfigUrlChanged String

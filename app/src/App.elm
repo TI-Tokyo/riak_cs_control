@@ -18,6 +18,9 @@ type alias Flags =
 emptyUsage =
     Data.Struct.Usage (Time.millisToPosix 0) (Time.millisToPosix 0) Dict.empty
 
+emptyBucketStats =
+    Data.Struct.BucketStats Dict.empty
+
 init : Flags -> (Model, Cmd Msg)
 init f =
     let

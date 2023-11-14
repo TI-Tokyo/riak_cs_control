@@ -4,12 +4,14 @@ module Request.Rcs exposing
     , createUser
     , deleteUser
     , updateUser
+    , listBucket
     , getUsage
     )
 
 import Model exposing (Model)
 import Data.Struct exposing (User)
 import Data.Json
+import Data.Xml
 import Msg exposing (Msg(..))
 import Request.Signature as Signature
 import Util exposing (hash)
@@ -26,6 +28,8 @@ import MD5
 import Base64
 import Bytes.Extra
 import Url
+import Http.Xml
+
 
 
 getServerInfo : Model -> Cmd Msg
@@ -153,6 +157,28 @@ deleteUser m a =
             |> HttpBuilder.request
 
 
+listBucket : Model -> String -> String -> Cmd Msg
+listBucket m u b =
+    let
+        cmd5 = md5b64 ""
+        date = rfc1123Date m.t
+        ct = "application/json"
+        stdHeaders =
+            [ ("accept", ct)
+            , ("content-md5", cmd5)
+            , ("content-type", ct)
+            , ("x-amz-date", date)
+            ]
+        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/buckets/" ++ b ++ "/objects"
+        authHeader = ("Authorization", makeAuthHeader m sig)
+    in
+        Url.Builder.crossOrigin m.c.csUrl [ "buckets", b, "objects" ] []
+            |> HttpBuilder.get
+            |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
+            |> HttpBuilder.withExpect (Http.Xml.expectXml GotBucketList (Data.Xml.decodeBucketContents u))
+            |> HttpBuilder.request
+
+
 getUsage : Model -> String -> Time.Posix -> Time.Posix -> Cmd Msg
 getUsage m k t0 t9 =
     let
@@ -165,15 +191,14 @@ getUsage m k t0 t9 =
             , ("content-type", ct)
             , ("x-amz-date", date)
             ]
-        path = Url.Builder.absolute [ "riak-cs", "usage", k, "bj" ]
+        pe = [ "riak-cs", "usage", k, "bj", Util.amzDate t0, Util.amzDate t9 ]
+        path = Url.Builder.absolute pe
             []
         sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) path
         authHeader = ("Authorization", makeAuthHeader m sig)
     in
-        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "usage", k, "bj" ]
-            [ Url.Builder.string "s" (Iso8601.fromTime t0)
-            , Url.Builder.string "e" (Iso8601.fromTime t9)
-            ]
+        Url.Builder.crossOrigin m.c.csUrl pe
+            []
             |> HttpBuilder.get
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
             |> HttpBuilder.withExpect (Http.expectJson GotUsage (Data.Json.decodeUsage k))

@@ -5,11 +5,12 @@ module Data.Xml exposing
     , decodeRoleCreated
     , decodePolicyCreated
     , decodeEmptySuccessResponse
+    , decodeBucketContents
     )
 
 import Data.Struct exposing (..)
 import Xml.Decode as D exposing (..)
-
+import Util
 
 -- Users
 
@@ -134,6 +135,30 @@ policy =
 decodePolicyCreated =
     path ["CreatePolicyResult", "Policy"] (single policy)
 
+
+
+-- BucketContents
+
+decodeBucketContents u =
+    succeed BucketContents
+        |> requiredPath ["Name"] (single string)
+        |> requiredPath ["Contents"] (list bucketContentsItem)
+        -- threading user
+        |> optionalPath ["UserName"] (single string) u
+
+bucketContentsItem =
+    succeed BucketContentsItem
+        |> requiredPath ["Key"] (single string)
+        |> requiredPath ["LastModified"] (single date)
+        |> requiredPath ["Size"] (single int)
+        |> requiredPath ["StorageClass"] (single string)
+        |> requiredPath ["Owner"] (single owner)
+
+date =
+    map dateFromString string
+
+dateFromString =
+    Util.amzDateToPosix
 
 
 -- common nodes

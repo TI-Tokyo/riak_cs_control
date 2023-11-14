@@ -1,6 +1,6 @@
 module Data.Json exposing
     ( decodeServerInfo
-    , decodeList
+    , decodeUserList
     , seriallyDecodeMultipartUsers
     , decodeUsage
     )
@@ -23,12 +23,12 @@ decodeServerInfo =
 seriallyDecodeMultipartUsers s =
     List.concat
         (List.map
-             ((D.decodeString decodeList) >> Result.withDefault [])
+             ((D.decodeString decodeUserList) >> Result.withDefault [])
              (s |> Util.stripMPBoundaries))
 
 
-decodeList : D.Decoder (List User)
-decodeList =
+decodeUserList : D.Decoder (List User)
+decodeUserList =
     list user
 
 user =

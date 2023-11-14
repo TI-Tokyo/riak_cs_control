@@ -64,20 +64,45 @@ type alias Tag =
     , value : String
     }
 
+
+-- Disk Usage has two alternative/complimentary implementations
+-- 1. Via ListBucket, where the disk usage per user is the total
+--    size of objects in all user's buckets
+
+type alias BucketContentsItem =
+    { key : String
+    , lastModified : Time.Posix
+    , size : Int
+    , storageClass : String
+    , owner : Owner
+    }
+type alias BucketContents =
+    { name : String
+    , contents : List BucketContentsItem
+    -- threaded via request
+    , userName : String
+    }
+
+type alias BucketStatsItem =
+    { totalBuckets : Int
+    , totalObjects : Int
+    , totalSize : Int
+    }
+type alias BucketStats =
+    Dict String BucketStatsItem
+
+-- 2. More detailed/rcs-specific usage, as reported by /riak-cs/usage
 type alias UsageStorageSample =
     { objects : Int
     , bytes : Int
     }
-
 type alias UsageStorage =
     { samples : List UsageStorageSample
     }
-
 type alias UsagePerUser =
     { keyId : String
     , storage : UsageStorage
     }
-
 type alias Usage =
     { dateFrom : Time.Posix
     , dateTo : Time.Posix

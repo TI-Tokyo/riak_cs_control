@@ -113,6 +113,27 @@ update msg m =
             , Cmd.none
             )
 
+        ListAllBuckets ->
+            (m, (List.map
+                     (\b -> Request.Rcs.listBucket m b)
+                     m.s.users) |> Cmd.batch)
+        ListBucket b ->
+            (m, Request.Rcs.listBucket m b)
+        GotBucketList (Ok a) ->
+            let
+                s_ = m.s
+                bucketStats_ = s_.bucketstats
+            in
+                ( {m | s = {s_ | bucketStats = Model.updateBucketStats a}}
+                , Cmd.none
+                )
+        GotBucketList (Err err) ->
+            let s_ = m.s in
+            ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+                            (Snackbar.message ("Failed to get bucket contents: " ++ (explainHttpError err))) m.s.msgQueue}}
+            , Cmd.none
+            )
+
         ShowEditUserDialog u ->
             let s_ = m.s in
             ({m | s = {s_ | openEditUserDialogFor = Just u}}, Cmd.none)
