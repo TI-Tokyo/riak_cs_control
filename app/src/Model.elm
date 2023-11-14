@@ -6,6 +6,7 @@ module Model exposing
     , SortOrder
     , userBy
     , policyByName
+    , flattenUserBucketList
     , updateBucketStats
     )
 
@@ -35,6 +36,7 @@ type SortByField
     | CreateDate
     | AttachmentCount
     | RoleLastUsed
+    | TotalObjectSize
     | Unsorted
 
 type alias SortOrder = Bool
@@ -98,7 +100,10 @@ type alias State =
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
 
-    -- usage
+    -- bucket stats/usage
+    , usageFilterValue : String
+    , usageSortBy : SortByField
+    , usageSortOrder : SortOrder
     }
 
 
@@ -114,16 +119,30 @@ policyByName m a =
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
 
---updateBucketStats : BucketStats -> BucketContentsItem -> BucketStats
-updateBucketStats ss si =
+
+flattenUserBucketList : Model -> List (String, String)
+flattenUserBucketList m =
     let
-        stats0 = case Dict.get si.userName ss of
+        ubPairs = \u bb -> List.map (\{name} -> (u, name)) bb
+    in
+        List.foldl
+            (\{userName, buckets} q -> (ubPairs userName buckets) ++ q)
+            [] m.s.users
+
+updateBucketStats : Model -> BucketContents -> Model
+updateBucketStats m bc =
+    let
+        s_ = m.s
+        stats0 = case Dict.get bc.userName m.s.bucketStats of
                      Nothing ->
                          BucketStatsItem 0 0 0
                      Just s ->
                          s
         stats9 = {stats0 | totalBuckets = stats0.totalBuckets + 1,
-                           totalObjects = stats0.totalObjects + List.length si.contents,
-                           totalSize = stats0.totalSize + (List.foldl (\c q -> c.size + q) 0 si.contents)}
+                           totalObjects = stats0.totalObjects + List.length bc.contents,
+                           totalSize = stats0.totalSize + (List.foldl (\c q -> c.size + q) 0 bc.contents)}
+        bucketStats9 =
+            Dict.insert bc.userName stats9 m.s.bucketStats
     in
-        Dict.insert si.userName stats9 ss
+        {m | s = {s_ | bucketStats = bucketStats9}}
+

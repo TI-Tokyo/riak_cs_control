@@ -18,8 +18,6 @@ type alias Flags =
 emptyUsage =
     Data.Struct.Usage (Time.millisToPosix 0) (Time.millisToPosix 0) Dict.empty
 
-emptyBucketStats =
-    Data.Struct.BucketStats Dict.empty
 
 init : Flags -> (Model, Cmd Msg)
 init f =
@@ -27,7 +25,7 @@ init f =
         haveCreds = f.csAdminSecret /= "" && f.csAdminKey /= ""
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
         state = State
-                    [] [] [] emptyUsage
+                    [] [] [] Dict.empty emptyUsage
                     Snackbar.initialQueue Msg.General
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
@@ -37,6 +35,7 @@ init f =
                     False "" "/" Nothing "" []
                     "" Name True
                     False "" "/" Nothing "" Nothing 3600 []
+                    "" Name True
         model = Model config state (Time.millisToPosix 0)
     in
         ( model

@@ -38,7 +38,7 @@ type Msg
     | UserDeleted (Result Http.Error ())
     | UpdateUser
     | ListAllBuckets
-    | ListBucket String
+    | ListBucket String String
     | GotBucketList (Result Http.Error BucketContents)
     | AttachUserPolicyBatch
     | DetachUserPolicyBatch
@@ -128,6 +128,8 @@ type Msg
     -- usage
     | UsageFilterChanged String
     | UsageSortByFieldChanged String
+    | UsageSortOrderChanged
+    -- later
     | UsageDateFromChanged String
     | UsageDateToChanged String
 

@@ -1,6 +1,6 @@
 module View.Usage exposing (makeContent)
 
-import Model exposing (Model)
+import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import View.Common
 
@@ -15,11 +15,12 @@ import Material.IconButton as IconButton
 import Material.Typography as Typography
 import Chart as C
 import Chart.Attributes as CA
+import Svg.Attributes as SA
 
 
 makeContent m =
     Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle ((View.Common.makeSubTab m) ++ (localSubTabElements m))
+        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
         , Html.div [] [makeUsage m]
         ]
 
@@ -42,17 +43,26 @@ localSubTabElements m =
 
 makeUsage m =
     let
-        data = Dict.toList m.s.usage.stats
-             |> List.map (\(k, u) -> { label = (Model.userBy m .keyId k) |> .userName
-                                     , bytes = bytesFrom u.storage.samples
+        byWhich =
+            case m.s.usageSortBy of
+                -- Name -> .label
+                TotalObjectSize -> .bytes
+                _ -> .bytes
+        maybeReverse =
+            if m.s.usageSortOrder then identity else List.reverse
+
+        data = Dict.toList m.s.bucketStats
+             |> List.map (\(k, u) -> { label = k
+                                     , bytes = toFloat u.totalSize
                                      })
-        _ = Debug.log "data" data
+             |> List.sortBy byWhich
+             |> maybeReverse
     in
-        Html.div [] [
-             C.chart
-                 [ CA.height 3
-                 , CA.width 3
+        Html.div [ style "display" "grid"
+                 , style "max-height" "500"
                  ]
+            [C.chart
+                 []
                  [ C.grid []
                  , C.yLabels [ CA.withGrid ]
                  , C.binLabels .label [ CA.moveDown 20 ]
@@ -60,6 +70,7 @@ makeUsage m =
                      [ C.bar .bytes []
                      ]
                      data
+                 , C.barLabels [ CA.moveDown 15, CA.color "white" ]
                  ]
             ]
 

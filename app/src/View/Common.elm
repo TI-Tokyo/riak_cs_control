@@ -59,11 +59,51 @@ makeSubTab m =
     let
         a =
             case m.s.activeTab of
-                Msg.General -> {a = "", b = Unsorted, c = Discard, d = Discard, e = NoOp, f = "Name", g = ["CreateDate"], h = True}
-                Msg.Users -> {a = m.s.userFilterValue, b = m.s.userSortBy, c = UserFilterChanged, d = UserSortByFieldChanged, e = UserSortOrderChanged, f = "Name", g = ["CreateDate"], h = m.s.userSortOrder}
-                Msg.Policies -> {a = m.s.policyFilterValue, b = m.s.policySortBy, c = PolicyFilterChanged, d = PolicySortByFieldChanged, e = PolicySortOrderChanged, f = "Name", g = ["CreateDate", "AttachmentCount"], h = m.s.policySortOrder}
-                Msg.Roles -> {a = m.s.roleFilterValue, b = m.s.roleSortBy, c = RoleFilterChanged, d = RoleSortByFieldChanged, e = RoleSortOrderChanged, f = "Name", g = ["CreateDate", "RoleLastUsed"], h = m.s.roleSortOrder}
-                Msg.Usage -> {a = "", b = Unsorted, c = UsageFilterChanged, d = UsageSortByFieldChanged, e = NoOp, f = "", g = [], h = True}
+                Msg.General ->  { a = ""
+                                , b = Unsorted
+                                , c = Discard
+                                , d = Discard
+                                , e = NoOp
+                                , f = "Name"
+                                , g = []
+                                , h = True
+                                }
+                Msg.Users ->    { a = m.s.userFilterValue
+                                , b = m.s.userSortBy
+                                , c = UserFilterChanged
+                                , d = UserSortByFieldChanged
+                                , e = UserSortOrderChanged
+                                , f = "Name"
+                                , g = ["CreateDate"]
+                                , h = m.s.userSortOrder
+                                }
+                Msg.Policies -> { a = m.s.policyFilterValue
+                                , b = m.s.policySortBy
+                                , c = PolicyFilterChanged
+                                , d = PolicySortByFieldChanged
+                                , e = PolicySortOrderChanged
+                                , f = "Name"
+                                , g = ["CreateDate", "AttachmentCount"]
+                                , h = m.s.policySortOrder
+                                }
+                Msg.Roles ->    { a = m.s.roleFilterValue
+                                , b = m.s.roleSortBy
+                                , c = RoleFilterChanged
+                                , d = RoleSortByFieldChanged
+                                , e = RoleSortOrderChanged
+                                , f = "Name"
+                                , g = ["CreateDate", "RoleLastUsed"]
+                                , h = m.s.roleSortOrder
+                                }
+                Msg.Usage ->    { a = m.s.usageFilterValue
+                                , b = m.s.usageSortBy
+                                , c = UsageFilterChanged
+                                , d = UsageSortByFieldChanged
+                                , e = UsageSortOrderChanged
+                                , f = "Name"
+                                , g = ["CreateDate", "TotalObjectSize", "Name"]
+                                , h = m.s.usageSortOrder
+                                }
         sortOrderText =
             \o -> if o then "Asc" else "Desc"
     in
@@ -90,6 +130,7 @@ selectSortByString a =
         CreateDate -> "CreateDate"
         AttachmentCount -> "AttachmentCount"
         RoleLastUsed -> "RoleLastUsed"
+        TotalObjectSize -> "TotalObjectSize"
         Unsorted -> "None"
 
 stringToSortBy a =
@@ -98,5 +139,6 @@ stringToSortBy a =
         "CreateDate" -> CreateDate
         "AttachmentCount" -> AttachmentCount
         "RoleLastUsed" -> RoleLastUsed
+        "TotalObjectSize" -> TotalObjectSize
         _ -> Unsorted
 

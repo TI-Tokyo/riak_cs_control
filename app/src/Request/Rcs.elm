@@ -45,7 +45,7 @@ getServerInfo m =
             , ("x-amz-date", date)
             ]
         sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/info"
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
         Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "info" ] []
             |> HttpBuilder.get
@@ -67,7 +67,7 @@ listUsers m =
             , ("x-amz-date", date)
             ]
         sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/users"
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
         Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "users" ] []
             |> HttpBuilder.get
@@ -93,7 +93,7 @@ createUser m  =
             , ("x-amz-date", date)
             ]
         sig = Signature.v2 m.c.csAdminSecret cmd5 "POST" ct date (extractAmzHeaders stdHeaders) "/riak-cs/user"
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "user" ] []
             |> HttpBuilder.post
@@ -124,7 +124,7 @@ updateUser m  =
             , ("x-amz-date", date)
             ]
         sig = Signature.v2 m.c.csAdminSecret cmd5 "PUT" ct date (extractAmzHeaders stdHeaders) "/riak-cs/user"
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "user" ] []
             |> HttpBuilder.put
@@ -148,7 +148,7 @@ deleteUser m a =
             , ("x-amz-date", date)
             ]
         sig = Signature.v2 m.c.csAdminSecret cmd5 "DELETE" ct date (extractAmzHeaders stdHeaders) ("/riak-cs/user/" ++ userKey)
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "user", userKey ] []
             |> HttpBuilder.delete
@@ -162,15 +162,17 @@ listBucket m u b =
     let
         cmd5 = md5b64 ""
         date = rfc1123Date m.t
-        ct = "application/json"
+        ct = "application/xml"
         stdHeaders =
             [ ("accept", ct)
             , ("content-md5", cmd5)
             , ("content-type", ct)
             , ("x-amz-date", date)
             ]
-        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/buckets/" ++ b ++ "/objects"
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        secret = Model.userBy m .userName u |> .secretKey
+        key = Model.userBy m .userName u |> .keyId
+        sig = Signature.v2 secret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) ("/buckets/" ++ b ++ "/objects")
+        authHeader = ("Authorization", makeAuthHeader key sig)
     in
         Url.Builder.crossOrigin m.c.csUrl [ "buckets", b, "objects" ] []
             |> HttpBuilder.get
@@ -195,7 +197,7 @@ getUsage m k t0 t9 =
         path = Url.Builder.absolute pe
             []
         sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) path
-        authHeader = ("Authorization", makeAuthHeader m sig)
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
         Url.Builder.crossOrigin m.c.csUrl pe
             []
@@ -212,8 +214,8 @@ rfc1123Date t =
 extractAmzHeaders hh =
     List.filter (\(h, _) -> String.left 6 h == "x-amz-") hh
 
-makeAuthHeader m sig =
-    "AWS " ++ m.c.csAdminKey ++ ":" ++ sig
+makeAuthHeader key sig =
+    "AWS " ++ key ++ ":" ++ sig
 
 md5b64 a =
     case Bytes.Extra.fromByteValues (MD5.bytes a) |> Base64.fromBytes of

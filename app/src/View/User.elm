@@ -223,18 +223,21 @@ makeEditUserDialog m =
                               [ TextField.filled
                                     (TextField.config
                                     |> TextField.setLabel (Just "Name")
+                                    |> TextField.setRequired True
                                     |> TextField.setValue (Just u.userName)
                                     |> TextField.setOnInput EditedUserNameChanged
                                     )
                               , TextField.filled
                                     (TextField.config
                                     |> TextField.setLabel (Just "Email")
+                                    |> TextField.setRequired True
                                     |> TextField.setValue (Just u.email)
                                     |> TextField.setOnInput EditedUserEmailChanged
                                     )
                               , TextField.filled
                                     (TextField.config
                                     |> TextField.setLabel (Just "Path")
+                                    |> TextField.setRequired True
                                     |> TextField.setValue (Just u.path)
                                     |> TextField.setOnInput EditedUserPathChanged
                                     )

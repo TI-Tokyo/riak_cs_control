@@ -61,7 +61,7 @@ listWhat m =
         Msg.Users -> ListUsers
         Msg.Roles -> ListRoles
         Msg.Policies -> ListPolicies
-        Msg.Usage -> GetAllUsage
+        Msg.Usage -> ListAllBuckets
 
 
 makeTabs m =

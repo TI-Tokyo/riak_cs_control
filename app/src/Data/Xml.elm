@@ -152,7 +152,15 @@ bucketContentsItem =
         |> requiredPath ["LastModified"] (single date)
         |> requiredPath ["Size"] (single int)
         |> requiredPath ["StorageClass"] (single string)
-        |> requiredPath ["Owner"] (single owner)
+        |> requiredPath ["Owner"] (single owner2)
+
+owner2 =
+    succeed Owner
+        |> optionalPath ["DisplayName"] (single string) ""
+        |> requiredPath ["ID"] (single string)
+        |> optionalPath ["Email"] (single string) ""
+        |> optionalPath ["KeyId"] (single string) ""
+
 
 date =
     map dateFromString string

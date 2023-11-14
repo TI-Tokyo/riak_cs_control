@@ -114,19 +114,13 @@ update msg m =
             )
 
         ListAllBuckets ->
-            (m, (List.map
-                     (\b -> Request.Rcs.listBucket m b)
-                     m.s.users) |> Cmd.batch)
-        ListBucket b ->
-            (m, Request.Rcs.listBucket m b)
+            (m, listAllBucketsCmd m)
+        ListBucket u b ->
+            (m, Request.Rcs.listBucket m u b)
         GotBucketList (Ok a) ->
-            let
-                s_ = m.s
-                bucketStats_ = s_.bucketstats
-            in
-                ( {m | s = {s_ | bucketStats = Model.updateBucketStats a}}
-                , Cmd.none
-                )
+            (Model.updateBucketStats m a
+            , Cmd.none
+            )
         GotBucketList (Err err) ->
             let s_ = m.s in
             ( {m | s = {s_ | msgQueue = Snackbar.addMessage
@@ -349,9 +343,14 @@ update msg m =
         -- Usage
         ------------------------------
         UsageFilterChanged s ->
-            (m, Cmd.none)
+            let s_ = m.s in
+            ({m | s = {s_ | usageFilterValue = s}}, Cmd.none)
         UsageSortByFieldChanged s ->
-            (m, Cmd.none)
+            let s_ = m.s in
+            ({m | s = {s_ | usageSortBy = View.Common.stringToSortBy s}}, Cmd.none)
+        UsageSortOrderChanged ->
+            let s_ = m.s in
+            ({m | s = {s_ | usageSortOrder = not s_.usageSortOrder}}, Cmd.none)
 
         UsageDateFromChanged s ->
             let
@@ -381,9 +380,7 @@ update msg m =
                         )
 
         GetAllUsage ->
-            (m, (List.map
-                     (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
-                     m.s.users) |> Cmd.batch)
+            (m, getAllUsageCmd m)
         GetUsage k ->
             (m, Request.Rcs.getUsage m k m.s.usage.dateFrom m.s.usage.dateTo)
         GotUsage (Ok i) ->
@@ -461,17 +458,23 @@ update msg m =
         Discard _ ->
             (m, Cmd.none)
 
+
+listAllBucketsCmd m =
+    (List.map
+         (\(u, b) -> Request.Rcs.listBucket m u b)
+         (Model.flattenUserBucketList m)) |> Cmd.batch
+
+getAllUsageCmd m =
+    (List.map
+         (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
+         m.s.users) |> Cmd.batch
 refreshTabMsg m t =
     case t of
-        Msg.General -> Cmd.none
+        Msg.General -> Request.Rcs.getServerInfo m
         Msg.Users -> Cmd.batch [Request.Rcs.listUsers m, Request.Aws.listPolicies m]
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
-        Msg.Usage ->
-            (List.map
-                 (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
-                 m.s.users)
-                |> Cmd.batch
+        Msg.Usage -> listAllBucketsCmd m
 
 
 explainHttpError a =
