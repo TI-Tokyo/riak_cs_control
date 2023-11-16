@@ -74,7 +74,7 @@ makeSubTab m =
                                 , d = UserSortByFieldChanged
                                 , e = UserSortOrderChanged
                                 , f = "Name"
-                                , g = ["CreateDate"]
+                                , g = ["Create date"]
                                 , h = m.s.userSortOrder
                                 }
                 Msg.Policies -> { a = m.s.policyFilterValue
@@ -83,7 +83,7 @@ makeSubTab m =
                                 , d = PolicySortByFieldChanged
                                 , e = PolicySortOrderChanged
                                 , f = "Name"
-                                , g = ["CreateDate", "AttachmentCount"]
+                                , g = ["Create date", "Attachment count"]
                                 , h = m.s.policySortOrder
                                 }
                 Msg.Roles ->    { a = m.s.roleFilterValue
@@ -92,7 +92,7 @@ makeSubTab m =
                                 , d = RoleSortByFieldChanged
                                 , e = RoleSortOrderChanged
                                 , f = "Name"
-                                , g = ["CreateDate", "RoleLastUsed"]
+                                , g = ["Create date", "Role last used"]
                                 , h = m.s.roleSortOrder
                                 }
                 Msg.Usage ->    { a = m.s.usageFilterValue
@@ -100,8 +100,8 @@ makeSubTab m =
                                 , c = UsageFilterChanged
                                 , d = UsageSortByFieldChanged
                                 , e = UsageSortOrderChanged
-                                , f = "Name"
-                                , g = ["CreateDate", "TotalObjectSize", "Name"]
+                                , f = "Total object size"
+                                , g = ["Create date", "Total object size", "Total object count", "Total bucket count", "Name"]
                                 , h = m.s.usageSortOrder
                                 }
         sortOrderText =
@@ -127,18 +127,22 @@ makeSubTab m =
 selectSortByString a =
     case a of
         Name -> "Name"
-        CreateDate -> "CreateDate"
-        AttachmentCount -> "AttachmentCount"
-        RoleLastUsed -> "RoleLastUsed"
-        TotalObjectSize -> "TotalObjectSize"
+        CreateDate -> "Create date"
+        AttachmentCount -> "Attachment count"
+        RoleLastUsed -> "Role last used"
+        TotalObjectSize -> "Total object size"
+        TotalObjectCount -> "Total object count"
+        TotalBucketCount -> "Total bucket count"
         Unsorted -> "None"
 
 stringToSortBy a =
     case a of
         "Name" -> Name
-        "CreateDate" -> CreateDate
-        "AttachmentCount" -> AttachmentCount
-        "RoleLastUsed" -> RoleLastUsed
-        "TotalObjectSize" -> TotalObjectSize
+        "Create date" -> CreateDate
+        "Attachment count" -> AttachmentCount
+        "Role last used" -> RoleLastUsed
+        "Total object size" -> TotalObjectSize
+        "Total object count" -> TotalObjectCount
+        "Total bucket count" -> TotalBucketCount
         _ -> Unsorted
 

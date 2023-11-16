@@ -176,16 +176,19 @@ makeCreateUserDialog m =
                           [ TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Name")
+                                |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserNameChanged
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Email")
+                                |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserEmailChanged
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Path")
+                                |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserPathChanged
                                 )
                           ]

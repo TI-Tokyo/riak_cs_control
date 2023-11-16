@@ -96,7 +96,7 @@ makeTabs m =
                     |> Tab.setActive (m.s.activeTab == Msg.Usage)
                     |> Tab.setOnClick (TabClicked Msg.Usage)
                     )
-                    { label = "Usage", icon = Nothing }
+                    { label = "Bucket stats", icon = Nothing }
               ]
     ]
 

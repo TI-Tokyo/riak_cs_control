@@ -11,6 +11,7 @@ import Util
 
 
 import Time
+import Task
 import Dict exposing (Dict)
 import Iso8601
 import Json.Decode
@@ -23,7 +24,9 @@ update msg m =
     case msg of
         TabClicked t ->
             let s_ = m.s in
-            ({m | s = {s_ | activeTab = t}}, refreshTabMsg m t)
+            ( {m | s = {s_ | activeTab = t, bucketStats = Dict.empty}}
+            , refreshTabMsg m t
+            )
 
         -- ServerInfo
         ------------------------------
@@ -113,12 +116,15 @@ update msg m =
             , Cmd.none
             )
 
+        ClearBucketsStats ->
+            let s_ = m.s in
+            ({m | s = {s_ | bucketStats = Dict.empty}}, Cmd.none)
         ListAllBuckets ->
             (m, listAllBucketsCmd m)
         ListBucket u b ->
             (m, Request.Rcs.listBucket m u b)
         GotBucketList (Ok a) ->
-            (Model.updateBucketStats m a
+            ( Model.updateBucketStats m a
             , Cmd.none
             )
         GotBucketList (Err err) ->
@@ -448,8 +454,11 @@ update msg m =
                     s_ = m.s
                     usage_ = s_.usage
                     oneDayEarlier = \x -> (Time.posixToMillis x) - 24 * 3600 * 1000 |> Time.millisToPosix
+                    m_ = {m | t = a, s = {s_ | usage = {usage_ | dateFrom = oneDayEarlier a, dateTo = a}}}
                 in
-                    ({m | t = a, s = {s_ | usage = {usage_ | dateFrom = oneDayEarlier a, dateTo = a}}}, Cmd.none)
+                    ( m_
+                    , refreshEssentials m_
+                    )
             else
                 ({ m | t = a}, Cmd.none)
 
@@ -460,21 +469,32 @@ update msg m =
 
 
 listAllBucketsCmd m =
-    (List.map
-         (\(u, b) -> Request.Rcs.listBucket m u b)
-         (Model.flattenUserBucketList m)) |> Cmd.batch
+    let
+        rr = List.map
+             (\(u, b) -> Task.perform (ListBucket u b) (Task.succeed ()))
+             (Model.flattenUserBucketList m)
+    in
+         Task.perform (Task.sequence rr) (Task.succeed ())
 
 getAllUsageCmd m =
     (List.map
          (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
          m.s.users) |> Cmd.batch
+
+
 refreshTabMsg m t =
     case t of
         Msg.General -> Request.Rcs.getServerInfo m
-        Msg.Users -> Cmd.batch [Request.Rcs.listUsers m, Request.Aws.listPolicies m]
+        Msg.Users -> refreshEssentials m
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
         Msg.Usage -> listAllBucketsCmd m
+
+refreshEssentials m =
+    Cmd.batch [ Request.Rcs.getServerInfo m
+              , Request.Rcs.listUsers m
+              , Request.Aws.listPolicies m
+              ]
 
 
 explainHttpError a =

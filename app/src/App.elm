@@ -35,7 +35,7 @@ init f =
                     False "" "/" Nothing "" []
                     "" Name True
                     False "" "/" Nothing "" Nothing 3600 []
-                    "" Name True
+                    "" TotalObjectSize True
         model = Model config state (Time.millisToPosix 0)
     in
         ( model

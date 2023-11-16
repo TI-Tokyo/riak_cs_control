@@ -142,7 +142,7 @@ decodePolicyCreated =
 decodeBucketContents u =
     succeed BucketContents
         |> requiredPath ["Name"] (single string)
-        |> requiredPath ["Contents"] (list bucketContentsItem)
+        |> optionalPath ["Contents"] (list bucketContentsItem) []
         -- threading user
         |> optionalPath ["UserName"] (single string) u
 

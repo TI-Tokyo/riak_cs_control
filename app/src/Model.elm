@@ -37,6 +37,8 @@ type SortByField
     | AttachmentCount
     | RoleLastUsed
     | TotalObjectSize
+    | TotalObjectCount
+    | TotalBucketCount
     | Unsorted
 
 type alias SortOrder = Bool
@@ -138,9 +140,9 @@ updateBucketStats m bc =
                          BucketStatsItem 0 0 0
                      Just s ->
                          s
-        stats9 = {stats0 | totalBuckets = stats0.totalBuckets + 1,
-                           totalObjects = stats0.totalObjects + List.length bc.contents,
-                           totalSize = stats0.totalSize + (List.foldl (\c q -> c.size + q) 0 bc.contents)}
+        stats9 = {stats0 | totalBucketCount = stats0.totalBucketCount + 1,
+                           totalObjectCount = stats0.totalObjectCount + List.length bc.contents,
+                           totalObjectSize = stats0.totalObjectSize + (List.foldl (\c q -> c.size + q) 0 bc.contents)}
         bucketStats9 =
             Dict.insert bc.userName stats9 m.s.bucketStats
     in

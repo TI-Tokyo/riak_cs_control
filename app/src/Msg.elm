@@ -37,6 +37,7 @@ type Msg
     | DeleteUser String
     | UserDeleted (Result Http.Error ())
     | UpdateUser
+    | ClearBucketsStats
     | ListAllBuckets
     | ListBucket String String
     | GotBucketList (Result Http.Error BucketContents)

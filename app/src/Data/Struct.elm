@@ -84,9 +84,9 @@ type alias BucketContents =
     }
 
 type alias BucketStatsItem =
-    { totalBuckets : Int
-    , totalObjects : Int
-    , totalSize : Int
+    { totalBucketCount : Int
+    , totalObjectCount : Int
+    , totalObjectSize : Int
     }
 type alias BucketStats =
     Dict String BucketStatsItem
