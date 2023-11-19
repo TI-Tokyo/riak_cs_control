@@ -12,11 +12,11 @@
         "errors": "webpack --mode development --display-error-details"
     },
     "dependencies": {
-        "elm": "^0.19.1-5",
+        "elm": "^0.19.1-6",
         "elm-webpack-loader": "^8.0.0",
         "less": "^4.2.0",
         "material-components-web-elm": "^9.1.0",
-        "parcel": "^2.10.1"
+        "parcel": "^2.10.3"
     },
     "devDependencies": {
         "@babel/core": "^7.22.20",

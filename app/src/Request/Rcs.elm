@@ -19,6 +19,7 @@ import Util exposing (hash)
 import Iso8601
 import Http
 import HttpBuilder
+import HttpBuilder.Task
 import Url.Builder
 import Time
 import Json.Encode
@@ -29,8 +30,9 @@ import Base64
 import Bytes.Extra
 import Url
 import Http.Xml
-
-
+import Retry
+import Task
+import Xml.Decode
 
 getServerInfo : Model -> Cmd Msg
 getServerInfo m =
@@ -173,12 +175,34 @@ listBucket m u b =
         key = Model.userBy m .userName u |> .keyId
         sig = Signature.v2 secret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) ("/buckets/" ++ b ++ "/objects")
         authHeader = ("Authorization", makeAuthHeader key sig)
+        url = Url.Builder.crossOrigin m.c.csUrl [ "buckets", b, "objects" ] []
+        task = Http.task
+            { url = url
+            , method = "get"
+            , body = Http.emptyBody
+            , headers = List.map (\(h, v) -> Http.header h v) (authHeader :: stdHeaders)
+            , resolver = Http.stringResolver (listBucketResolver u)
+            , timeout = Nothing
+            }
+        retryConfig =
+            [ Retry.maxDuration 7000
+            , Retry.exponentialBackoff { interval = 500, maxInterval = 3000 }
+            ]
     in
-        Url.Builder.crossOrigin m.c.csUrl [ "buckets", b, "objects" ] []
-            |> HttpBuilder.get
-            |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
-            |> HttpBuilder.withExpect (Http.Xml.expectXml GotBucketList (Data.Xml.decodeBucketContents u))
-            |> HttpBuilder.request
+        task |> Retry.with retryConfig |> Task.attempt GotBucketList
+
+listBucketResolver u a =
+    case a of
+        Http.GoodStatus_ _ body ->
+            case Xml.Decode.run (Data.Xml.decodeBucketContents u) body of
+                Ok b ->
+                    Ok b
+                Err err ->
+                    Err (Http.BadBody "Bad XML")
+        Http.BadStatus_ md _ ->
+            Err (Http.BadStatus md.statusCode)
+        _ ->
+            Err (Http.NetworkError)
 
 
 getUsage : Model -> String -> Time.Posix -> Time.Posix -> Cmd Msg

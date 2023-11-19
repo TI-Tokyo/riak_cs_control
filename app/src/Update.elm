@@ -16,6 +16,7 @@ import Dict exposing (Dict)
 import Iso8601
 import Json.Decode
 import Http
+import Retry
 import Material.Snackbar as Snackbar
 
 
@@ -470,11 +471,16 @@ update msg m =
 
 listAllBucketsCmd m =
     let
-        rr = List.map
-             (\(u, b) -> Task.perform (ListBucket u b) (Task.succeed ()))
+        config =
+            [ Retry.maxDuration 7000
+            , Retry.constantInterval 800
+            ]
+        cc = List.map
+             (\(u, b) ->
+                  Request.Rcs.listBucket m u b)
              (Model.flattenUserBucketList m)
     in
-         Task.perform (Task.sequence rr) (Task.succeed ())
+         Cmd.batch cc
 
 getAllUsageCmd m =
     (List.map
