@@ -5,7 +5,7 @@ module Request.Rcs exposing
     , deleteUser
     , updateUser
     , listBucket
-    , getUsage
+--    , getUsage
     )
 
 import Model exposing (Model)
@@ -186,7 +186,7 @@ listBucket m u b =
             }
         retryConfig =
             [ Retry.maxDuration 7000
-            , Retry.exponentialBackoff { interval = 500, maxInterval = 3000 }
+            , Retry.exponentialBackoff { interval = 250, maxInterval = 3000 }
             ]
     in
         task |> Retry.with retryConfig |> Task.attempt GotBucketList
@@ -205,30 +205,30 @@ listBucketResolver u a =
             Err (Http.NetworkError)
 
 
-getUsage : Model -> String -> Time.Posix -> Time.Posix -> Cmd Msg
-getUsage m k t0 t9 =
-    let
-        cmd5 = md5b64 ""
-        date = rfc1123Date m.t
-        ct = "application/json"
-        stdHeaders =
-            [ ("accept", ct)
-            , ("content-md5", cmd5)
-            , ("content-type", ct)
-            , ("x-amz-date", date)
-            ]
-        pe = [ "riak-cs", "usage", k, "bj", Util.amzDate t0, Util.amzDate t9 ]
-        path = Url.Builder.absolute pe
-            []
-        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) path
-        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
-    in
-        Url.Builder.crossOrigin m.c.csUrl pe
-            []
-            |> HttpBuilder.get
-            |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
-            |> HttpBuilder.withExpect (Http.expectJson GotUsage (Data.Json.decodeUsage k))
-            |> HttpBuilder.request
+-- getUsage : Model -> String -> Time.Posix -> Time.Posix -> Cmd Msg
+-- getUsage m k t0 t9 =
+--     let
+--         cmd5 = md5b64 ""
+--         date = rfc1123Date m.t
+--         ct = "application/json"
+--         stdHeaders =
+--             [ ("accept", ct)
+--             , ("content-md5", cmd5)
+--             , ("content-type", ct)
+--             , ("x-amz-date", date)
+--             ]
+--         pe = [ "riak-cs", "usage", k, "bj", Util.amzDate t0, Util.amzDate t9 ]
+--         path = Url.Builder.absolute pe
+--             []
+--         sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) path
+--         authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
+--     in
+--         Url.Builder.crossOrigin m.c.csUrl pe
+--             []
+--             |> HttpBuilder.get
+--             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
+--             |> HttpBuilder.withExpect (Http.expectJson GotUsage (Data.Json.decodeUsage k))
+--             |> HttpBuilder.request
 
 
 

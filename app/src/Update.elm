@@ -121,7 +121,8 @@ update msg m =
             let s_ = m.s in
             ({m | s = {s_ | bucketStats = Dict.empty}}, Cmd.none)
         ListAllBuckets ->
-            (m, listAllBucketsCmd m)
+            let s_ = m.s in
+            ({m | s = {s_ | bucketStats = Dict.empty}}, listAllBucketsCmd m)
         ListBucket u b ->
             (m, Request.Rcs.listBucket m u b)
         GotBucketList (Ok a) ->
@@ -358,56 +359,59 @@ update msg m =
         UsageSortOrderChanged ->
             let s_ = m.s in
             ({m | s = {s_ | usageSortOrder = not s_.usageSortOrder}}, Cmd.none)
+        UsageTopItemsShownChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | usageTopItemsShown = String.toInt s |> Maybe.withDefault 8}}, Cmd.none)
 
-        UsageDateFromChanged s ->
-            let
-                s_ = m.s
-                usage_ = s_.usage
-            in
-                case Iso8601.toTime s of
-                    Ok t ->
-                        ({m | s = {s_ | usage = {usage_ | dateFrom = t}}}, Cmd.none)
-                    Err _ ->
-                        ( {m | s = {s_ | msgQueue = Snackbar.addMessage
-                                        (Snackbar.message "Invalid date") m.s.msgQueue}}
-                        , Cmd.none
-                        )
-        UsageDateToChanged s ->
-            let
-                s_ = m.s
-                usage_ = s_.usage
-            in
-                case Iso8601.toTime s of
-                    Ok t ->
-                        ({m | s = {s_ | usage = {usage_ | dateTo = t}}}, Cmd.none)
-                    Err _ ->
-                        ( {m | s = {s_ | msgQueue = Snackbar.addMessage
-                                        (Snackbar.message "Invalid date") m.s.msgQueue}}
-                        , Cmd.none
-                        )
+        -- UsageDateFromChanged s ->
+        --     let
+        --         s_ = m.s
+        --         usage_ = s_.usage
+        --     in
+        --         case Iso8601.toTime s of
+        --             Ok t ->
+        --                 ({m | s = {s_ | usage = {usage_ | dateFrom = t}}}, Cmd.none)
+        --             Err _ ->
+        --                 ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+        --                                 (Snackbar.message "Invalid date") m.s.msgQueue}}
+        --                 , Cmd.none
+        --                 )
+        -- UsageDateToChanged s ->
+        --     let
+        --         s_ = m.s
+        --         usage_ = s_.usage
+        --     in
+        --         case Iso8601.toTime s of
+        --             Ok t ->
+        --                 ({m | s = {s_ | usage = {usage_ | dateTo = t}}}, Cmd.none)
+        --             Err _ ->
+        --                 ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+        --                                 (Snackbar.message "Invalid date") m.s.msgQueue}}
+        --                 , Cmd.none
+        --                 )
 
-        GetAllUsage ->
-            (m, getAllUsageCmd m)
-        GetUsage k ->
-            (m, Request.Rcs.getUsage m k m.s.usage.dateFrom m.s.usage.dateTo)
-        GotUsage (Ok i) ->
-            let
-                s_ = m.s
-                usage_ = s_.usage
-                stats_ = usage_.stats
-            in
-                ({m | s = {s_ | usage = {usage_ | stats = Dict.insert i.keyId i stats_}}}
-                 , Cmd.none
-                 )
-        GotUsage (Err err) ->
-            let
-                s_ = m.s
-                usage_ = s_.usage
-            in
-                ( {m | s = {s_ | usage = {usage_ | stats = Dict.empty}, msgQueue = Snackbar.addMessage
-                                (Snackbar.message ("Failed to fetch usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
-                , Cmd.none
-                )
+        -- GetAllUsage ->
+        --     (m, getAllUsageCmd m)
+        -- GetUsage k ->
+        --     (m, Request.Rcs.getUsage m k m.s.usage.dateFrom m.s.usage.dateTo)
+        -- GotUsage (Ok i) ->
+        --     let
+        --         s_ = m.s
+        --         usage_ = s_.usage
+        --         stats_ = usage_.stats
+        --     in
+        --         ({m | s = {s_ | usage = {usage_ | stats = Dict.insert i.keyId i stats_}}}
+        --          , Cmd.none
+        --          )
+        -- GotUsage (Err err) ->
+        --     let
+        --         s_ = m.s
+        --         usage_ = s_.usage
+        --     in
+        --         ( {m | s = {s_ | usage = {usage_ | stats = Dict.empty}, msgQueue = Snackbar.addMessage
+        --                         (Snackbar.message ("Failed to fetch usage stats: " ++ (explainHttpError err))) m.s.msgQueue}}
+        --         , Cmd.none
+        --         )
 
         -- Admin creds
         ------------------------------
@@ -471,10 +475,6 @@ update msg m =
 
 listAllBucketsCmd m =
     let
-        config =
-            [ Retry.maxDuration 7000
-            , Retry.constantInterval 800
-            ]
         cc = List.map
              (\(u, b) ->
                   Request.Rcs.listBucket m u b)
@@ -482,10 +482,10 @@ listAllBucketsCmd m =
     in
          Cmd.batch cc
 
-getAllUsageCmd m =
-    (List.map
-         (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
-         m.s.users) |> Cmd.batch
+-- getAllUsageCmd m =
+--     (List.map
+--          (\{keyId} -> Request.Rcs.getUsage m keyId m.s.usage.dateFrom m.s.usage.dateTo)
+--          m.s.users) |> Cmd.batch
 
 
 refreshTabMsg m t =
@@ -506,7 +506,7 @@ refreshEssentials m =
 explainHttpError a =
     case a of
         Http.BadBody s ->
-            "" ++ (ellipsize s)
+            "" ++ (Util.ellipsize s 50)
         Http.Timeout ->
             "Request timed out"
         Http.NetworkError ->
@@ -515,12 +515,6 @@ explainHttpError a =
             "Bad status " ++ String.fromInt s
         Http.BadUrl s ->
             "BadUrl. This shouldn't have happened"
-
-ellipsize a =
-    if String.length a > 40 then
-        (String.left 40 a) ++ "..."
-    else
-        a
 
 toggleStatus a =
     case a of

@@ -61,6 +61,8 @@ maybeTags aa pfx =
     else
         pfx ++ String.join "; " (List.map (\t -> t.name ++ ":" ++ t.value) aa)
 
+
+pprintJson : String -> String
 pprintJson a =
     let
         cfg =
@@ -71,5 +73,13 @@ pprintJson a =
     Result.withDefault "(bad json)" (Json.Print.prettyString cfg a)
 
 
-timeBefore t a =
-    (Time.posixToMillis t - a * 1000) |> Time.millisToPosix
+-- timeBefore t a =
+--     (Time.posixToMillis t - a * 1000) |> Time.millisToPosix
+
+
+ellipsize : String -> Int -> String
+ellipsize a n =
+    if String.length a > n then
+        (String.left n a) ++ "…"
+    else
+        a

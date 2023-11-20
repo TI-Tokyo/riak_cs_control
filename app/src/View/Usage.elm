@@ -3,6 +3,7 @@ module View.Usage exposing (makeContent)
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import View.Common
+import Util
 
 import Dict
 import Iso8601
@@ -24,27 +25,29 @@ import Filesize
 
 makeContent m =
     Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
+        [ Html.div View.Common.subTabStyle ((View.Common.makeSubTab m) ++ extraSubTabItems m)
         , Html.div [ style "display" "flex"
                    , style "flex-wrap" "wrap"
                    , style "gap" "2em"
                    ] (makeUsage m)
         ]
 
+extraSubTabItems m =
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Top items to show")
+          |> TextField.setType (Just "number")
+          |> TextField.setValue (Just (String.fromInt m.s.usageTopItemsShown))
+          |> TextField.setOnInput UsageTopItemsShownChanged
+          )
+    ]
+
+
 makeUsage m =
-    let
-        data = Dict.toList m.s.bucketStats
-             |> List.map (\(k, u) -> { userName = k
-                                     , totalObjectSize = toFloat u.totalObjectSize
-                                     , totalObjectCount = toFloat u.totalObjectCount
-                                     , totalBucketCount = toFloat u.totalBucketCount
-                                     })
-             |> filter m |> sort m
-    in
-        [ encard [makeChart m .totalBucketCount data "#163506" String.fromFloat ] "Bucket count"
-        , encard [makeChart m .totalObjectCount data "#7a1892" String.fromFloat ] "Object count"
-        , encard [makeChart m .totalObjectSize data "#211892" toKMG ] "Total object size"
-        ]
+    [ encard [makeChart m .totalBucketCount "#163506" String.fromFloat ] "Bucket count"
+    , encard [makeChart m .totalObjectCount "#7a1892" String.fromFloat ] "Object count"
+    , encard [makeChart m .totalObjectSize "#211892" toKMG ] "Total object size"
+    ]
 
 encard content title =
     Html.div [ style "flex" "0 35em" ]
@@ -61,39 +64,53 @@ encard content title =
               }
         ]
 
-makeChart m selector data color yTicksFmt =
-    Html.div []
-        [ C.chart
-              [ CA.width 500
-              , CA.padding { top = 50
-                           , bottom = 50
-                           , left = 70
-                           , right = 50
-                           }
-              , CA.margin { top = 20
-                          , bottom = 10
-                          , left = 20
-                          , right = 20
-                          }
-              ]
-              [ C.grid []
-              , C.yTicks [ CA.amount 3
-                         , CA.ints
-                         , CA.limits
-                               [ CA.lowest 0 CA.exactly
-                               ]
-                         ]
-              , C.yLabels [ CA.withGrid
-                          , CA.ints
-                          , CA.format yTicksFmt
-                          ]
-              , C.binLabels .userName [ CA.moveDown 20 ]
-              , C.bars [ CA.margin 0.8 ]
-                  [ C.bar selector [ CA.color color ]
+makeChart m selector color yTicksFmt =
+    let
+        data = Dict.toList m.s.bucketStats
+             |> List.map (\(k, u) -> { userName = Util.ellipsize k 7
+                                     , totalObjectSize = toFloat u.totalObjectSize
+                                     , totalObjectCount = toFloat u.totalObjectCount
+                                     , totalBucketCount = toFloat u.totalBucketCount
+                                     , packed = False
+                                     , packedUsers = []
+                                     })
+             |> filter m |> sort m |> packTail m
+    in
+        Html.div []
+            [ C.chart
+                  [ CA.height 220
+                  , CA.width 500
+                  , CA.padding
+                        { top = 50
+                        , bottom = 20
+                        , left = 70
+                        , right = 50
+                        }
+                  , CA.margin
+                        { top = 20
+                        , bottom = 10
+                        , left = 20
+                        , right = 20
+                        }
+                  , CA.domain [ CA.lowest 0 CA.exactly ]
                   ]
+                  [ C.grid []
+                  , C.yTicks [ CA.amount 3
+                             , CA.ints
+                             ]
+                  , C.yLabels [ CA.withGrid
+                              , CA.ints
+                              , CA.format yTicksFmt
+                              ]
+                  , C.binLabels .userName [ CA.moveDown 20 ]
+                  , C.bars [ CA.roundTop 0.1
+                           , CA.margin 0.8
+                           ]
+                      [ C.bar selector [ CA.color color ]
+                      ]
                   data
-              ]
-        ]
+                  ]
+            ]
 
 toKMG a =
     a |> round |> Filesize.format
@@ -105,17 +122,53 @@ makeLabel a selector =
 filter m uu =
     List.filter (\u -> String.contains m.s.usageFilterValue u.userName) uu
 
-sort m aa =
+sort m aa0 =
     let
-        aa0 =
+        aa =
             case m.s.usageSortBy of
-                Name -> List.sortBy .userName aa
-                TotalObjectSize -> List.sortBy .totalObjectSize aa
-                TotalObjectCount -> List.sortBy .totalObjectCount aa
-                TotalBucketCount -> List.sortBy .totalBucketCount aa
-                _ -> aa
+                Name -> List.sortBy .userName aa0
+                TotalObjectSize -> List.sortBy .totalObjectSize aa0
+                TotalObjectCount -> List.sortBy .totalObjectCount aa0
+                TotalBucketCount -> List.sortBy .totalBucketCount aa0
+                _ -> aa0
     in
-        if m.s.usageSortOrder then aa0 else List.reverse aa0
+        List.reverse aa
+
+packTail m aa =
+    let
+        shown = List.take m.s.usageTopItemsShown aa
+        packedBin = List.drop m.s.usageTopItemsShown aa |> packBin
+    in
+        if (List.length aa) - m.s.usageTopItemsShown > 1 then
+            List.append shown [{packedBin | userName = relabelPackedBin (List.length packedBin.packedUsers)}]
+        else
+            aa
+
+relabelPackedBin s =
+    (s |> String.fromInt) ++ " more"
+
+packBin aa =
+    List.foldl
+        (\a q ->
+             let
+                 t1 = q.totalObjectSize + a.totalObjectSize
+                 t2 = q.totalObjectCount + a.totalObjectCount
+                 t3 = q.totalBucketCount + a.totalBucketCount
+             in
+                 { q | packedUsers = a.userName :: q.packedUsers
+                 , totalObjectSize = t1
+                 , totalObjectCount = t2
+                 , totalBucketCount = t3
+                 }
+        )
+        { totalObjectSize = 0
+        , totalObjectCount = 0
+        , totalBucketCount = 0
+        , packed = True
+        , userName = ""
+        , packedUsers = []
+        }
+        aa
 
 
 -- bytesFrom ll =

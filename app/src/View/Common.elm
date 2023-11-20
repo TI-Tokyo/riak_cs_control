@@ -104,25 +104,33 @@ makeSubTab m =
                                 , g = ["Create date", "Total object size", "Total object count", "Total bucket count", "Name"]
                                 , h = m.s.usageSortOrder
                                 }
-        sortOrderText =
-            \o -> if o then "Asc" else "Desc"
     in
-    [ TextField.outlined
-          (TextField.config
-          |> TextField.setLabel (Just "Filter")
-          |> TextField.setValue (Just a.a)
-          |> TextField.setOnInput a.c
-          )
-    , Select.outlined
-          (Select.config
-          |> Select.setLabel (Just "Sort by")
-          |> Select.setSelected (Just (selectSortByString a.b))
-          |> Select.setOnChange a.d
-          )
-          (SelectItem.selectItem (SelectItem.config { value = a.f }) a.f)
-          (List.map (\i -> SelectItem.selectItem (SelectItem.config {value = i}) i) a.g)
-    , Button.text (Button.config |> Button.setOnClick a.e) (sortOrderText a.h)
-    ]
+        [ TextField.outlined
+              (TextField.config
+              |> TextField.setLabel (Just "Filter")
+              |> TextField.setValue (Just a.a)
+              |> TextField.setOnInput a.c
+              )
+        , Select.outlined
+              (Select.config
+              |> Select.setLabel (Just "Sort by")
+              |> Select.setSelected (Just (selectSortByString a.b))
+              |> Select.setOnChange a.d
+              )
+              (SelectItem.selectItem (SelectItem.config { value = a.f }) a.f)
+              (List.map (\i -> SelectItem.selectItem (SelectItem.config {value = i}) i) a.g)
+        ] ++ maybeSortOrderButton m a
+
+sortOrderText =
+    \o -> if o then "Asc" else "Desc"
+
+maybeSortOrderButton m a =
+    case m.s.activeTab of
+        Msg.Usage ->
+            []
+        _ ->
+            [ Button.text (Button.config |> Button.setOnClick a.e) (sortOrderText a.h) ]
+
 
 selectSortByString a =
     case a of

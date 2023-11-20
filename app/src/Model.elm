@@ -106,6 +106,7 @@ type alias State =
     , usageFilterValue : String
     , usageSortBy : SortByField
     , usageSortOrder : SortOrder
+    , usageTopItemsShown : Int
     }
 
 

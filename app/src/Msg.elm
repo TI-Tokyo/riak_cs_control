@@ -62,10 +62,10 @@ type Msg
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
 
-    -- Usage
-    | GetAllUsage
-    | GetUsage String
-    | GotUsage (Result Http.Error UsagePerUser)
+    -- -- Usage
+    -- | GetAllUsage
+    -- | GetUsage String
+    -- | GotUsage (Result Http.Error UsagePerUser)
 
     -- UI interactions
     ------------------
@@ -130,9 +130,10 @@ type Msg
     | UsageFilterChanged String
     | UsageSortByFieldChanged String
     | UsageSortOrderChanged
+    | UsageTopItemsShownChanged String
     -- later
-    | UsageDateFromChanged String
-    | UsageDateToChanged String
+    -- | UsageDateFromChanged String
+    -- | UsageDateToChanged String
 
     -- misc
     | SnackbarClosed Snackbar.MessageId
