@@ -70,6 +70,7 @@ type Msg
     -- UI interactions
     ------------------
     | TabClicked Tab
+    | OpenTopDrawer
     | ShowConfigDialog
     | ConfigUrlChanged String
     | ConfigKeyIdChanged String

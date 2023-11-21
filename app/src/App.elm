@@ -26,7 +26,7 @@ init f =
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
         state = State
                     [] [] [] Dict.empty emptyUsage
-                    Snackbar.initialQueue Msg.General
+                    Snackbar.initialQueue Msg.General True
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     "" Name True

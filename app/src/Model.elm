@@ -51,6 +51,7 @@ type alias State =
     , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
     , activeTab : Msg.Tab
+    , topDrawerOpen : Bool
 
     -- general
     , serverInfo : ServerInfo

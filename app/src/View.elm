@@ -10,25 +10,21 @@ import Msg exposing (Msg(..))
 
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (style, attribute, src)
+import Material.Drawer.Dismissible as DismissibleDrawer
 import Material.TopAppBar as TopAppBar
-import Material.Tab as Tab
-import Material.TabBar as TabBar
 import Material.Snackbar as Snackbar
 import Material.Button as Button
 import Material.IconButton as IconButton
-import Material.TextField as TextField
+import Material.List as List
+import Material.List.Item as ListItem
 import Material.Typography as Typography
-import Material.Dialog as Dialog
-import Material.Icons as Filled
-import Material.Icons.Outlined as Outlined
 
 
 view : Model -> Html Msg
 view m =
     Html.div [ Typography.typography ]
-        [ Html.div [] (makeTopAppBar m)
-        , Html.div [TopAppBar.fixedAdjust] (makeTabs m)
-        , Html.div [] [makeContents m]
+        [ Html.div [] [makeTopAppBar m]
+        , Html.div [TopAppBar.fixedAdjust] [makeDrawer m]
         , Snackbar.snackbar
               (Snackbar.config { onClosed = SnackbarClosed })
                   m.s.msgQueue
@@ -36,24 +32,32 @@ view m =
 
 
 makeTopAppBar m =
-    [ TopAppBar.regular (TopAppBar.config |> TopAppBar.setFixed True)
-          [ TopAppBar.row []
-                [ TopAppBar.section [ TopAppBar.alignStart ]
-                      [ IconButton.iconButton
-                            (IconButton.config
-                            |> IconButton.setOnClick (listWhat m)
-                            )
-                            (IconButton.icon "refresh")
-                      , Html.span [ TopAppBar.title ]
-                          [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
-                      ]
-                , TopAppBar.section [ TopAppBar.alignEnd ]
-                    [ Html.span [ TopAppBar.alignEnd ]
-                          [ text m.c.csUrl ]
+    TopAppBar.regular
+        (TopAppBar.config
+        |> TopAppBar.setFixed True)
+        [ TopAppBar.row []
+              [ TopAppBar.section [ TopAppBar.alignStart ]
+                    [ IconButton.iconButton
+                          (IconButton.config
+                          |> IconButton.setOnClick OpenTopDrawer
+                          |> IconButton.setAttributes
+                               [ TopAppBar.navigationIcon ])
+                          (IconButton.icon "menu")
+                    , IconButton.iconButton
+                          (IconButton.config
+                          |> IconButton.setOnClick (listWhat m)
+                          )
+                          (IconButton.icon "refresh")
+                    , Html.span [ TopAppBar.title ]
+                        [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
                     ]
-                ]
-          ]
-    ]
+              , TopAppBar.section [ TopAppBar.alignEnd ]
+                  [ Html.span [ TopAppBar.alignEnd ]
+                        [ text m.c.csUrl ]
+                  ]
+              ]
+        ]
+
 
 listWhat m =
     case m.s.activeTab of
@@ -64,41 +68,49 @@ listWhat m =
         Msg.Usage -> ListAllBuckets
 
 
-makeTabs m =
-        [ TabBar.tabBar TabBar.config
-              (Tab.tab
-               (Tab.config
-               |> Tab.setActive (m.s.activeTab == Msg.General)
-               |> Tab.setOnClick (TabClicked Msg.General)
-               )
-               { label = "General", icon = Nothing }
-          )
-              [ Tab.tab
-                    (Tab.config
-                    |> Tab.setActive (m.s.activeTab == Msg.Users)
-                    |> Tab.setOnClick (TabClicked Msg.Users)
-                    )
-                    { label = "Users", icon = Nothing }
-              , Tab.tab
-                    (Tab.config
-                    |> Tab.setActive (m.s.activeTab == Msg.Policies)
-                    |> Tab.setOnClick (TabClicked Msg.Policies)
-                    )
-                    { label = "Policies", icon = Nothing }
-              , Tab.tab
-                    (Tab.config
-                    |> Tab.setActive (m.s.activeTab == Msg.Roles)
-                    |> Tab.setOnClick (TabClicked Msg.Roles)
-                    )
-                    { label = "Roles", icon = Nothing }
-              , Tab.tab
-                    (Tab.config
-                    |> Tab.setActive (m.s.activeTab == Msg.Usage)
-                    |> Tab.setOnClick (TabClicked Msg.Usage)
-                    )
-                    { label = "Bucket stats", icon = Nothing }
+makeDrawer m =
+    Html.div
+        [ style "display" "flex"
+        , style "flex-flow" "row nowrap"
+        ]
+        [ DismissibleDrawer.drawer
+              (DismissibleDrawer.config
+              |> DismissibleDrawer.setOpen m.s.topDrawerOpen
+              )
+              [ DismissibleDrawer.content []
+                    [ List.list List.config
+                          ( ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.General)
+                                )
+                                [ text "CS node" ]
+                          )
+                          [ ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.Users)
+                                )
+                                [ text "Users" ]
+                          , ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.Usage)
+                                )
+                                [ text "Disk usage" ]
+                          , ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.Policies)
+                                )
+                                [ text "Policies" ]
+                          , ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.Roles)
+                                )
+                                [ text "Roles" ]
+                          ]
+                    ]
               ]
-    ]
+        , Html.div [ DismissibleDrawer.appContent ]
+            [ makeContents m ]
+        ]
 
 
 makeContents m =

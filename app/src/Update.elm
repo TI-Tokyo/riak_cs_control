@@ -25,8 +25,13 @@ update msg m =
     case msg of
         TabClicked t ->
             let s_ = m.s in
-            ( {m | s = {s_ | activeTab = t, bucketStats = Dict.empty}}
+            ( {m | s = {s_ | activeTab = t, bucketStats = Dict.empty, topDrawerOpen = False}}
             , refreshTabMsg m t
+            )
+        OpenTopDrawer ->
+            let s_ = m.s in
+            ( {m | s = {s_ | topDrawerOpen = not s_.topDrawerOpen}}
+            , Cmd.none
             )
 
         -- ServerInfo
