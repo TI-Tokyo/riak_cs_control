@@ -184,6 +184,15 @@ type alias RoleLastUsed =
     }
 
 
+type alias SAMLProvider =
+    { arn : String
+    , name : String
+    , createDate : String
+    , validUntil : String
+    , samlMetadataDocument : String
+    , tags : List Tag
+    }
+
 type alias RequestId =
     String
 

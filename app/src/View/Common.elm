@@ -59,51 +59,65 @@ makeSubTab m =
     let
         a =
             case m.s.activeTab of
-                Msg.General ->  { a = ""
-                                , b = Unsorted
-                                , c = Discard
-                                , d = Discard
-                                , e = NoOp
-                                , f = "Name"
-                                , g = []
-                                , h = True
-                                }
-                Msg.Users ->    { a = m.s.userFilterValue
-                                , b = m.s.userSortBy
-                                , c = UserFilterChanged
-                                , d = UserSortByFieldChanged
-                                , e = UserSortOrderChanged
-                                , f = "Name"
-                                , g = ["Create date"]
-                                , h = m.s.userSortOrder
-                                }
-                Msg.Policies -> { a = m.s.policyFilterValue
-                                , b = m.s.policySortBy
-                                , c = PolicyFilterChanged
-                                , d = PolicySortByFieldChanged
-                                , e = PolicySortOrderChanged
-                                , f = "Name"
-                                , g = ["Create date", "Attachment count"]
-                                , h = m.s.policySortOrder
-                                }
-                Msg.Roles ->    { a = m.s.roleFilterValue
-                                , b = m.s.roleSortBy
-                                , c = RoleFilterChanged
-                                , d = RoleSortByFieldChanged
-                                , e = RoleSortOrderChanged
-                                , f = "Name"
-                                , g = ["Create date", "Role last used"]
-                                , h = m.s.roleSortOrder
-                                }
-                Msg.Usage ->    { a = m.s.usageFilterValue
-                                , b = m.s.usageSortBy
-                                , c = UsageFilterChanged
-                                , d = UsageSortByFieldChanged
-                                , e = UsageSortOrderChanged
-                                , f = "Total object size"
-                                , g = ["Create date", "Total object size", "Total object count", "Total bucket count", "Name"]
-                                , h = m.s.usageSortOrder
-                                }
+                Msg.General ->       { a = ""
+                                     , b = Unsorted
+                                     , c = Discard
+                                     , d = Discard
+                                     , e = NoOp
+                                     , f = "Name"
+                                     , g = []
+                                     , h = True
+                                     }
+
+                Msg.Users ->         { a = m.s.userFilterValue
+                                     , b = m.s.userSortBy
+                                     , c = UserFilterChanged
+                                     , d = UserSortByFieldChanged
+                                     , e = UserSortOrderChanged
+                                     , f = "Name"
+                                     , g = ["Create date"]
+                                     , h = m.s.userSortOrder
+                                     }
+
+                Msg.Policies ->      { a = m.s.policyFilterValue
+                                     , b = m.s.policySortBy
+                                     , c = PolicyFilterChanged
+                                     , d = PolicySortByFieldChanged
+                                     , e = PolicySortOrderChanged
+                                     , f = "Name"
+                                     , g = ["Create date", "Attachment count"]
+                                     , h = m.s.policySortOrder
+                                     }
+
+                Msg.Roles ->         { a = m.s.roleFilterValue
+                                     , b = m.s.roleSortBy
+                                     , c = RoleFilterChanged
+                                     , d = RoleSortByFieldChanged
+                                     , e = RoleSortOrderChanged
+                                     , f = "Name"
+                                     , g = ["Create date", "Role last used"]
+                                     , h = m.s.roleSortOrder
+                                     }
+
+                Msg.SAMLProviders -> { a = m.s.samlProviderFilterValue
+                                     , b = m.s.samlProviderSortBy
+                                     , c = SAMLProviderFilterChanged
+                                     , d = SAMLProviderSortByFieldChanged
+                                     , e = SAMLProviderSortOrderChanged
+                                     , f = "Name"
+                                     , g = ["Create date", "Valid until"]
+                                     , h = m.s.samlProviderSortOrder
+                                     }
+
+                Msg.Usage ->         { a = m.s.usageFilterValue
+                                     , b = m.s.usageSortBy
+                                     , c = UsageFilterChanged
+                                     , d = UsageSortByFieldChanged
+                                     , e = UsageSortOrderChanged
+                                     , f = "Total object size"
+                                     , g = ["Create date", "Total object size", "Total object count", "Total bucket count", "Name"]
+                                     , h = m.s.usageSortOrder
+                                     }
     in
         [ TextField.outlined
               (TextField.config
@@ -136,6 +150,7 @@ selectSortByString a =
     case a of
         Name -> "Name"
         CreateDate -> "Create date"
+        ValidUntil -> "Valid until"
         AttachmentCount -> "Attachment count"
         RoleLastUsed -> "Role last used"
         TotalObjectSize -> "Total object size"
@@ -147,6 +162,7 @@ stringToSortBy a =
     case a of
         "Name" -> Name
         "Create date" -> CreateDate
+        "Valid until" -> ValidUntil
         "Attachment count" -> AttachmentCount
         "Role last used" -> RoleLastUsed
         "Total object size" -> TotalObjectSize

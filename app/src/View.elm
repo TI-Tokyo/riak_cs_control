@@ -2,8 +2,9 @@ module View exposing (view)
 
 import View.General
 import View.User
-import View.Role
 import View.Policy
+import View.Role
+import View.SAMLProvider
 import View.Usage
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -34,7 +35,8 @@ view m =
 makeTopAppBar m =
     TopAppBar.regular
         (TopAppBar.config
-        |> TopAppBar.setFixed True)
+        |> TopAppBar.setFixed True
+        |> TopAppBar.setAttributes [ style "z-index" "20" ])
         [ TopAppBar.row []
               [ TopAppBar.section [ TopAppBar.alignStart ]
                     [ IconButton.iconButton
@@ -63,8 +65,9 @@ listWhat m =
     case m.s.activeTab of
         Msg.General -> GetServerInfo
         Msg.Users -> ListUsers
-        Msg.Roles -> ListRoles
         Msg.Policies -> ListPolicies
+        Msg.Roles -> ListRoles
+        Msg.SAMLProviders -> GetAllSAMLProviders
         Msg.Usage -> ListAllBuckets
 
 
@@ -105,6 +108,11 @@ makeDrawer m =
                                 |> ListItem.setOnClick (TabClicked Msg.Roles)
                                 )
                                 [ text "Roles" ]
+                          , ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.SAMLProviders)
+                                )
+                                [ text "SAML Providers" ]
                           ]
                     ]
               ]
@@ -120,3 +128,4 @@ makeContents m =
         Msg.Roles -> View.Role.makeContent m
         Msg.Policies -> View.Policy.makeContent m
         Msg.Usage -> View.Usage.makeContent m
+        Msg.SAMLProviders -> View.SAMLProvider.makeContent m

@@ -1,11 +1,15 @@
 module Request.Aws exposing
     ( listUsers
-    , listRoles
     , listPolicies
-    , createRole
     , createPolicy
-    , deleteRole
     , deletePolicy
+    , listRoles
+    , createRole
+    , deleteRole
+    , listSAMLProviders
+    , getSAMLProvider
+    , createSAMLProvider
+    , deleteSAMLProvider
     , attachUserPolicy
     , detachUserPolicy
     )
@@ -32,15 +36,11 @@ listUsers m =
     iamCall m "ListUsers" []
         (Http.Xml.expectXml GotUserList Data.Xml.decodeUsers)
 
+
 listPolicies : Model -> Cmd Msg
 listPolicies m =
     iamCall m "ListPolicies" []
         (Http.Xml.expectXml GotPolicyList Data.Xml.decodePolicies)
-
-listRoles : Model -> Cmd Msg
-listRoles m =
-    iamCall m "ListRoles" []
-        (Http.Xml.expectXml GotRoleList Data.Xml.decodeRoles)
 
 createPolicy : Model -> Cmd Msg
 createPolicy m =
@@ -58,6 +58,12 @@ deletePolicy m a =
     iamCall m "DeletePolicy"
         [ ("PolicyArn", a) ]
         (Http.Xml.expectXml PolicyDeleted Data.Xml.decodeEmptySuccessResponse)
+
+
+listRoles : Model -> Cmd Msg
+listRoles m =
+    iamCall m "ListRoles" []
+        (Http.Xml.expectXml GotRoleList Data.Xml.decodeRoles)
 
 createRole : Model -> Cmd Msg
 createRole m =
@@ -77,6 +83,36 @@ deleteRole m a =
     iamCall m "DeleteRole"
         [ ("RoleName", a) ]
         (Http.Xml.expectXml RoleDeleted Data.Xml.decodeEmptySuccessResponse)
+
+
+listSAMLProviders : Model -> Cmd Msg
+listSAMLProviders m =
+    iamCall m "ListSAMLProviders" []
+        (Http.Xml.expectXml GotSAMLProviderList Data.Xml.decodeSAMLProviders)
+
+getSAMLProvider : Model -> String -> Cmd Msg
+getSAMLProvider m a =
+    iamCall m "GetSAMLProvider"
+        ([ ("SAMLProviderArn", a)
+         ]
+        )
+        (Http.Xml.expectXml GotSAMLProvider (Data.Xml.decodeGetSAMLProviderResponse a))
+
+createSAMLProvider : Model -> Cmd Msg
+createSAMLProvider m =
+    iamCall m "CreateSAMLProvider"
+        ([ ("Name", m.s.newSAMLProviderName)
+         , ("SAMLMetadataDocument", m.s.newSAMLProviderSAMLMetadataDocument)
+         ] ++ (maybeAddTags m.s.newSAMLProviderTags)
+        )
+        (Http.Xml.expectXml SAMLProviderCreated Data.Xml.decodeSAMLProviderCreated)
+
+deleteSAMLProvider : Model -> String -> Cmd Msg
+deleteSAMLProvider m a =
+    iamCall m "DeleteSAMLProvider"
+        [ ("SAMLProviderArn", a) ]
+        (Http.Xml.expectXml SAMLProviderDeleted Data.Xml.decodeEmptySuccessResponse)
+
 
 
 attachUserPolicy : Model -> String -> Cmd Msg

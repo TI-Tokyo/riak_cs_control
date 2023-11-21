@@ -30,7 +30,7 @@ makeContent m =
         ]
 
 makeRoles m =
-    case m.s.roles |> (filter m) |> (sort m) |> List.map makeRole of
+    case m.s.roles |> filter m |> sort m |> List.map makeRole of
         [] ->
             [ img [src "images/filter-man.jpg"] [] ]
         rr ->

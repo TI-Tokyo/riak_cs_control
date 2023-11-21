@@ -353,6 +353,76 @@ update msg m =
             )
 
 
+        -- SAMLProvider
+        ------------------------------
+        SAMLProviderFilterChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | samlProviderFilterValue = s}}, Cmd.none)
+        SAMLProviderSortByFieldChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | samlProviderSortBy = View.Common.stringToSortBy s}}, Cmd.none)
+        SAMLProviderSortOrderChanged ->
+            let s_ = m.s in
+            ({m | s = {s_ | samlProviderSortOrder = not s_.samlProviderSortOrder}}, Cmd.none)
+
+        ListSAMLProviders ->
+            (m, Request.Aws.listSAMLProviders m)
+        GetAllSAMLProviders ->
+            (m, getAllSamlProvidersCmd m)
+        GotSAMLProvider (Ok a) ->
+            (Model.enrichSamlProvider m a, Cmd.none)
+        GotSAMLProvider (Err err) ->
+            let s_ = m.s in
+            ( { m | s = {s_ | msgQueue = Snackbar.addMessage
+                             (Snackbar.message ("Failed to get SAML Provider: " ++ (explainHttpError err))) m.s.msgQueue } }
+            , Cmd.none
+            )
+        GotSAMLProviderList (Ok aa) ->
+            let s_ = m.s in
+            ({m | s = {s_ | samlProviders = aa}}, Cmd.none)
+        GotSAMLProviderList (Err err) ->
+            let s_ = m.s in
+            ( { m | s = {s_ | samlProviders = [], msgQueue = Snackbar.addMessage
+                             (Snackbar.message ("Failed to fetch SAML Providers: " ++ (explainHttpError err))) m.s.msgQueue } }
+            , Cmd.none
+            )
+
+        ShowCreateSAMLProviderDialog ->
+            let s_ = m.s in
+            ({m | s = {s_ | createSAMLProviderDialogShown = True}}, Cmd.none)
+        NewSAMLProviderNameChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | newSAMLProviderName = s}}, Cmd.none)
+        NewSAMLProviderSAMLMetadataDocumentChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | newSAMLProviderSAMLMetadataDocument = s}}, Cmd.none)
+        CreateSAMLProvider ->
+            (m, Request.Aws.createSAMLProvider m)
+        CreateSAMLProviderCancelled ->
+            let s_ = m.s in
+            ({m | s = {s_ | createSAMLProviderDialogShown = False}}, Cmd.none)
+        SAMLProviderCreated (Ok _) ->
+            let s_ = m.s in
+            ({m | s = {s_ | createSAMLProviderDialogShown = False}}, Request.Aws.listSAMLProviders m)
+        SAMLProviderCreated (Err err) ->
+            let s_ = m.s in
+            ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+                            (Snackbar.message ("Failed to create SAML Provider: " ++ (explainHttpError err))) m.s.msgQueue}}
+            , Cmd.none
+            )
+
+        DeleteSAMLProvider a ->
+            (m, Request.Aws.deleteSAMLProvider m a)
+        SAMLProviderDeleted (Ok _) ->
+            (m, Request.Aws.listSAMLProviders m)
+        SAMLProviderDeleted (Err err) ->
+            let s_ = m.s in
+            ( {m | s = {s_ | msgQueue = Snackbar.addMessage
+                            (Snackbar.message ("Failed to delete SAML Provider: " ++ (explainHttpError err))) m.s.msgQueue}}
+            , Cmd.none
+            )
+
+
         -- Usage
         ------------------------------
         UsageFilterChanged s ->
@@ -479,13 +549,13 @@ update msg m =
 
 
 listAllBucketsCmd m =
-    let
-        cc = List.map
-             (\(u, b) ->
-                  Request.Rcs.listBucket m u b)
-             (Model.flattenUserBucketList m)
-    in
-         Cmd.batch cc
+    List.map
+        (\(u, b) -> Request.Rcs.listBucket m u b)
+        (Model.flattenUserBucketList m)
+            |> Cmd.batch
+
+getAllSamlProvidersCmd m =
+    List.map (\{arn} -> Request.Aws.getSAMLProvider m arn) m.s.samlProviders |> Cmd.batch
 
 -- getAllUsageCmd m =
 --     (List.map
@@ -499,6 +569,7 @@ refreshTabMsg m t =
         Msg.Users -> refreshEssentials m
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
+        Msg.SAMLProviders -> Request.Aws.listSAMLProviders m
         Msg.Usage -> listAllBucketsCmd m
 
 refreshEssentials m =

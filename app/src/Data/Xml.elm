@@ -1,9 +1,13 @@
 module Data.Xml exposing
     ( decodeUsers
-    , decodeRoles
     , decodePolicies
-    , decodeRoleCreated
     , decodePolicyCreated
+    , decodeRoles
+    , decodeRoleCreated
+    , decodeSAMLProviders
+    , decodeSAMLProvider
+    , decodeSAMLProviderCreated
+    , decodeGetSAMLProviderResponse
     , decodeEmptySuccessResponse
     , decodeBucketContents
     )
@@ -79,6 +83,33 @@ perm =
 decodeEmptySuccessResponse =
     path ["ResponseMetadata", "RequestId"] (single string)
 
+
+-- Policies
+
+decodePolicies : D.Decoder (List Policy)
+decodePolicies =
+    path [ "ListPoliciesResult", "Policies", "Policy" ] (list policy)
+
+policy =
+    succeed Policy
+        |> requiredPath ["Arn"] (single string)
+        |> requiredPath ["Path"] (single string)
+        |> requiredPath ["PolicyId"] (single string)
+        |> requiredPath ["PolicyName"] (single string)
+        |> requiredPath ["CreateDate"] (single string)
+        |> possiblePath ["Description"] (single string)
+        |> requiredPath ["PolicyDocument"] (single string)
+        |> requiredPath ["DefaultVersionId"] (single string)
+        |> requiredPath ["AttachmentCount"] (single int)
+        |> requiredPath ["PermissionsBoundaryUsageCount"] (single int)
+        |> requiredPath ["IsAttachable"] (single bool)
+        |> requiredPath ["UpdateDate"] (single string)
+        |> optionalPath ["Tags"] (list tag) []
+
+decodePolicyCreated =
+    path ["CreatePolicyResult", "Policy"] (single policy)
+
+
 -- Roles
 
 decodeRoles : D.Decoder (List Role)
@@ -109,31 +140,46 @@ decodeRoleCreated =
     path ["CreateRoleResult", "Role"] (single role)
 
 
+-- SAMLProviders
 
--- Policies
+decodeSAMLProviders : D.Decoder (List SAMLProvider)
+decodeSAMLProviders =
+    path [ "ListSAMLProvidersResult", "SAMLProviderList", "SAMLProviderListEntry" ] (list decodeSAMLProvider)
 
-decodePolicies : D.Decoder (List Policy)
-decodePolicies =
-    path [ "ListPoliciesResult", "Policies", "Policy" ] (list policy)
-
-policy =
-    succeed Policy
+decodeSAMLProvider =
+    succeed SAMLProvider
         |> requiredPath ["Arn"] (single string)
-        |> requiredPath ["Path"] (single string)
-        |> requiredPath ["PolicyId"] (single string)
-        |> requiredPath ["PolicyName"] (single string)
+        |> optionalPath ["Name"] (single string) ""
         |> requiredPath ["CreateDate"] (single string)
-        |> possiblePath ["Description"] (single string)
-        |> requiredPath ["PolicyDocument"] (single string)
-        |> requiredPath ["DefaultVersionId"] (single string)
-        |> requiredPath ["AttachmentCount"] (single int)
-        |> requiredPath ["PermissionsBoundaryUsageCount"] (single int)
-        |> requiredPath ["IsAttachable"] (single bool)
-        |> requiredPath ["UpdateDate"] (single string)
+        |> requiredPath ["ValidUntil"] (single string)
+        |> optionalPath ["SAMLMetadataDocument"] (single string) ""
         |> optionalPath ["Tags"] (list tag) []
 
-decodePolicyCreated =
-    path ["CreatePolicyResult", "Policy"] (single policy)
+decodeGetSAMLProviderResponse a =
+    path [ "GetSAMLProviderResult" ] (single (decodeGetSAMLProviderResult a))
+
+decodeGetSAMLProviderResult a =
+    succeed SAMLProvider
+        |> optionalPath ["Arn"] (single string) a
+        |> optionalPath ["Name"] (single string) ""
+        |> requiredPath ["CreateDate"] (single string)
+        |> requiredPath ["ValidUntil"] (single string)
+        |> optionalPath ["SAMLMetadataDocument"] (single string) ""
+        |> optionalPath ["Tags"] (list tag) []
+
+decodeSAMLProviderCreated =
+    path ["CreateSAMLProviderResult"] (single decodeSAMLProviderCreateResponse)
+
+decodeSAMLProviderCreateResponse =
+    succeed SAMLProvider
+        |> requiredPath ["SAMLProviderArn"] (single string)
+        -- none the following is present in the response
+        |> optionalPath ["Name"] (single string) ""
+        |> optionalPath ["CreateDate"] (single string) ""
+        |> optionalPath ["ValidUntil"] (single string) ""
+        |> optionalPath ["SAMLMetadataDocument"] (single string) ""
+        |> optionalPath ["Tags"] (list tag) []
+
 
 
 

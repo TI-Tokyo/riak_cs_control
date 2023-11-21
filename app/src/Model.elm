@@ -6,6 +6,7 @@ module Model exposing
     , SortOrder
     , userBy
     , policyByName
+    , enrichSamlProvider
     , flattenUserBucketList
     , updateBucketStats
     )
@@ -34,6 +35,7 @@ type alias Config =
 type SortByField
     = Name
     | CreateDate
+    | ValidUntil
     | AttachmentCount
     | RoleLastUsed
     | TotalObjectSize
@@ -47,6 +49,7 @@ type alias State =
     { users : List User
     , roles : List Role
     , policies : List Policy
+    , samlProviders : List SAMLProvider
     , bucketStats : BucketStats
     -- , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
@@ -103,6 +106,16 @@ type alias State =
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
 
+    -- saml providers
+    , samlProviderFilterValue : String
+    , samlProviderSortBy : SortByField
+    , samlProviderSortOrder : SortOrder
+    --
+    , createSAMLProviderDialogShown : Bool
+    , newSAMLProviderName : String
+    , newSAMLProviderSAMLMetadataDocument : String
+    , newSAMLProviderTags : List Tag
+
     -- bucket stats/usage
     , usageFilterValue : String
     , usageSortBy : SortByField
@@ -122,6 +135,26 @@ policyByName m a =
     case List.filter (\p -> p.policyName == a) m.s.policies of
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
+
+enrichSamlProvider : Model -> SAMLProvider -> Model
+enrichSamlProvider m a =
+    let
+        s_ = m.s
+        replacer =
+            \x ->
+                if x.arn == a.arn then
+                    let
+                        name = String.split "/" a.arn |> List.reverse |> List.head |> Maybe.withDefault "?"
+                    in
+                        {x | name = name
+                           , samlMetadataDocument = a.samlMetadataDocument
+                           , tags = a.tags
+                        }
+                else
+                    x
+        pp = List.map replacer m.s.samlProviders
+    in
+        {m | s = {s_ | samlProviders = pp}}
 
 
 flattenUserBucketList : Model -> List (String, String)

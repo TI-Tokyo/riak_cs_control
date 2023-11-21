@@ -1,7 +1,7 @@
 module Msg exposing (Msg(..), Tab(..))
 
 import Data.Struct exposing
-    ( User, Role, Policy
+    ( User, Role, Policy, SAMLProvider
     , ServerInfo
     , BucketContents
     , RequestId
@@ -17,6 +17,7 @@ type Tab
     | Roles
     | Policies
     | Usage
+    | SAMLProviders
 
 type Msg
     = NoOp
@@ -60,6 +61,16 @@ type Msg
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
+
+    -- SAMLProviders
+    | ListSAMLProviders
+    | GetAllSAMLProviders  -- do GetSAMLProvider on all arns from ListSAMLProviders
+    | GotSAMLProvider (Result Http.Error SAMLProvider)
+    | GotSAMLProviderList (Result Http.Error (List SAMLProvider))
+    | CreateSAMLProvider
+    | SAMLProviderCreated (Result Http.Error SAMLProvider)
+    | DeleteSAMLProvider String
+    | SAMLProviderDeleted (Result Http.Error RequestId)
 
     -- -- Usage
     -- | GetAllUsage
@@ -125,6 +136,15 @@ type Msg
     | NewRolePermissionsBoundaryChanged String
     | NewRoleMaxSessionDurationChanged Int
     | CreateRoleCancelled
+
+    -- saml providers
+    | SAMLProviderFilterChanged String
+    | SAMLProviderSortByFieldChanged String
+    | SAMLProviderSortOrderChanged
+    | ShowCreateSAMLProviderDialog
+    | NewSAMLProviderNameChanged String
+    | NewSAMLProviderSAMLMetadataDocumentChanged String
+    | CreateSAMLProviderCancelled
 
     -- usage
     | UsageFilterChanged String
