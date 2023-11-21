@@ -3,7 +3,6 @@ module Msg exposing (Msg(..), Tab(..))
 import Data.Struct exposing
     ( User, Role, Policy
     , ServerInfo
-    , UsagePerUser, Usage
     , BucketContents
     , RequestId
     )

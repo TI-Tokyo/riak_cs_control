@@ -462,9 +462,9 @@ update msg m =
             if Time.posixToMillis m.t == 0 then
                 let
                     s_ = m.s
-                    usage_ = s_.usage
-                    oneDayEarlier = \x -> (Time.posixToMillis x) - 24 * 3600 * 1000 |> Time.millisToPosix
-                    m_ = {m | t = a, s = {s_ | usage = {usage_ | dateFrom = oneDayEarlier a, dateTo = a}}}
+                    -- usage_ = s_.usage
+                    -- oneDayEarlier = \x -> (Time.posixToMillis x) - 24 * 3600 * 1000 |> Time.millisToPosix
+                    m_ = {m | t = a}
                 in
                     ( m_
                     , refreshEssentials m_

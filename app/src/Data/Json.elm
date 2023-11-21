@@ -2,7 +2,7 @@ module Data.Json exposing
     ( decodeServerInfo
     , decodeUserList
     , seriallyDecodeMultipartUsers
-    , decodeUsage
+--    , decodeUsage
     )
 
 import Data.Struct exposing (..)
@@ -121,16 +121,16 @@ permFromString a =
         _ -> INVALID
 
 
-decodeUsage k =
-    succeed UsagePerUser
-        |> hardcoded k  -- this is how we thread the keyId
-        |> required "Storage" storage
-storage =
-    succeed UsageStorage
-        |> required "Samples" samples
-samples =
-    list sample
-sample =
-    succeed UsageStorageSample
-        |> required "Objects" int
-        |> required "Bytes" int
+-- decodeUsage k =
+--     succeed UsagePerUser
+--         |> hardcoded k  -- this is how we thread the keyId
+--         |> required "Storage" storage
+-- storage =
+--     succeed UsageStorage
+--         |> required "Samples" samples
+-- samples =
+--     list sample
+-- sample =
+--     succeed UsageStorageSample
+--         |> required "Objects" int
+--         |> required "Bytes" int

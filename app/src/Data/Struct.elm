@@ -91,23 +91,23 @@ type alias BucketStatsItem =
 type alias BucketStats =
     Dict String BucketStatsItem
 
--- 2. More detailed/rcs-specific usage, as reported by /riak-cs/usage
-type alias UsageStorageSample =
-    { objects : Int
-    , bytes : Int
-    }
-type alias UsageStorage =
-    { samples : List UsageStorageSample
-    }
-type alias UsagePerUser =
-    { keyId : String
-    , storage : UsageStorage
-    }
-type alias Usage =
-    { dateFrom : Time.Posix
-    , dateTo : Time.Posix
-    , stats : Dict String UsagePerUser
-    }
+-- -- 2. More detailed/rcs-specific usage, as reported by /riak-cs/usage
+-- type alias UsageStorageSample =
+--     { objects : Int
+--     , bytes : Int
+--     }
+-- type alias UsageStorage =
+--     { samples : List UsageStorageSample
+--     }
+-- type alias UsagePerUser =
+--     { keyId : String
+--     , storage : UsageStorage
+--     }
+-- type alias Usage =
+--     { dateFrom : Time.Posix
+--     , dateTo : Time.Posix
+--     , stats : Dict String UsagePerUser
+--     }
 
 type alias User =
     { arn : String

@@ -48,7 +48,7 @@ type alias State =
     , roles : List Role
     , policies : List Policy
     , bucketStats : BucketStats
-    , usage : Usage
+    -- , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
     , activeTab : Msg.Tab
     , topDrawerOpen : Bool
