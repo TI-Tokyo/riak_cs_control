@@ -67,7 +67,7 @@ listWhat m =
         Msg.Users -> ListUsers
         Msg.Policies -> ListPolicies
         Msg.Roles -> ListRoles
-        Msg.SAMLProviders -> GetAllSAMLProviders
+        Msg.SAMLProviders -> ListSAMLProviders
         Msg.Usage -> ListAllBuckets
 
 

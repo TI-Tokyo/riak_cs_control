@@ -184,12 +184,8 @@ listBucket m u b =
             , resolver = Http.stringResolver (listBucketResolver u)
             , timeout = Nothing
             }
-        retryConfig =
-            [ Retry.maxDuration 7000
-            , Retry.exponentialBackoff { interval = 250, maxInterval = 3000 }
-            ]
     in
-        task |> Retry.with retryConfig |> Task.attempt GotBucketList
+        task |> Retry.with Util.retryConfig |> Task.attempt GotBucketList
 
 listBucketResolver u a =
     case a of

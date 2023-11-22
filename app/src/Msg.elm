@@ -64,7 +64,7 @@ type Msg
 
     -- SAMLProviders
     | ListSAMLProviders
-    | GetAllSAMLProviders  -- do GetSAMLProvider on all arns from ListSAMLProviders
+    | GetSAMLProvider String
     | GotSAMLProvider (Result Http.Error SAMLProvider)
     | GotSAMLProviderList (Result Http.Error (List SAMLProvider))
     | CreateSAMLProvider

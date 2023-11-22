@@ -143,13 +143,9 @@ enrichSamlProvider m a =
         replacer =
             \x ->
                 if x.arn == a.arn then
-                    let
-                        name = String.split "/" a.arn |> List.reverse |> List.head |> Maybe.withDefault "?"
-                    in
-                        {x | name = name
-                           , samlMetadataDocument = a.samlMetadataDocument
-                           , tags = a.tags
-                        }
+                    {x | samlMetadataDocument = a.samlMetadataDocument
+                       , tags = a.tags
+                    }
                 else
                     x
         pp = List.map replacer m.s.samlProviders

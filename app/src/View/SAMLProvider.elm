@@ -51,30 +51,23 @@ sort m aa =
         if m.s.samlProviderSortOrder then aa0 else List.reverse aa0
 
 makeSAMLProvider a =
-    Card.card Card.config
-        { blocks =
-              ( Card.block <|
-                    Html.div View.Common.cardInnerHeaderStyle
-                    [ text a.name ]
-              , [ Card.block <|
-                      Html.div View.Common.cardInnerContentStyle
-                      [ Html.pre [] [ a |> cardContent |> text] ]
-                , Card.block <|
-                    Html.div View.Common.cardInnerContentStyle
-                        [ TextArea.outlined
-                              (TextArea.config
-                              |> TextArea.setLabel (Just "Metadata document")
-                              |> TextArea.setValue (Just (cardMetadataDocument a))
-                              |> TextArea.setCols (Just 77)
-                              |> TextArea.setRows (Just 15)
-                              |> TextArea.setDisabled True
-                              |> TextArea.setAttributes []
-                              )
-                        ]
-                ]
-              )
-        , actions = samlProviderCardActions a
-        }
+    let
+        name = String.split "/" a.arn |> List.reverse |> List.head |> Maybe.withDefault "?"
+    in
+        Card.card Card.config
+            { blocks =
+                  ( Card.block <|
+                        Html.div View.Common.cardInnerHeaderStyle
+                        [ text name ]
+                  , [ Card.block <|
+                          Html.div View.Common.cardInnerContentStyle
+                          [ Html.pre [] [ a |> cardContent |> text] ]
+                    , Card.block <|
+                        makeIdpMetadata a
+                    ]
+                  )
+            , actions = samlProviderCardActions a
+            }
 
 cardContent a =
     "               Arn: " ++ a.arn ++ "\n" ++
@@ -82,7 +75,32 @@ cardContent a =
     "        ValidUntil: " ++ a.validUntil ++ "\n"
         ++ Util.maybeTags a.tags "\nTags: "
 
+makeIdpMetadata a =
+    case a.samlMetadataDocument of
+        "" ->
+            Html.div [ style "display" "grid"
+                     , style "align-items" "center"
+                     , style "justify-content" "center"
+                     ]
+                [ Button.text
+                      (Button.config |> Button.setOnClick (GetSAMLProvider a.arn))
+                      "IDP Metadata"
+                ]
+        d ->
+            Html.div View.Common.cardInnerContentStyle
+                [ TextArea.outlined
+                      (TextArea.config
+                      |> TextArea.setLabel (Just "Metadata document")
+                      |> TextArea.setValue (Just d)
+                      |> TextArea.setCols (Just 77)
+                      |> TextArea.setRows (Just 15)
+                      |> TextArea.setDisabled True
+                      |> TextArea.setAttributes []
+                      )
+                ]
+
 cardMetadataDocument a =
+    -- pprint that xml?
     a.samlMetadataDocument
 
 

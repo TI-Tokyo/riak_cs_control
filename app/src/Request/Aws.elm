@@ -16,19 +16,22 @@ module Request.Aws exposing
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Data.Struct exposing (User, Role, Policy)
 import Data.Xml
 import Request.Signature as Signature
 import Util exposing (hash)
 
 import Http
 import HttpBuilder
+import HttpBuilder.Task
 import Url.Builder as UrlBuilder
 import Url
 import Time
 import Strftime
 import Http.Xml
 import Crypto.Hash
+import Task
+import Retry
+import Xml.Decode
 
 
 listUsers : Model -> Cmd Msg
@@ -93,10 +96,22 @@ listSAMLProviders m =
 getSAMLProvider : Model -> String -> Cmd Msg
 getSAMLProvider m a =
     iamCall m "GetSAMLProvider"
-        ([ ("SAMLProviderArn", a)
-         ]
-        )
+        [("SAMLProviderArn", a)]
         (Http.Xml.expectXml GotSAMLProvider (Data.Xml.decodeGetSAMLProviderResponse a))
+
+-- getSamlProviderResolver u a =
+--     case a of
+--         Http.GoodStatus_ _ body ->
+--             case Xml.Decode.run (Data.Xml.decodeGetSAMLProviderResponse u) body of
+--                 Ok b ->
+--                     Ok b
+--                 Err err ->
+--                     Err (Http.BadBody "Bad XML")
+--         Http.BadStatus_ md _ ->
+--             Err (Http.BadStatus md.statusCode)
+--         _ ->
+--             Err (Http.NetworkError)
+
 
 createSAMLProvider : Model -> Cmd Msg
 createSAMLProvider m =
@@ -154,6 +169,20 @@ iamCall m a qs_ exp =
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
             |> HttpBuilder.withExpect exp
             |> HttpBuilder.request
+
+-- iamCallAsTask m a qs_ resolver =
+--     let
+--         qs = List.sort (("Action", a) :: qs_)
+--         payloadHash = Crypto.Hash.sha256 (canonicalizeQs qs)
+--         stdHeaders = makeStdHeaders m payloadHash
+--         authHeader = ("Authorization", (makeAuthHeader m "POST" "/iam" [("Action", a)] stdHeaders "iam" payloadHash))
+--     in
+--         UrlBuilder.crossOrigin m.c.csUrl [ "iam" ] [ UrlBuilder.string "Action" a ]
+--             |> HttpBuilder.Task.post
+--             |> HttpBuilder.Task.withUrlEncodedBody qs
+--             |> HttpBuilder.Task.withHeaders (authHeader :: stdHeaders)
+--             |> HttpBuilder.Task.withResolver resolver
+--             |> HttpBuilder.Task.toTask
 
 canonicalizeQs qs =
     qs |> List.sort |> List.map (\(q,s) -> q++"="++s) |> String.join "&"

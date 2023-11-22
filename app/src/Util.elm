@@ -9,6 +9,7 @@ import Strftime
 import Json.Print
 import DateTime
 import Calendar
+import Retry
 
 
 hash : String -> String
@@ -83,3 +84,9 @@ ellipsize a n =
         (String.left n a) ++ "…"
     else
         a
+
+retryConfig : List (Retry.Policy x)
+retryConfig =
+    [ Retry.maxDuration 7000
+    , Retry.exponentialBackoff { interval = 250, maxInterval = 3000 }
+    ]

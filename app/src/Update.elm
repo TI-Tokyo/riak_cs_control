@@ -367,8 +367,8 @@ update msg m =
 
         ListSAMLProviders ->
             (m, Request.Aws.listSAMLProviders m)
-        GetAllSAMLProviders ->
-            (m, getAllSamlProvidersCmd m)
+        GetSAMLProvider a ->
+            (m, Request.Aws.getSAMLProvider m a)
         GotSAMLProvider (Ok a) ->
             (Model.enrichSamlProvider m a, Cmd.none)
         GotSAMLProvider (Err err) ->
@@ -569,7 +569,7 @@ refreshTabMsg m t =
         Msg.Users -> refreshEssentials m
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
-        Msg.SAMLProviders -> Request.Aws.listSAMLProviders m
+        Msg.SAMLProviders -> Request.Aws.listSAMLProviders m -- getAllSamlProvidersCmd m
         Msg.Usage -> listAllBucketsCmd m
 
 refreshEssentials m =
