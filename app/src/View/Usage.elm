@@ -50,7 +50,7 @@ makeUsage m =
     ]
 
 encard content title =
-    Html.div [ style "flex" "0 35em" ]
+    Html.div [ style "flex" "0 55em" ]
         [ Card.card Card.config
               { blocks =
                     ( Card.block <|
