@@ -422,6 +422,29 @@ update msg m =
             , Cmd.none
             )
 
+        -- temp sessions
+        ListTempSessions ->
+            (m, Request.Rcs.listTempSessions m)
+        GotTempSessionList (Ok aa) ->
+            let s_ = m.s in
+            ({m | s = {s_ | tempSessions = aa}}, Cmd.none)
+        GotTempSessionList (Err err) ->
+            let s_ = m.s in
+            ( { m | s = {s_ | tempSessions = [], msgQueue = Snackbar.addMessage
+                             (Snackbar.message ("Failed to fetch temp sessions: " ++ (explainHttpError err))) m.s.msgQueue } }
+            , Cmd.none
+            )
+
+        TempSessionFilterChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | tempSessionFilterValue = s}}, Cmd.none)
+        TempSessionSortByFieldChanged s ->
+            let s_ = m.s in
+            ({m | s = {s_ | tempSessionSortBy = View.Common.stringToSortBy s}}, Cmd.none)
+        TempSessionSortOrderChanged ->
+            let s_ = m.s in
+            ({m | s = {s_ | tempSessionSortOrder = not s_.tempSessionSortOrder}}, Cmd.none)
+
 
         -- Usage
         ------------------------------
@@ -570,6 +593,7 @@ refreshTabMsg m t =
         Msg.Policies -> Request.Aws.listPolicies m
         Msg.Roles -> Request.Aws.listRoles m
         Msg.SAMLProviders -> Request.Aws.listSAMLProviders m -- getAllSamlProvidersCmd m
+        Msg.TempSessions -> Request.Rcs.listTempSessions m
         Msg.Usage -> listAllBucketsCmd m
 
 refreshEssentials m =

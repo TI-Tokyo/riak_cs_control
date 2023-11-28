@@ -10,11 +10,13 @@ module Data.Xml exposing
     , decodeGetSAMLProviderResponse
     , decodeEmptySuccessResponse
     , decodeBucketContents
+    , decodeTempSessionList
     )
 
 import Data.Struct exposing (..)
 import Xml.Decode as D exposing (..)
 import Util
+import Iso8601
 
 -- Users
 
@@ -181,7 +183,36 @@ decodeSAMLProviderCreateResponse =
         |> optionalPath ["Tags"] (list tag) []
 
 
+-- temp sessions
+decodeTempSessionList : D.Decoder (List TempSession)
+decodeTempSessionList =
+    path [ "ListTempSessionsResult", "TempSessions", "TempSession" ] (list tempSession)
 
+tempSession =
+    succeed TempSession
+        |> requiredPath ["AssumedRoleUser"] (single assumedRoleUser)
+        |> requiredPath ["Role"] (single role)
+        |> requiredPath ["Credentials"] (single credentials)
+        |> requiredPath ["DurationSeconds"] (single int)
+        |> requiredPath ["Created"] (single isoDate)
+        |> possiblePath ["InlinePolicy"] (single string)
+        |> requiredPath ["Subject"] (single string)
+        |> requiredPath ["SourceIdentity"] (single string)
+        |> requiredPath ["Email"] (single string)
+        |> requiredPath ["UserId"] (single string)
+        |> requiredPath ["CanonicalID"] (single string)
+
+assumedRoleUser =
+    succeed AssumedRoleUser
+        |> requiredPath ["Arn"] (single string)
+        |> requiredPath ["AssumedRoleId"] (single string)
+
+credentials =
+    succeed Credentials
+        |> requiredPath ["AccessKeyId"] (single string)
+        |> requiredPath ["SecretAccessKey"] (single string)
+        |> requiredPath ["SessionToken"] (single string)
+        |> requiredPath ["Expiration"] (single isoDate)
 
 -- BucketContents
 
@@ -210,9 +241,11 @@ owner2 =
 
 date =
     map dateFromString string
-
 dateFromString =
     Util.amzDateToPosix
+
+isoDate =
+    map Util.isoDateToPosix string
 
 
 -- common nodes

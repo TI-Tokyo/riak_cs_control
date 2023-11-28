@@ -10,7 +10,7 @@ import Json.Print
 import DateTime
 import Calendar
 import Retry
-
+import Iso8601
 
 hash : String -> String
 hash a =
@@ -50,6 +50,11 @@ amzDateToPosix a =
             Nothing ->
                 Time.millisToPosix 0
 
+isoDateToPosix : String -> Time.Posix
+isoDateToPosix a =
+    case Iso8601.toTime a of
+        Ok s -> s
+        Err _ -> Time.millisToPosix 0
 
 stripMPBoundaries =
     String.split "\r\n"

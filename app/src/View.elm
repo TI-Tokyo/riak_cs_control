@@ -2,10 +2,11 @@ module View exposing (view)
 
 import View.General
 import View.User
+import View.Usage
 import View.Policy
 import View.Role
 import View.SAMLProvider
-import View.Usage
+import View.TempSession
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 
@@ -68,6 +69,7 @@ listWhat m =
         Msg.Policies -> ListPolicies
         Msg.Roles -> ListRoles
         Msg.SAMLProviders -> ListSAMLProviders
+        Msg.TempSessions -> ListTempSessions
         Msg.Usage -> ListAllBuckets
 
 
@@ -113,6 +115,11 @@ makeDrawer m =
                                 |> ListItem.setOnClick (TabClicked Msg.SAMLProviders)
                                 )
                                 [ text "SAML Providers" ]
+                          , ListItem.listItem
+                                (ListItem.config
+                                |> ListItem.setOnClick (TabClicked Msg.TempSessions)
+                                )
+                                [ text "Temp sessions" ]
                           ]
                     ]
               ]
@@ -129,3 +136,4 @@ makeContents m =
         Msg.Policies -> View.Policy.makeContent m
         Msg.Usage -> View.Usage.makeContent m
         Msg.SAMLProviders -> View.SAMLProvider.makeContent m
+        Msg.TempSessions -> View.TempSession.makeContent m

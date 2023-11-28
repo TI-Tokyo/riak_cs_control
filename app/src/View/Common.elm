@@ -109,6 +109,16 @@ makeSubTab m =
                                      , h = m.s.samlProviderSortOrder
                                      }
 
+                Msg.TempSessions ->  { a = m.s.tempSessionFilterValue
+                                     , b = m.s.tempSessionSortBy
+                                     , c = TempSessionFilterChanged
+                                     , d = TempSessionSortByFieldChanged
+                                     , e = TempSessionSortOrderChanged
+                                     , f = "Name"
+                                     , g = ["Create date"]
+                                     , h = m.s.tempSessionSortOrder
+                                     }
+
                 Msg.Usage ->         { a = m.s.usageFilterValue
                                      , b = m.s.usageSortBy
                                      , c = UsageFilterChanged

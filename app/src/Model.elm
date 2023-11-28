@@ -50,6 +50,7 @@ type alias State =
     , roles : List Role
     , policies : List Policy
     , samlProviders : List SAMLProvider
+    , tempSessions : List TempSession
     , bucketStats : BucketStats
     -- , usage : Usage
     , msgQueue : Snackbar.Queue Msg.Msg
@@ -115,6 +116,12 @@ type alias State =
     , newSAMLProviderName : String
     , newSAMLProviderSAMLMetadataDocument : String
     , newSAMLProviderTags : List Tag
+
+    -- temp sessions
+    , tempSessionFilterValue : String
+    , tempSessionSortBy : SortByField
+    , tempSessionSortOrder : SortOrder
+    --
 
     -- bucket stats/usage
     , usageFilterValue : String

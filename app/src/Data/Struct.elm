@@ -193,6 +193,35 @@ type alias SAMLProvider =
     , tags : List Tag
     }
 
+
+type alias AssumedRoleUser =
+    { arn : String
+    , assumedRoleId : String
+    }
+
+type alias Credentials =
+    { accessKeyId : String
+    , secretAccessKey : String
+    , sessionToken : String
+    , expiration : Time.Posix
+    }
+
+type alias TempSession =
+    { assumedRoleUser : AssumedRoleUser
+    , role : Role
+    , credentials : Credentials
+    , durationSeconds : Int
+    , created : Time.Posix
+    , inlinePolicy : Maybe String
+    , subject : String
+    , sourceIdentity : String
+    , email : String
+    , userId : String
+    , canonicalId : String
+    }
+
+
+
 type alias RequestId =
     String
 

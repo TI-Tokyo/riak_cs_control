@@ -1,7 +1,7 @@
 module Msg exposing (Msg(..), Tab(..))
 
 import Data.Struct exposing
-    ( User, Role, Policy, SAMLProvider
+    ( User, Role, Policy, SAMLProvider, TempSession
     , ServerInfo
     , BucketContents
     , RequestId
@@ -18,6 +18,7 @@ type Tab
     | Policies
     | Usage
     | SAMLProviders
+    | TempSessions
 
 type Msg
     = NoOp
@@ -71,6 +72,10 @@ type Msg
     | SAMLProviderCreated (Result Http.Error SAMLProvider)
     | DeleteSAMLProvider String
     | SAMLProviderDeleted (Result Http.Error RequestId)
+
+    -- TempSessions
+    | ListTempSessions
+    | GotTempSessionList (Result Http.Error (List TempSession))
 
     -- -- Usage
     -- | GetAllUsage
@@ -145,6 +150,11 @@ type Msg
     | NewSAMLProviderNameChanged String
     | NewSAMLProviderSAMLMetadataDocumentChanged String
     | CreateSAMLProviderCancelled
+
+    -- saml providers
+    | TempSessionFilterChanged String
+    | TempSessionSortByFieldChanged String
+    | TempSessionSortOrderChanged
 
     -- usage
     | UsageFilterChanged String

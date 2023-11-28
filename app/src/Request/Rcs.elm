@@ -5,6 +5,7 @@ module Request.Rcs exposing
     , deleteUser
     , updateUser
     , listBucket
+    , listTempSessions
 --    , getUsage
     )
 
@@ -157,6 +158,29 @@ deleteUser m a =
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
             |> HttpBuilder.withExpect (Http.expectWhatever UserDeleted)
             |> HttpBuilder.request
+
+
+listTempSessions : Model -> Cmd Msg
+listTempSessions m =
+    let
+        cmd5 = md5b64 ""
+        date = rfc1123Date m.t
+        ct = "application/xml"
+        stdHeaders =
+            [ ("accept", ct)
+            , ("content-md5", cmd5)
+            , ("content-type", ct)
+            , ("x-amz-date", date)
+            ]
+        sig = Signature.v2 m.c.csAdminSecret cmd5 "GET" ct date (extractAmzHeaders stdHeaders) "/riak-cs/temp-sessions"
+        authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
+    in
+        Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "temp-sessions" ] []
+            |> HttpBuilder.get
+            |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
+            |> HttpBuilder.withExpect (Http.Xml.expectXml GotTempSessionList Data.Xml.decodeTempSessionList)
+            |> HttpBuilder.request
+
 
 
 listBucket : Model -> String -> String -> Cmd Msg

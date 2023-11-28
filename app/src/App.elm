@@ -25,7 +25,7 @@ init f =
         haveCreds = f.csAdminSecret /= "" && f.csAdminKey /= ""
         config = Config f.csUrl f.csAdminKey f.csAdminSecret f.csRegion
         state = State
-                    [] [] [] [] Dict.empty
+                    [] [] [] [] [] Dict.empty
                     Snackbar.initialQueue Msg.General True
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
@@ -37,6 +37,7 @@ init f =
                     False "" "/" Nothing "" Nothing 3600 []
                     "" Name True
                     False "" "" []
+                    "" CreateDate True
                     "" TotalObjectSize True 8
         model = Model config state (Time.millisToPosix 0)
     in
