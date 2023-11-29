@@ -41,9 +41,9 @@ extraSubTabItems m =
 
 
 makeUsage m =
-    [ encard [makeChart m .totalBucketCount "#163506" String.fromFloat ] "Bucket count"
+    [ encard [makeChart m .totalObjectSize "#211892" toKMG ] "Total object size"
     , encard [makeChart m .totalObjectCount "#7a1892" String.fromFloat ] "Object count"
-    , encard [makeChart m .totalObjectSize "#211892" toKMG ] "Total object size"
+    , encard [makeChart m .totalBucketCount "#163506" String.fromFloat ] "Bucket count"
     ]
 
 encard content title =
@@ -71,7 +71,7 @@ makeChart m selector color yTicksFmt =
                                      , packed = False
                                      , packedUsers = []
                                      })
-             |> filter m |> sort m |> packTail m
+             |> filter m |> sort selector |> packTail m
     in
         div []
             [ C.chart
@@ -119,17 +119,8 @@ makeLabel a selector =
 filter m uu =
     List.filter (\u -> String.contains m.s.usageFilterValue u.userName) uu
 
-sort m aa0 =
-    let
-        aa =
-            case m.s.usageSortBy of
-                Name -> List.sortBy .userName aa0
-                TotalObjectSize -> List.sortBy .totalObjectSize aa0
-                TotalObjectCount -> List.sortBy .totalObjectCount aa0
-                TotalBucketCount -> List.sortBy .totalBucketCount aa0
-                _ -> aa0
-    in
-        List.reverse aa
+sort selector aa =
+    List.sortBy selector aa |> List.reverse
 
 packTail m aa =
     let
