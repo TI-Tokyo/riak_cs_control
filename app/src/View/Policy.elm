@@ -21,11 +21,11 @@ import Material.Typography as Typography
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , Html.div View.Common.cardStyle (makePolicies m)
-        , Html.div [] (createPolicy m)
-        , Html.div [] (maybeShowCreatePolicyFab m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
+        , div View.Common.cardStyle (makePolicies m)
+        , div [] (createPolicy m)
+        , div [] (maybeShowCreatePolicyFab m)
         ]
 
 makePolicies m =
@@ -54,13 +54,13 @@ makePolicy a =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    Html.div View.Common.cardInnerHeaderStyle
+                    div View.Common.cardInnerHeaderStyle
                     [ text a.policyName ]
               , [ Card.block <|
-                      Html.div View.Common.cardInnerContentStyle
+                      div View.Common.cardInnerContentStyle
                       [ Html.pre [] [ a |> cardContent |> text ] ]
                 , Card.block <|
-                    Html.div (View.Common.cardInnerContentStyle ++
+                    div (View.Common.cardInnerContentStyle ++
                                   [ style "scale" "0.8"
                                   , style "background-color" "lightgrey"
                                   , style "border" "thick"
@@ -120,7 +120,7 @@ createPolicy m =
               )
               { title = "New policy"
               , content =
-                    [ Html.div [ style "display" "grid"
+                    [ div [ style "display" "grid"
                                , style "grid-template-columns" "1"
                                , style "row-gap" "0.3em"
                                ]

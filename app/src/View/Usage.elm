@@ -24,12 +24,9 @@ import Filesize
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle ((View.Common.makeSubTab m) ++ extraSubTabItems m)
-        , Html.div [ style "display" "flex"
-                   , style "flex-wrap" "wrap"
-                   , style "gap" "2em"
-                   ] (makeUsage m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle ((View.Common.makeSubTab m) ++ extraSubTabItems m)
+        , div View.Common.cardStyle (makeUsage m)
         ]
 
 extraSubTabItems m =
@@ -50,14 +47,14 @@ makeUsage m =
     ]
 
 encard content title =
-    Html.div [ style "flex" "0 55em" ]
+    div [ style "flex" "0 55em" ]
         [ Card.card Card.config
               { blocks =
                     ( Card.block <|
-                          Html.div View.Common.cardInnerHeaderStyle
+                          div View.Common.cardInnerHeaderStyle
                           [ text title ]
                     , [ Card.block <|
-                            Html.div (View.Common.cardInnerContentStyle) content
+                            div (View.Common.cardInnerContentStyle) content
                       ]
                     )
               , actions = Nothing
@@ -76,7 +73,7 @@ makeChart m selector color yTicksFmt =
                                      })
              |> filter m |> sort m |> packTail m
     in
-        Html.div []
+        div []
             [ C.chart
                   [ CA.height 220
                   , CA.width 500

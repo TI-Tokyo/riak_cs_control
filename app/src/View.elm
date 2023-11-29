@@ -94,7 +94,7 @@ makeDrawer m =
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.Users)
                                 )
-                                [ text "Users" ]
+                                [ itemWithCount "Users" m.s.users ]
                           , ListItem.listItem
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.Usage)
@@ -104,22 +104,22 @@ makeDrawer m =
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.Policies)
                                 )
-                                [ text "Policies" ]
+                                [ itemWithCount "Policies" m.s.policies ]
                           , ListItem.listItem
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.Roles)
                                 )
-                                [ text "Roles" ]
+                                [ itemWithCount "Roles" m.s.roles ]
                           , ListItem.listItem
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.SAMLProviders)
                                 )
-                                [ text "SAML Providers" ]
+                                [ itemWithCount "SAML Providers" m.s.samlProviders ]
                           , ListItem.listItem
                                 (ListItem.config
                                 |> ListItem.setOnClick (TabClicked Msg.TempSessions)
                                 )
-                                [ text "Temp sessions" ]
+                                [ itemWithCount "Temp sessions" m.s.tempSessions ]
                           ]
                     ]
               ]
@@ -127,6 +127,8 @@ makeDrawer m =
             [ makeContents m ]
         ]
 
+itemWithCount s a =
+     s ++ " (" ++ (List.length a |> String.fromInt) ++ ")" |> text
 
 makeContents m =
     case m.s.activeTab of

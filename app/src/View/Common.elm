@@ -37,7 +37,19 @@ cardInnerHeaderStyle =
     ]
 
 cardInnerContentStyle =
-    [ style "padding" "0 1em 0"
+    [ style "padding" ".5em"
+    , style "white-space" "pre"
+    , style "font-family" "monospace"
+    , style "padding" "1.5em"
+    ]
+
+jsonInsetStyle =
+    [ style "scale" "0.8"
+    , style "background-color" "#f5f5f5"
+    , style "border" "thick"
+    , style "border-radius" "0 0 1em 0"
+    , style "font-family" "monospace"
+    , style "white-space" "pre"
     ]
 
 
@@ -45,13 +57,6 @@ createFabStyle =
     [ style "position" "fixed"
     , style "bottom" "2rem"
     , style "right" "2rem"
-    ]
-
-jsonInsetStyle =
-    [ style "scale" "0.8"
-    , style "background-color" "lightgrey"
-    , style "border" "thick"
-    , style "border-radius" "0 0 1em 0"
     ]
 
 

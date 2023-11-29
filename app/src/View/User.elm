@@ -23,14 +23,14 @@ import Material.Switch as Switch
 import Material.Checkbox as Checkbox
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , Html.div View.Common.cardStyle (makeUsers m)
-        , Html.div [] (makeCreateUserDialog m)
-        , Html.div [] (makeEditUserDialog m)
-        , Html.div [] (makeEditUserPoliciesDialog m)
-        , Html.div [] (makeAttachUserPolicyDialog m)
-        , Html.div [] (maybeShowCreateUserFab m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
+        , div View.Common.cardStyle (makeUsers m)
+        , div [] (makeCreateUserDialog m)
+        , div [] (makeEditUserDialog m)
+        , div [] (makeEditUserPoliciesDialog m)
+        , div [] (makeAttachUserPolicyDialog m)
+        , div [] (maybeShowCreateUserFab m)
         ]
 
 makeUsers m =
@@ -62,18 +62,18 @@ makeUser m u =
             else
                 " (disabled)"
     in
-        Html.div []
+        div []
             [ Card.card Card.config
                  { blocks =
                        ( Card.block <|
-                             Html.div View.Common.cardInnerHeaderStyle
+                             div View.Common.cardInnerHeaderStyle
                              [ text (u.userName ++ maybeDisabled)]
                        , [ Card.block <|
-                               Html.div (View.Common.cardInnerContentStyle ++ (isEnabledStyle u))
-                               [ Html.pre [ style "row-span" "2" ] [ u |> cardContent |> text ]
-                               , Html.div [ Typography.body2 ]
+                               div (View.Common.cardInnerContentStyle ++ (isEnabledStyle u))
+                               [ u |> cardContent |> text
+                               , div [ Typography.body2 ]
                                    [ text (userBucketsDetail u) ]
-                               , Html.div [ Typography.body2 ]
+                               , div [ Typography.body2 ]
                                    [ text (userPoliciesDetail u) ]
                                ]
                          ]
@@ -133,7 +133,7 @@ userPoliciesDetail u =
             "no attached policies"
         n ->
             "Policies (" ++ String.fromInt n ++ "): "
-                ++ (String.join ", " u.attachedPolicies)
+                ++ (String.join ", " (u.attachedPolicies |> List.map Util.nameFromArn))
 
 
 isAdmin m {keyId} =
@@ -169,7 +169,7 @@ makeCreateUserDialog m =
               )
               { title = "New user"
               , content =
-                    [ Html.div [ style "display" "grid"
+                    [ div [ style "display" "grid"
                                , style "grid-template-columns" "1"
                                , style "row-gap" "0.3em"
                                ]
@@ -219,7 +219,7 @@ makeEditUserDialog m =
                   )
                   { title = "Edit user"
                   , content =
-                        [ Html.div [ style "display" "grid"
+                        [ div [ style "display" "grid"
                                    , style "grid-template-columns" "1"
                                    , style "row-gap" "0.3em"
                                    ]
@@ -244,7 +244,7 @@ makeEditUserDialog m =
                                     |> TextField.setValue (Just u.path)
                                     |> TextField.setOnInput EditedUserPathChanged
                                     )
-                              , Html.div [ style "display" "grid"
+                              , div [ style "display" "grid"
                                          , style "grid-template-columns" "repeat(2, 1fr)"
                                          , style "align-items" "center"
                                          , style "margin" "0.6em 0 0 0"
@@ -293,7 +293,7 @@ makeEditUserPoliciesDialog m =
                   )
                   { title = ("Policies attached to user " ++ u.userName)
                   , content =
-                        [ Html.div [ style "display" "grid"
+                        [ div [ style "display" "grid"
                                    , style "grid-template-columns" "1"
                                    , style "row-gap" "0.3em"
                                    ]
@@ -301,7 +301,7 @@ makeEditUserPoliciesDialog m =
                                      u.attachedPolicies
                                      m.s.selectedPoliciesForDetach
                                      SelectOrUnselectPolicyToDetach ]
-                                   ++ [ Html.div []
+                                   ++ [ div []
                                             [IconButton.iconButton
                                                  (IconButton.config
                                                  |> IconButton.setOnClick (ShowAttachUserPolicyDialog arn))
@@ -343,7 +343,7 @@ makeAttachUserPolicyDialog m =
                   )
                   { title = "Available policies"
                   , content =
-                        [ Html.div [ style "display" "grid"
+                        [ div [ style "display" "grid"
                                    , style "grid-template-columns" "1"
                                    , style "row-gap" "0.3em"
                                    ]
@@ -396,7 +396,7 @@ policiesAsList m pp selected msg =
                                             [ text p ]))
                              pn)
     in
-        Html.div [] [element]
+        div [] [element]
 
 subtract l1 l2 =
     List.filter (\a -> not (List.member a l2)) l1

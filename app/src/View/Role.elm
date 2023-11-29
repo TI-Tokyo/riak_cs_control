@@ -22,11 +22,11 @@ import Material.Select.Item as SelectItem
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , Html.div View.Common.cardStyle (makeRoles m)
-        , Html.div [] (createRole m)
-        , Html.div [] (maybeShowCreateRoleFab m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
+        , div View.Common.cardStyle (makeRoles m)
+        , div [] (createRole m)
+        , div [] (maybeShowCreateRoleFab m)
         ]
 
 makeRoles m =
@@ -59,13 +59,13 @@ makeRole a =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    Html.div View.Common.cardInnerHeaderStyle
+                    div View.Common.cardInnerHeaderStyle
                     [ text a.roleName ]
               , [ Card.block <|
-                      Html.div View.Common.cardInnerContentStyle
+                      div View.Common.cardInnerContentStyle
                       [ Html.pre [] [ a |> cardContent |>text] ]
                 , Card.block <|
-                    Html.div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
+                    div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
                         [ Html.pre [] [ a |> cardPolicyDocument |> text ] ]
                 ]
               )
@@ -75,7 +75,6 @@ makeRole a =
 cardContent a =
     "               Arn: " ++ a.arn ++ "\n" ++
     "              Path: " ++ a.path ++ "\n" ++
-    "              Name: " ++ a.roleName ++ "\n" ++
     "       Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
     "                Id: " ++ a.roleId ++ "\n" ++
     "           Created: " ++ a.createDate ++ "\n" ++
@@ -125,10 +124,10 @@ createRole m =
               )
               { title = "New role"
               , content =
-                    [ Html.div [ style "display" "grid"
-                               , style "grid-template-columns" "1"
-                               , style "row-gap" "0.3em"
-                               ]
+                    [ div [ style "display" "grid"
+                          , style "grid-template-columns" "1"
+                          , style "row-gap" "0.3em"
+                          ]
                           [ TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Name")

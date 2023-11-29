@@ -196,6 +196,7 @@ tempSession =
         |> requiredPath ["DurationSeconds"] (single int)
         |> requiredPath ["Created"] (single isoDate)
         |> possiblePath ["InlinePolicy"] (single string)
+        |> requiredPath ["SessionPolicies"] (list string)
         |> requiredPath ["Subject"] (single string)
         |> requiredPath ["SourceIdentity"] (single string)
         |> requiredPath ["Email"] (single string)

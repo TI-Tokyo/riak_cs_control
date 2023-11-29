@@ -213,6 +213,7 @@ type alias TempSession =
     , durationSeconds : Int
     , created : Time.Posix
     , inlinePolicy : Maybe String
+    , sessionPolicies : List String
     , subject : String
     , sourceIdentity : String
     , email : String

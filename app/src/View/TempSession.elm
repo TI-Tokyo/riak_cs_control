@@ -21,9 +21,9 @@ import Time
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , Html.div View.Common.cardStyle (makeTempSessions m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
+        , div View.Common.cardStyle (makeTempSessions m)
         ]
 
 makeTempSessions m =
@@ -55,28 +55,29 @@ makeTempSession a =
         Card.card Card.config
             { blocks =
                   ( Card.block <|
-                        Html.div View.Common.cardInnerHeaderStyle
-                        [ text name ]
+                        div View.Common.cardInnerHeaderStyle [ text name ]
                   , [ Card.block <|
-                          Html.div View.Common.cardInnerContentStyle
-                          [ Html.pre [] [ a |> cardContent |> text] ]
+                          div View.Common.cardInnerContentStyle
+                          [ a |> cardContent |> text ]
                     , Card.block <|
-                        Html.div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
-                            [ Html.pre [] [ a |> cardPolicyDocument |> text ] ]
+                        div View.Common.cardInnerContentStyle
+                            [ div []
+                                  [ "InlinePolicy:" |> text ]
+                            , div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
+                                  [ a |> cardPolicyDocument |> text ]
+                            ]
                     ]
                   )
             , actions = tempSessionCardActions a
             }
 
 cardContent a =
-    let
-        _ = Debug.log "expiration" a.credentials.expiration
-    in
-    "       Credentials: " ++ a.credentials.accessKeyId ++ ":" ++ a.credentials.secretAccessKey ++ "\n" ++
-    "   AssumedRoleUser: " ++ a.assumedRoleUser.arn ++ "\n" ++
-    "           Created: " ++ (Iso8601.fromTime a.created) ++ "\n" ++
-    "   DurationSeconds: " ++ (String.fromInt a.durationSeconds) ++ "\n" ++
-    "           Expires: " ++ (Iso8601.fromTime a.credentials.expiration)
+    "    Credentials: " ++ a.credentials.accessKeyId ++ ":" ++ a.credentials.secretAccessKey ++ "\n" ++
+    "AssumedRoleUser: " ++ a.assumedRoleUser.arn ++ "\n" ++
+    "        Created: " ++ (Iso8601.fromTime a.created) ++ "\n" ++
+    "DurationSeconds: " ++ (String.fromInt a.durationSeconds) ++ "\n" ++
+    "        Expires: " ++ (Iso8601.fromTime a.credentials.expiration)
+        ++ Util.maybeItems (List.map Util.nameFromArn a.sessionPolicies) "\nSessionPolicies: "
 
 cardPolicyDocument a =
     Util.pprintJson

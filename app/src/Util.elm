@@ -61,11 +61,14 @@ stripMPBoundaries =
       >> List.filter (\a -> (String.left 2 a) /= "--" && (String.left 8 a) /= "Content-" && a /= "")
 
 
-maybeTags aa pfx =
+maybeItems aa pfx =
     if aa == [] then
         ""
     else
-        pfx ++ String.join "; " (List.map (\t -> t.name ++ ":" ++ t.value) aa)
+        pfx ++ String.join "; " aa
+
+maybeTags tt pfx =
+    maybeItems (List.map (\t -> t.name ++ ":" ++ t.value) tt) pfx
 
 
 pprintJson : String -> String
@@ -78,9 +81,11 @@ pprintJson a =
     in
     Result.withDefault "(bad json)" (Json.Print.prettyString cfg a)
 
-
--- timeBefore t a =
---     (Time.posixToMillis t - a * 1000) |> Time.millisToPosix
+nameFromArn : String -> String
+nameFromArn s =
+    case s |> String.split "/" |> List.reverse |> List.head of
+        Just a -> a
+        Nothing -> "bad-arn"
 
 
 ellipsize : String -> Int -> String

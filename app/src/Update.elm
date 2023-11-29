@@ -560,7 +560,7 @@ update msg m =
                     m_ = {m | t = a}
                 in
                     ( m_
-                    , refreshEssentials m_
+                    , refreshAll m_
                     )
             else
                 ({ m | t = a}, Cmd.none)
@@ -600,6 +600,15 @@ refreshEssentials m =
     Cmd.batch [ Request.Rcs.getServerInfo m
               , Request.Rcs.listUsers m
               , Request.Aws.listPolicies m
+              ]
+
+refreshAll m =
+    Cmd.batch [ Request.Rcs.getServerInfo m
+              , Request.Rcs.listUsers m
+              , Request.Aws.listPolicies m
+              , Request.Aws.listRoles m
+              , Request.Aws.listSAMLProviders m
+              , Request.Rcs.listTempSessions m
               ]
 
 

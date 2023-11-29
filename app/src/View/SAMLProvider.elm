@@ -22,11 +22,11 @@ import Material.Select.Item as SelectItem
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
-        [ Html.div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , Html.div View.Common.cardStyle (makeSAMLProviders m)
-        , Html.div [] (createSAMLProvider m)
-        , Html.div [] (maybeShowCreateSAMLProviderFab m)
+    div View.Common.topContentStyle
+        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
+        , div View.Common.cardStyle (makeSAMLProviders m)
+        , div [] (createSAMLProvider m)
+        , div [] (maybeShowCreateSAMLProviderFab m)
         ]
 
 makeSAMLProviders m =
@@ -51,43 +51,40 @@ sort m aa =
         if m.s.samlProviderSortOrder then aa0 else List.reverse aa0
 
 makeSAMLProvider a =
-    let
-        name = String.split "/" a.arn |> List.reverse |> List.head |> Maybe.withDefault "?"
-    in
-        Card.card Card.config
-            { blocks =
-                  ( Card.block <|
-                        Html.div View.Common.cardInnerHeaderStyle
-                        [ text name ]
-                  , [ Card.block <|
-                          Html.div View.Common.cardInnerContentStyle
-                          [ Html.pre [] [ a |> cardContent |> text] ]
-                    , Card.block <|
-                        makeIdpMetadata a
-                    ]
-                  )
-            , actions = samlProviderCardActions a
-            }
+    Card.card Card.config
+        { blocks =
+              ( Card.block <|
+                    div View.Common.cardInnerHeaderStyle
+                    [ text (Util.nameFromArn a.arn) ]
+              , [ Card.block <|
+                      div View.Common.cardInnerContentStyle
+                      [ Html.pre [] [ a |> cardContent |> text] ]
+                , Card.block <|
+                    makeIdpMetadata a
+                ]
+              )
+        , actions = samlProviderCardActions a
+        }
 
 cardContent a =
-    "               Arn: " ++ a.arn ++ "\n" ++
-    "        CreateDate: " ++ a.createDate ++ "\n" ++
-    "        ValidUntil: " ++ a.validUntil ++ "\n"
+    "         Arn: " ++ a.arn ++ "\n" ++
+    "  CreateDate: " ++ a.createDate ++ "\n" ++
+    "  ValidUntil: " ++ a.validUntil ++ "\n"
         ++ Util.maybeTags a.tags "\nTags: "
 
 makeIdpMetadata a =
     case a.samlMetadataDocument of
         "" ->
-            Html.div [ style "display" "grid"
-                     , style "align-items" "center"
-                     , style "justify-content" "center"
-                     ]
+            div [ style "display" "grid"
+                , style "align-items" "center"
+                , style "justify-content" "center"
+                ]
                 [ Button.text
                       (Button.config |> Button.setOnClick (GetSAMLProvider a.arn))
                       "IDP Metadata"
                 ]
         d ->
-            Html.div View.Common.cardInnerContentStyle
+            div View.Common.cardInnerContentStyle
                 [ TextArea.outlined
                       (TextArea.config
                       |> TextArea.setLabel (Just "Metadata document")
@@ -139,10 +136,10 @@ createSAMLProvider m =
               )
               { title = "New SAML provider"
               , content =
-                    [ Html.div [ style "display" "grid"
-                               , style "grid-template-columns" "1"
-                               , style "row-gap" "0.3em"
-                               ]
+                    [ div [ style "display" "grid"
+                          , style "grid-template-columns" "1"
+                          , style "row-gap" "0.3em"
+                          ]
                           [ TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Name")
