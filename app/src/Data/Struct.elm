@@ -114,8 +114,8 @@ type alias User =
     , path : String
     , userId : String
     , userName : String
-    , createDate : String
-    , passwordLastUsed : Maybe String
+    , createDate : Time.Posix
+    , passwordLastUsed : Maybe Time.Posix
     , permissionsBoundary : Maybe PermissionsBoundary
     , tags : List Tag
     -- rcs extensions:
@@ -152,7 +152,7 @@ type alias Policy =
     , path : String
     , policyId : String
     , policyName : String
-    , createDate : String
+    , createDate : Time.Posix
     , description : Maybe String
     , policyDocument : String
     , defaultVersionId : String
@@ -169,7 +169,7 @@ type alias Role =
     , path : String
     , roleId : String
     , roleName : String
-    , createDate : String
+    , createDate : Time.Posix
     , description : Maybe String
     , assumeRolePolicyDocument : Maybe String
     , permissionsBoundary : Maybe PermissionsBoundary
@@ -187,8 +187,8 @@ type alias RoleLastUsed =
 type alias SAMLProvider =
     { arn : String
     , name : String
-    , createDate : String
-    , validUntil : String
+    , createDate : Time.Posix
+    , validUntil : Time.Posix
     , samlMetadataDocument : String
     , tags : List Tag
     }
@@ -232,7 +232,7 @@ dummyUser =
     , path = ""
     , userId = ""
     , userName = ""
-    , createDate = ""
+    , createDate = Time.millisToPosix 0
     , passwordLastUsed = Nothing
     , permissionsBoundary = Nothing
     , tags = []
@@ -250,7 +250,7 @@ dummyPolicy =
     , path = ""
     , policyId = ""
     , policyName = ""
-    , createDate = ""
+    , createDate = Time.millisToPosix 0
     , description = Nothing
     , policyDocument = ""
     , defaultVersionId = ""

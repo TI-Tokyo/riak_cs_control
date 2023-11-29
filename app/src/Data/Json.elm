@@ -37,8 +37,8 @@ user =
         |> required "path" string
         |> required "id" string
         |> required "name" string
-        |> required "create_date" isoDateFromInt
-        |> required "password_last_used" (nullable isoDateFromInt)
+        |> required "create_date" isoDate
+        |> required "password_last_used" (nullable isoDate)
         |> required "permissions_boundary" (nullable permissionsBoundary)
         |> required "tags" (list tag)
         --
@@ -50,12 +50,8 @@ user =
         |> required "buckets" (list bucket)
         |> required "attached_policies" (list string)
 
--- Riak CS stores unixtime in user password_last_used and create_date
--- kept fields. It exports these fields as such in admin interface
--- (json), but converts values to iso8601 date strings in IAM API
--- calls, so:
-isoDateFromInt =
-    map (Time.millisToPosix >> Iso8601.fromTime) int
+isoDate =
+    map Time.millisToPosix int
 
 tag =
     succeed Tag

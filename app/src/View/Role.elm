@@ -19,7 +19,7 @@ import Material.Dialog as Dialog
 import Material.Typography as Typography
 import Material.Select as Select
 import Material.Select.Item as SelectItem
-
+import Iso8601
 
 makeContent m =
     div View.Common.topContentStyle
@@ -44,7 +44,7 @@ sort m aa =
         aa0 =
             case m.s.roleSortBy of
                 Name -> List.sortBy .roleName aa
-                CreateDate -> List.sortBy .createDate aa
+                CreateDate -> List.sortWith (Util.compareByPosixTime .createDate) aa
                 RoleLastUsed -> List.sortWith
                                 (\r1 r2 -> case (r1.roleLastUsed, r2.roleLastUsed) of
                                                (Just q1, Just q2) -> if q1.lastUsedDate < q2.lastUsedDate then LT else GT
@@ -77,7 +77,7 @@ cardContent a =
     "              Path: " ++ a.path ++ "\n" ++
     "       Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
     "                Id: " ++ a.roleId ++ "\n" ++
-    "           Created: " ++ a.createDate ++ "\n" ++
+    "           Created: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
     "MaxSessionDuration: " ++ (String.fromInt (Maybe.withDefault 3600 a.maxSessionDuration))
         ++ Util.maybeTags a.tags "\nTags: "
 

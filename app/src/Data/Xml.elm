@@ -14,9 +14,11 @@ module Data.Xml exposing
     )
 
 import Data.Struct exposing (..)
-import Xml.Decode as D exposing (..)
 import Util
+import Xml.Decode as D exposing (..)
 import Iso8601
+import Time
+
 
 -- Users
 
@@ -30,8 +32,8 @@ user =
         |> requiredPath ["Path"] (single string)
         |> requiredPath ["UserId"] (single string)
         |> requiredPath ["UserName"] (single string)
-        |> requiredPath ["CreateDate"] (single string)
-        |> possiblePath ["PasswordLastUsed"] (single string)
+        |> requiredPath ["CreateDate"] (single unixtime)
+        |> possiblePath ["PasswordLastUsed"] (single unixtime)
         |> possiblePath ["PermissionsBoundary"] (single permissionsBoundary)
         |> optionalPath ["Tags"] (list tag) []
         -- rcs extensions, not reported in ListUsers:
@@ -98,7 +100,7 @@ policy =
         |> requiredPath ["Path"] (single string)
         |> requiredPath ["PolicyId"] (single string)
         |> requiredPath ["PolicyName"] (single string)
-        |> requiredPath ["CreateDate"] (single string)
+        |> requiredPath ["CreateDate"] (single isoDate)
         |> possiblePath ["Description"] (single string)
         |> requiredPath ["PolicyDocument"] (single string)
         |> requiredPath ["DefaultVersionId"] (single string)
@@ -124,7 +126,7 @@ role =
         |> requiredPath ["Path"] (single string)
         |> requiredPath ["RoleId"] (single string)
         |> requiredPath ["RoleName"] (single string)
-        |> requiredPath ["CreateDate"] (single string)
+        |> requiredPath ["CreateDate"] (single isoDate)
         |> possiblePath ["Description"] (single string)
         |> possiblePath ["AssumeRolePolicyDocument"] (single string)
         |> possiblePath ["PermissionsBoundary"] (single permissionsBoundary)
@@ -152,8 +154,8 @@ decodeSAMLProvider =
     succeed SAMLProvider
         |> requiredPath ["Arn"] (single string)
         |> optionalPath ["Name"] (single string) ""
-        |> requiredPath ["CreateDate"] (single string)
-        |> requiredPath ["ValidUntil"] (single string)
+        |> requiredPath ["CreateDate"] (single isoDate)
+        |> requiredPath ["ValidUntil"] (single isoDate)
         |> optionalPath ["SAMLMetadataDocument"] (single string) ""
         |> optionalPath ["Tags"] (list tag) []
 
@@ -164,8 +166,8 @@ decodeGetSAMLProviderResult a =
     succeed SAMLProvider
         |> optionalPath ["Arn"] (single string) a
         |> optionalPath ["Name"] (single string) ""
-        |> requiredPath ["CreateDate"] (single string)
-        |> requiredPath ["ValidUntil"] (single string)
+        |> requiredPath ["CreateDate"] (single isoDate)
+        |> requiredPath ["ValidUntil"] (single isoDate)
         |> optionalPath ["SAMLMetadataDocument"] (single string) ""
         |> optionalPath ["Tags"] (list tag) []
 
@@ -177,8 +179,8 @@ decodeSAMLProviderCreateResponse =
         |> requiredPath ["SAMLProviderArn"] (single string)
         -- none the following is present in the response
         |> optionalPath ["Name"] (single string) ""
-        |> optionalPath ["CreateDate"] (single string) ""
-        |> optionalPath ["ValidUntil"] (single string) ""
+        |> optionalPath ["CreateDate"] (single isoDate) (Time.millisToPosix 0)
+        |> optionalPath ["ValidUntil"] (single isoDate) (Time.millisToPosix 0)
         |> optionalPath ["SAMLMetadataDocument"] (single string) ""
         |> optionalPath ["Tags"] (list tag) []
 
@@ -196,7 +198,7 @@ tempSession =
         |> requiredPath ["DurationSeconds"] (single int)
         |> requiredPath ["Created"] (single isoDate)
         |> possiblePath ["InlinePolicy"] (single string)
-        |> requiredPath ["SessionPolicies"] (list string)
+        |> requiredPath ["SessionPolicies", "SessionPolicy" ] (list string)
         |> requiredPath ["Subject"] (single string)
         |> requiredPath ["SourceIdentity"] (single string)
         |> requiredPath ["Email"] (single string)
@@ -214,6 +216,7 @@ credentials =
         |> requiredPath ["SecretAccessKey"] (single string)
         |> requiredPath ["SessionToken"] (single string)
         |> requiredPath ["Expiration"] (single isoDate)
+
 
 -- BucketContents
 
@@ -247,6 +250,9 @@ dateFromString =
 
 isoDate =
     map Util.isoDateToPosix string
+
+unixtime =
+    map Time.millisToPosix int
 
 
 -- common nodes

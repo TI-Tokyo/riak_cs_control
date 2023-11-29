@@ -19,7 +19,7 @@ import Material.Dialog as Dialog
 import Material.Typography as Typography
 import Material.Select as Select
 import Material.Select.Item as SelectItem
-
+import Iso8601
 
 makeContent m =
     div View.Common.topContentStyle
@@ -44,8 +44,8 @@ sort m aa =
         aa0 =
             case m.s.samlProviderSortBy of
                 Name -> List.sortBy .name aa
-                CreateDate -> List.sortBy .createDate aa
-                ValidUntil -> List.sortBy .validUntil aa
+                CreateDate -> List.sortWith (Util.compareByPosixTime .createDate) aa
+                ValidUntil -> List.sortWith (Util.compareByPosixTime .validUntil) aa
                 _ -> aa
     in
         if m.s.samlProviderSortOrder then aa0 else List.reverse aa0
@@ -68,8 +68,8 @@ makeSAMLProvider a =
 
 cardContent a =
     "         Arn: " ++ a.arn ++ "\n" ++
-    "  CreateDate: " ++ a.createDate ++ "\n" ++
-    "  ValidUntil: " ++ a.validUntil ++ "\n"
+    "  CreateDate: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
+    "  ValidUntil: " ++ (Iso8601.fromTime a.validUntil) ++ "\n"
         ++ Util.maybeTags a.tags "\nTags: "
 
 makeIdpMetadata a =

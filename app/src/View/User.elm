@@ -21,6 +21,8 @@ import Material.List as List
 import Material.List.Item as ListItem
 import Material.Switch as Switch
 import Material.Checkbox as Checkbox
+import Iso8601
+
 
 makeContent m =
     div View.Common.topContentStyle
@@ -48,7 +50,7 @@ sort m aa =
         aa0 =
             case m.s.userSortBy of
                 Name -> List.sortBy .userName aa
-                CreateDate -> List.sortBy .createDate aa
+                CreateDate -> List.sortWith (Util.compareByPosixTime .createDate) aa
                 _ -> aa
     in
         if m.s.userSortOrder then aa0 else List.reverse aa0
@@ -92,7 +94,7 @@ cardContent u =
     "      Arn: " ++ u.arn ++ "\n" ++
     "     Path: " ++ u.path ++ "\n" ++
     "    Email: " ++ u.email ++ "\n" ++
-    "  Created: " ++ u.createDate ++ "\n" ++
+    "  Created: " ++ (Iso8601.fromTime u.createDate) ++ "\n" ++
     "    KeyId: " ++ u.keyId ++ "\n" ++
     "SecretKey: " ++ u.secretKey ++ "\n" ++
     "       Id: " ++ u.userId

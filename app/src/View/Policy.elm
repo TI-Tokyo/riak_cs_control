@@ -18,7 +18,7 @@ import Material.Dialog as Dialog
 import Material.Select as Select
 import Material.Select.Item as SelectItem
 import Material.Typography as Typography
-
+import Iso8601
 
 makeContent m =
     div View.Common.topContentStyle
@@ -43,7 +43,7 @@ sort m aa =
         aa0 =
             case m.s.policySortBy of
                 Name -> List.sortBy .policyName aa
-                CreateDate -> List.sortBy .createDate aa
+                CreateDate -> List.sortWith (Util.compareByPosixTime .createDate) aa
                 AttachmentCount -> List.sortBy .attachmentCount aa
                 _ -> aa
     in
@@ -78,7 +78,7 @@ cardContent a =
     "    Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
     "AttachmentCount: " ++ (String.fromInt a.attachmentCount) ++ "\n" ++
     "             Id: " ++ a.policyId ++ "\n" ++
-    "        Created: " ++ a.createDate
+    "        Created: " ++ (Iso8601.fromTime a.createDate)
         ++ Util.maybeTags a.tags "\nTags: "
 
 cardPolicyDocument a =

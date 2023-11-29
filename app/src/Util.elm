@@ -65,7 +65,7 @@ maybeItems aa pfx =
     if aa == [] then
         ""
     else
-        pfx ++ String.join "; " aa
+        pfx ++ String.join ", " aa
 
 maybeTags tt pfx =
     maybeItems (List.map (\t -> t.name ++ ":" ++ t.value) tt) pfx
@@ -100,3 +100,9 @@ retryConfig =
     [ Retry.maxDuration 7000
     , Retry.exponentialBackoff { interval = 250, maxInterval = 3000 }
     ]
+
+
+compareByPosixTime f a b =
+    case (a |> f |> Time.posixToMillis) < (b |> f |> Time.posixToMillis) of
+        True -> LT
+        False -> GT

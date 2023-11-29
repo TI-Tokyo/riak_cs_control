@@ -51,12 +51,13 @@ makeTopAppBar m =
                           |> IconButton.setOnClick (listWhat m)
                           )
                           (IconButton.icon "refresh")
-                    , Html.span [ TopAppBar.title ]
-                        [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
+                    , text (activeTabName m)
                     ]
               , TopAppBar.section [ TopAppBar.alignEnd ]
                   [ Html.span [ TopAppBar.alignEnd ]
                         [ text m.c.csUrl ]
+                  , Html.span [ TopAppBar.title ]
+                      [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
                   ]
               ]
         ]
@@ -139,3 +140,13 @@ makeContents m =
         Msg.Usage -> View.Usage.makeContent m
         Msg.SAMLProviders -> View.SAMLProvider.makeContent m
         Msg.TempSessions -> View.TempSession.makeContent m
+
+activeTabName m =
+    case m.s.activeTab of
+        Msg.General -> ""
+        Msg.Users -> "Users"
+        Msg.Roles -> "Roles"
+        Msg.Policies -> "Policies"
+        Msg.Usage -> "Disk usage & bucket stats"
+        Msg.SAMLProviders -> "SAML providers"
+        Msg.TempSessions -> "Temp sessions for federated users"

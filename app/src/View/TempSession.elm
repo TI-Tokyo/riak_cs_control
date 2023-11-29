@@ -40,10 +40,7 @@ sort m aa =
     let
         aa0 =
             case m.s.tempSessionSortBy of
-                CreateDate -> List.sortWith (\a b -> case (Time.posixToMillis a.created) < (Time.posixToMillis b.created) of
-                                                         True -> LT
-                                                         False -> GT
-                                            ) aa
+                CreateDate -> List.sortWith (Util.compareByPosixTime .created) aa
                 _ -> aa
     in
         if m.s.tempSessionSortOrder then aa0 else List.reverse aa0
