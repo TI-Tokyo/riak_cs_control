@@ -2,8 +2,6 @@ module Model exposing
     ( Model
     , Config
     , State
-    , SortByField(..)
-    , SortOrder
     , userBy
     , policyByName
     , enrichSamlProvider
@@ -13,6 +11,7 @@ module Model exposing
 
 import Data.Struct exposing (..)
 import Msg
+import View.Common
 
 import Dict
 import Time
@@ -31,16 +30,6 @@ type alias Config =
     , csAdminSecret : String
     , region : String
     }
-
-type SortByField
-    = Name
-    | CreateDate
-    | ValidUntil
-    | AttachmentCount
-    | RoleLastUsed
-    | Unsorted
-
-type alias SortOrder = Bool
 
 type alias State =
     { users : List User
@@ -64,8 +53,9 @@ type alias State =
 
     -- users
     , userFilterValue : String
-    , userSortBy : SortByField
-    , userSortOrder : SortOrder
+    , userFilterIn : List String
+    , userSortBy : View.Common.SortByField
+    , userSortOrder : View.Common.SortOrder
     --
     , createUserDialogShown : Bool
     , newUserName : String
@@ -80,8 +70,9 @@ type alias State =
 
     -- policies
     , policyFilterValue : String
-    , policySortBy : SortByField
-    , policySortOrder : SortOrder
+    , policyFilterIn : List String
+    , policySortBy : View.Common.SortByField
+    , policySortOrder : View.Common.SortOrder
     --
     , createPolicyDialogShown : Bool
     , newPolicyName : String
@@ -92,8 +83,8 @@ type alias State =
 
     -- roles
     , roleFilterValue : String
-    , roleSortBy : SortByField
-    , roleSortOrder : SortOrder
+    , roleSortBy : View.Common.SortByField
+    , roleSortOrder : View.Common.SortOrder
     --
     , createRoleDialogShown : Bool
     , newRoleName : String
@@ -106,8 +97,8 @@ type alias State =
 
     -- saml providers
     , samlProviderFilterValue : String
-    , samlProviderSortBy : SortByField
-    , samlProviderSortOrder : SortOrder
+    , samlProviderSortBy : View.Common.SortByField
+    , samlProviderSortOrder : View.Common.SortOrder
     --
     , createSAMLProviderDialogShown : Bool
     , newSAMLProviderName : String
@@ -116,8 +107,8 @@ type alias State =
 
     -- temp sessions
     , tempSessionFilterValue : String
-    , tempSessionSortBy : SortByField
-    , tempSessionSortOrder : SortOrder
+    , tempSessionSortBy : View.Common.SortByField
+    , tempSessionSortOrder : View.Common.SortOrder
     --
 
     -- bucket stats/usage

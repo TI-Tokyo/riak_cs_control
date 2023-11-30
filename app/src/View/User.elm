@@ -1,9 +1,9 @@
 module View.User exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Data.Struct
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 
@@ -22,6 +22,8 @@ import Material.List as List
 import Material.List.Item as ListItem
 import Material.Switch as Switch
 import Material.Checkbox as Checkbox
+import Material.Chip.Filter as FilterChip
+import Material.ChipSet.Filter as FilterChipSet
 import Iso8601
 
 
@@ -40,10 +42,11 @@ makeSubTab m =
     let n = View.Common.selectSortByString Name in
     [ TextField.outlined
           (TextField.config
-          |> TextField.setLabel (Just "Filter")
+          |> TextField.setLabel (Just "Filter by")
           |> TextField.setValue (Just m.s.userFilterValue)
           |> TextField.setOnInput UserFilterChanged
           )
+    , makeFilterChips m
     , Select.outlined
           (Select.config
           |> Select.setLabel (Just "Sort by")
@@ -54,10 +57,32 @@ makeSubTab m =
           (List.map
                (\i -> let j = View.Common.selectSortByString i in
                       SelectItem.selectItem (SelectItem.config {value = j}) j)
-               [CreateDate])
+               [Email, CreateDate, BucketCount])
     , Button.text (Button.config |> Button.setOnClick UserSortOrderChanged)
             (View.Common.sortOrderText m.s.userSortOrder)
     ]
+
+
+makeFilterChips m =
+    let
+        first = FilterChip.chip
+                (FilterChip.config
+                |> FilterChip.setSelected (List.member "Name" m.s.userFilterIn)
+                |> FilterChip.setOnChange (UserFilterInItemClicked "Name")
+                ) "Name"
+        rest =
+            List.map
+                (\n ->
+                     FilterChip.chip
+                       (FilterChip.config
+                       |> FilterChip.setSelected (List.member n m.s.userFilterIn)
+                       |> FilterChip.setOnChange (UserFilterInItemClicked n)
+                       )
+                       n
+                )
+            ["Email", "Arn"]
+    in
+        FilterChipSet.chipSet [] first rest
 
 makeUsers m =
     case m.s.users |> (filter m) |> (sort m) |> List.map (makeUser m) of
@@ -67,7 +92,16 @@ makeUsers m =
             rr
 
 filter m uu =
-    List.filter (\u -> String.contains m.s.userFilterValue u.userName) uu
+    case m.s.userFilterValue of
+        "" -> uu
+        s ->
+            List.filter
+                (\u ->
+                     (  (List.member "Name" m.s.userFilterIn && String.contains s u.userName)
+                     || (List.member "Email" m.s.userFilterIn && String.contains s u.email)
+                     || (List.member "Arn" m.s.userFilterIn && String.contains s u.arn)
+                     )
+                ) uu
 
 sort m aa =
     let
@@ -75,6 +109,11 @@ sort m aa =
             case m.s.userSortBy of
                 Name -> List.sortBy .userName aa
                 CreateDate -> List.sortWith (Util.compareByPosixTime .createDate) aa
+                BucketCount -> List.sortWith (\u1 u2 ->
+                                                  case List.length u1.buckets < List.length u2.buckets of
+                                                      True -> LT
+                                                      False -> GT
+                                             ) aa
                 _ -> aa
     in
         if m.s.userSortOrder then aa0 else List.reverse aa0
@@ -413,13 +452,13 @@ policiesAsList m pp selected msg =
                              (ListItem.config
                              |> ListItem.setSelected (selectArg p0)
                              |> ListItem.setOnClick (msg p0))
-                             [ text p0 ])
+                             [ text (Util.nameFromArn p0) ])
                         (List.map (\p ->
                                        (ListItem.listItem
                                             (ListItem.config
                                             |> ListItem.setSelected (selectArg p)
                                             |> ListItem.setOnClick (msg p))
-                                            [ text p ]))
+                                            [ text (Util.nameFromArn p) ]))
                              pn)
     in
         div [] [element]

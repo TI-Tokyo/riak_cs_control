@@ -1,8 +1,8 @@
 module View.SAMLProvider exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 
@@ -92,9 +92,9 @@ makeSAMLProvider a =
         }
 
 cardContent a =
-    "         Arn: " ++ a.arn ++ "\n" ++
-    "  CreateDate: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
-    "  ValidUntil: " ++ (Iso8601.fromTime a.validUntil) ++ "\n"
+    "       Arn: " ++ a.arn ++ "\n" ++
+    "CreateDate: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
+    "ValidUntil: " ++ (Iso8601.fromTime a.validUntil) ++ "\n"
         ++ Util.maybeTags a.tags "\nTags: "
 
 makeIdpMetadata a =
@@ -117,7 +117,6 @@ makeIdpMetadata a =
                       |> TextArea.setCols (Just 77)
                       |> TextArea.setRows (Just 15)
                       |> TextArea.setDisabled True
-                      |> TextArea.setAttributes []
                       )
                 ]
 

@@ -53,6 +53,9 @@ update msg m =
         UserFilterChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | userFilterValue = s}}, Cmd.none)
+        UserFilterInItemClicked s ->
+            let s_ = m.s in
+            ({m | s = {s_ | userFilterIn = addOrDeleteElement s_.userFilterIn s}}, Cmd.none)
         UserSortByFieldChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | userSortBy = View.Common.stringToSortBy s}}, Cmd.none)
@@ -221,6 +224,9 @@ update msg m =
         PolicyFilterChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | policyFilterValue = s}}, Cmd.none)
+        PolicyFilterInItemClicked s ->
+            let s_ = m.s in
+            ({m | s = {s_ | policyFilterIn = addOrDeleteElement s_.policyFilterIn s}}, Cmd.none)
         PolicySortByFieldChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | policySortBy = View.Common.stringToSortBy s}}, Cmd.none)

@@ -1,9 +1,9 @@
 module View.TempSession exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Data.Struct
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 

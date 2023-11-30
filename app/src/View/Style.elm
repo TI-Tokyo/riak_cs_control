@@ -52,9 +52,9 @@ createFab =
 
 filterAndSort =
     [ style "position" "fixed"
-    , style "top" "5rem"
-    , style "right" "0"
+    , style "bottom" "2rem"
+    , style "left" "2rem"
     , style "scale" "0.6"
-    , style "opacity" "0.1"
+    , style "opacity" "0.9"
     , style "z-index" "20"
     ]

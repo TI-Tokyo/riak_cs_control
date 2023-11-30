@@ -1,8 +1,8 @@
 module View.Usage exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 
@@ -77,8 +77,10 @@ makeChart m selector color yTicksFmt =
                                      , totalBucketCount = toFloat u.totalBucketCount
                                      , packed = False
                                      , packedUsers = []
+                                     , barStart = -1.1
+                                     , barEnd = -1.1
                                      })
-             |> filter m |> sort selector |> packTail m
+             |> filter m |> sort selector |> packTail m |> setBarWidths
     in
         div []
             [ C.chart
@@ -109,6 +111,8 @@ makeChart m selector color yTicksFmt =
                   , C.binLabels .userName [ CA.moveDown 20 ]
                   , C.bars [ CA.roundTop 0.1
                            , CA.margin 0.8
+                           , CA.x1 .barStart
+                           , CA.x2 .barEnd
                            ]
                       [ C.bar selector [ CA.color color ]
                       ]
@@ -139,6 +143,19 @@ packTail m aa =
         else
             aa
 
+setBarWidths aa =
+    List.foldl
+        (\a q ->
+             let
+                 p = List.length q
+                 b = if a.packed then
+                         {a | barStart = (toFloat p), barEnd = (toFloat p) + 1.5}
+                     else
+                         {a | barStart = (toFloat p), barEnd = (toFloat p) + 1.0}
+             in
+                 b :: q
+        ) [] aa
+
 relabelPackedBin s =
     (s |> String.fromInt) ++ " more"
 
@@ -150,7 +167,8 @@ packBin aa =
                  t2 = q.totalObjectCount + a.totalObjectCount
                  t3 = q.totalBucketCount + a.totalBucketCount
              in
-                 { q | packedUsers = a.userName :: q.packedUsers
+                 { q
+                 | packedUsers = a.userName :: q.packedUsers
                  , totalObjectSize = t1
                  , totalObjectCount = t2
                  , totalBucketCount = t3
@@ -162,6 +180,8 @@ packBin aa =
         , packed = True
         , userName = ""
         , packedUsers = []
+        , barStart = -1.1
+        , barEnd = -1.1
         }
         aa
 

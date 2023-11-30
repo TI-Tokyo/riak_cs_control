@@ -1,8 +1,8 @@
 module View.Policy exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 
@@ -19,6 +19,8 @@ import Material.Dialog as Dialog
 import Material.Select as Select
 import Material.Select.Item as SelectItem
 import Material.Typography as Typography
+import Material.Chip.Filter as FilterChip
+import Material.ChipSet.Filter as FilterChipSet
 import Iso8601
 
 makeContent m =
@@ -37,6 +39,7 @@ makeSubTab m =
           |> TextField.setValue (Just m.s.policyFilterValue)
           |> TextField.setOnInput PolicyFilterChanged
           )
+    , makeFilterChips m
     , Select.outlined
           (Select.config
           |> Select.setLabel (Just "Sort by")
@@ -52,6 +55,26 @@ makeSubTab m =
             (View.Common.sortOrderText m.s.policySortOrder)
     ]
 
+makeFilterChips m =
+    let
+        first = FilterChip.chip
+                (FilterChip.config
+                |> FilterChip.setSelected (List.member "Name" m.s.policyFilterIn)
+                |> FilterChip.setOnChange (PolicyFilterInItemClicked "Name")
+                ) "Name"
+        rest =
+            List.map
+                (\n ->
+                     FilterChip.chip
+                       (FilterChip.config
+                       |> FilterChip.setSelected (List.member n m.s.policyFilterIn)
+                       |> FilterChip.setOnChange (PolicyFilterInItemClicked n)
+                       )
+                       n
+                )
+            ["Id", "Arn"]
+    in
+        FilterChipSet.chipSet [] first rest
 
 makePolicies m =
     case m.s.policies |> (filter m) |> (sort m) |> List.map makePolicy of
@@ -60,8 +83,17 @@ makePolicies m =
         rr ->
             rr
 
-filter m aa =
-    List.filter (\a -> String.contains m.s.policyFilterValue a.policyName) aa
+filter m pp =
+    case m.s.policyFilterValue of
+        "" -> pp
+        s ->
+            List.filter
+                (\p ->
+                     (  (List.member "Name" m.s.policyFilterIn && String.contains s p.policyName)
+                     || (List.member "Id" m.s.policyFilterIn && String.contains s p.policyId)
+                     || (List.member "Arn" m.s.policyFilterIn && String.contains s p.arn)
+                     )
+                ) pp
 
 sort m aa =
     let
@@ -102,9 +134,13 @@ cardContent a =
     "           Path: " ++ a.path ++ "\n" ++
     "    Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
     "AttachmentCount: " ++ (String.fromInt a.attachmentCount) ++ "\n" ++
+    "   IsAttachable: " ++ (yesOrNo a.isAttachable) ++ "\n" ++
     "             Id: " ++ a.policyId ++ "\n" ++
     "        Created: " ++ (Iso8601.fromTime a.createDate)
         ++ Util.maybeTags a.tags "\nTags: "
+
+yesOrNo a =
+    if a then "Yes" else "No"
 
 cardPolicyDocument a =
     (Util.pprintJson a.policyDocument)
@@ -146,9 +182,9 @@ createPolicy m =
               { title = "New policy"
               , content =
                     [ div [ style "display" "grid"
-                               , style "grid-template-columns" "1"
-                               , style "row-gap" "0.3em"
-                               ]
+                          , style "grid-template-columns" "1"
+                          , style "row-gap" "0.3em"
+                          ]
                           [ TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Name")
@@ -172,6 +208,7 @@ createPolicy m =
                                 |> TextArea.setRequired True
                                 |> TextArea.setOnChange NewPolicyPolicyDocumentChanged
                                 |> TextArea.setRows (Just 12)
+                                |> TextArea.setCols (Just 82)
                                 )
                           ]
                     ]

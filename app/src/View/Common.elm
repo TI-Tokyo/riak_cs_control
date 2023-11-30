@@ -1,10 +1,20 @@
 module View.Common exposing (..)
 
-import Model exposing (Model, SortByField(..), SortOrder)
 import Msg exposing (Msg(..))
 
 import Html.Attributes exposing (style)
 
+type SortByField
+    = Name
+    | Email
+    | BucketCount
+    | CreateDate
+    | ValidUntil
+    | AttachmentCount
+    | RoleLastUsed
+    | Unsorted
+
+type alias SortOrder = Bool
 
 sortOrderText =
     \o -> if o then "Asc" else "Desc"
@@ -12,6 +22,8 @@ sortOrderText =
 selectSortByString a =
     case a of
         Name -> "Name"
+        Email -> "Email"
+        BucketCount -> "Bucket count"
         CreateDate -> "Create date"
         ValidUntil -> "Valid until"
         AttachmentCount -> "Attachment count"
@@ -21,6 +33,8 @@ selectSortByString a =
 stringToSortBy a =
     case a of
         "Name" -> Name
+        "Email" -> Email
+        "Bucket count" -> BucketCount
         "Create date" -> CreateDate
         "Valid until" -> ValidUntil
         "Attachment count" -> AttachmentCount

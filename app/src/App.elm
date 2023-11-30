@@ -3,6 +3,8 @@ module App exposing (init, subscriptions, Flags)
 import Model exposing (..)
 import Data.Struct
 import Msg exposing (Msg(..))
+import View.Common exposing (SortByField(..))
+
 import Time
 import Dict exposing (Dict)
 import Task
@@ -29,9 +31,9 @@ init f =
                     Snackbar.initialQueue Msg.General True
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
-                    "" Name True
+                    "" ["Name", "Email"] Name True
                     False "" "/" "" Nothing False Nothing Nothing [] []
-                    "" Name True
+                    "" ["Name"] Name True
                     False "" "/" Nothing "" []
                     "" Name True
                     False "" "/" Nothing "" Nothing 3600 []

@@ -95,6 +95,7 @@ type Msg
 
     -- users
     | UserFilterChanged String
+    | UserFilterInItemClicked String
     | UserSortByFieldChanged String
     | UserSortOrderChanged
 
@@ -120,6 +121,7 @@ type Msg
 
     -- policies
     | PolicyFilterChanged String
+    | PolicyFilterInItemClicked String
     | PolicySortByFieldChanged String
     | PolicySortOrderChanged
     | ShowCreatePolicyDialog

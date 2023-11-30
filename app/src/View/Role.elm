@@ -1,8 +1,8 @@
 module View.Role exposing (makeContent)
 
-import Model exposing (Model, SortByField(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-import View.Common
+import View.Common exposing (SortByField(..))
 import View.Style
 import Util
 
@@ -168,6 +168,7 @@ createRole m =
                                 |> TextArea.setRequired True
                                 |> TextArea.setOnChange NewRoleAssumeRolePolicyDocumentChanged
                                 |> TextArea.setRows (Just 12)
+                                |> TextArea.setCols (Just 82)
                                 )
                           , TextField.filled
                                 (TextField.config
