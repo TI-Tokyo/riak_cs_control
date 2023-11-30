@@ -4,6 +4,7 @@ import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import Data.Struct
 import View.Common
+import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -16,15 +17,39 @@ import Material.IconButton as IconButton
 import Material.Typography as Typography
 import Material.Select as Select
 import Material.Select.Item as SelectItem
+import Material.TextField as TextField
 import Iso8601
 import Time
 
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , div View.Common.cardStyle (makeTempSessions m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makeTempSessions m)
         ]
+
+makeSubTab m =
+    let n = View.Common.selectSortByString Name in
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.tempSessionFilterValue)
+          |> TextField.setOnInput TempSessionFilterChanged
+          )
+    , Select.outlined
+          (Select.config
+          |> Select.setLabel (Just "Sort by")
+          |> Select.setSelected (Just (View.Common.selectSortByString m.s.tempSessionSortBy))
+          |> Select.setOnChange TempSessionSortByFieldChanged
+          )
+          (SelectItem.selectItem (SelectItem.config { value = n }) n)
+          (List.map
+               (\i -> let j = View.Common.selectSortByString i in
+                      SelectItem.selectItem (SelectItem.config {value = j}) j)
+               [CreateDate, ValidUntil])
+    , Button.text (Button.config |> Button.setOnClick TempSessionSortOrderChanged)
+            (View.Common.sortOrderText m.s.tempSessionSortOrder)
+    ]
 
 makeTempSessions m =
     case m.s.tempSessions |> filter m |> sort m |> List.map makeTempSession of
@@ -52,15 +77,15 @@ makeTempSession a =
         Card.card Card.config
             { blocks =
                   ( Card.block <|
-                        div View.Common.cardInnerHeaderStyle [ text name ]
+                        div View.Style.cardInnerHeader [ text name ]
                   , [ Card.block <|
-                          div View.Common.cardInnerContentStyle
+                          div View.Style.cardInnerContent
                           [ a |> cardContent |> text ]
                     , Card.block <|
-                        div View.Common.cardInnerContentStyle
+                        div View.Style.cardInnerContent
                             [ div []
                                   [ "InlinePolicy:" |> text ]
-                            , div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
+                            , div (View.Style.cardInnerContent ++ View.Style.jsonInset)
                                   [ a |> cardPolicyDocument |> text ]
                             ]
                     ]

@@ -2,8 +2,8 @@ module View.Role exposing (makeContent)
 
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
-import Data.Struct
 import View.Common
+import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -22,12 +22,35 @@ import Material.Select.Item as SelectItem
 import Iso8601
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , div View.Common.cardStyle (makeRoles m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makeRoles m)
         , div [] (createRole m)
         , div [] (maybeShowCreateRoleFab m)
         ]
+
+makeSubTab m =
+    let n = View.Common.selectSortByString Name in
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.roleFilterValue)
+          |> TextField.setOnInput RoleFilterChanged
+          )
+    , Select.outlined
+          (Select.config
+          |> Select.setLabel (Just "Sort by")
+          |> Select.setSelected (Just (View.Common.selectSortByString m.s.roleSortBy))
+          |> Select.setOnChange RoleSortByFieldChanged
+          )
+          (SelectItem.selectItem (SelectItem.config { value = n }) n)
+          (List.map
+               (\i -> let j = View.Common.selectSortByString i in
+                      SelectItem.selectItem (SelectItem.config {value = j}) j)
+               [CreateDate, RoleLastUsed])
+    , Button.text (Button.config |> Button.setOnClick RoleSortOrderChanged)
+            (View.Common.sortOrderText m.s.roleSortOrder)
+    ]
 
 makeRoles m =
     case m.s.roles |> filter m |> sort m |> List.map makeRole of
@@ -59,14 +82,14 @@ makeRole a =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    div View.Common.cardInnerHeaderStyle
+                    div View.Style.cardInnerHeader
                     [ text a.roleName ]
               , [ Card.block <|
-                      div View.Common.cardInnerContentStyle
+                      div View.Style.cardInnerContent
                       [ Html.pre [] [ a |> cardContent |>text] ]
                 , Card.block <|
-                    div (View.Common.cardInnerContentStyle ++ View.Common.jsonInsetStyle)
-                        [ Html.pre [] [ a |> cardPolicyDocument |> text ] ]
+                    div (View.Style.cardInnerContent ++ View.Style.jsonInset)
+                        [ a |> cardPolicyDocument |> text ]
                 ]
               )
         , actions = roleCardActions a

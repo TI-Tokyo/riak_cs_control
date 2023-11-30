@@ -38,7 +38,7 @@ init f =
                     "" Name True
                     False "" "" []
                     "" CreateDate True
-                    "" TotalObjectSize True 8
+                    "" 8
         model = Model config state (Time.millisToPosix 0)
     in
         ( model

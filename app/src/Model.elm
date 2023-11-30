@@ -38,9 +38,6 @@ type SortByField
     | ValidUntil
     | AttachmentCount
     | RoleLastUsed
-    | TotalObjectSize
-    | TotalObjectCount
-    | TotalBucketCount
     | Unsorted
 
 type alias SortOrder = Bool
@@ -125,8 +122,6 @@ type alias State =
 
     -- bucket stats/usage
     , usageFilterValue : String
-    , usageSortBy : SortByField
-    , usageSortOrder : SortOrder
     , usageTopItemsShown : Int
     }
 

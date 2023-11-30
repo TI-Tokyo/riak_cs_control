@@ -158,8 +158,6 @@ type Msg
 
     -- usage
     | UsageFilterChanged String
-    | UsageSortByFieldChanged String
-    | UsageSortOrderChanged
     | UsageTopItemsShownChanged String
     -- later
     -- | UsageDateFromChanged String

@@ -3,6 +3,7 @@ module View.Usage exposing (makeContent)
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import View.Common
+import View.Style
 import Util
 
 import Dict
@@ -24,13 +25,19 @@ import Filesize
 
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle ((View.Common.makeSubTab m) ++ extraSubTabItems m)
-        , div View.Common.cardStyle (makeUsage m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makeUsage m)
         ]
 
-extraSubTabItems m =
+makeSubTab m =
     [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.usageFilterValue)
+          |> TextField.setOnInput UsageFilterChanged
+          )
+    , TextField.outlined
           (TextField.config
           |> TextField.setLabel (Just "Top items to show")
           |> TextField.setType (Just "number")
@@ -51,10 +58,10 @@ encard content title =
         [ Card.card Card.config
               { blocks =
                     ( Card.block <|
-                          div View.Common.cardInnerHeaderStyle
+                          div View.Style.cardInnerHeader
                           [ text title ]
                     , [ Card.block <|
-                            div (View.Common.cardInnerContentStyle) content
+                            div (View.Style.cardInnerContent) content
                       ]
                     )
               , actions = Nothing

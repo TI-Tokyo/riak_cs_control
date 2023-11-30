@@ -4,6 +4,7 @@ import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import Data.Struct
 import View.Common
+import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -25,15 +26,38 @@ import Iso8601
 
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , div View.Common.cardStyle (makeUsers m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makeUsers m)
         , div [] (makeCreateUserDialog m)
         , div [] (makeEditUserDialog m)
         , div [] (makeEditUserPoliciesDialog m)
         , div [] (makeAttachUserPolicyDialog m)
         , div [] (maybeShowCreateUserFab m)
         ]
+
+makeSubTab m =
+    let n = View.Common.selectSortByString Name in
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.userFilterValue)
+          |> TextField.setOnInput UserFilterChanged
+          )
+    , Select.outlined
+          (Select.config
+          |> Select.setLabel (Just "Sort by")
+          |> Select.setSelected (Just (View.Common.selectSortByString m.s.userSortBy))
+          |> Select.setOnChange UserSortByFieldChanged
+          )
+          (SelectItem.selectItem (SelectItem.config { value = n }) n)
+          (List.map
+               (\i -> let j = View.Common.selectSortByString i in
+                      SelectItem.selectItem (SelectItem.config {value = j}) j)
+               [CreateDate])
+    , Button.text (Button.config |> Button.setOnClick UserSortOrderChanged)
+            (View.Common.sortOrderText m.s.userSortOrder)
+    ]
 
 makeUsers m =
     case m.s.users |> (filter m) |> (sort m) |> List.map (makeUser m) of
@@ -68,10 +92,10 @@ makeUser m u =
             [ Card.card Card.config
                  { blocks =
                        ( Card.block <|
-                             div View.Common.cardInnerHeaderStyle
+                             div View.Style.cardInnerHeader
                              [ text (u.userName ++ maybeDisabled)]
                        , [ Card.block <|
-                               div (View.Common.cardInnerContentStyle ++ (isEnabledStyle u))
+                               div (View.Style.cardInnerContent ++ (isEnabledStyle u))
                                [ u |> cardContent |> text
                                , div [ Typography.body2 ]
                                    [ text (userBucketsDetail u) ]
@@ -156,7 +180,7 @@ maybeShowCreateUserFab m =
         [ Fab.fab
               (Fab.config
               |> Fab.setOnClick ShowCreateUserDialog
-              |> Fab.setAttributes View.Common.createFabStyle
+              |> Fab.setAttributes View.Style.createFab
               )
               (Fab.icon "add")
         ]

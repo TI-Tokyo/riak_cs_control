@@ -2,8 +2,8 @@ module View.SAMLProvider exposing (makeContent)
 
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
-import Data.Struct
 import View.Common
+import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -22,12 +22,37 @@ import Material.Select.Item as SelectItem
 import Iso8601
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , div View.Common.cardStyle (makeSAMLProviders m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makeSAMLProviders m)
         , div [] (createSAMLProvider m)
         , div [] (maybeShowCreateSAMLProviderFab m)
         ]
+
+makeSubTab m =
+    let n = View.Common.selectSortByString Name in
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.samlProviderFilterValue)
+          |> TextField.setOnInput SAMLProviderFilterChanged
+          )
+    , Select.outlined
+          (Select.config
+          |> Select.setLabel (Just "Sort by")
+          |> Select.setSelected (Just (View.Common.selectSortByString m.s.samlProviderSortBy))
+          |> Select.setOnChange SAMLProviderSortByFieldChanged
+          )
+          (SelectItem.selectItem (SelectItem.config { value = n }) n)
+          (List.map
+               (\i -> let j = View.Common.selectSortByString i in
+                      SelectItem.selectItem (SelectItem.config {value = j}) j)
+               [CreateDate, ValidUntil])
+    , Button.text (Button.config |> Button.setOnClick SAMLProviderSortOrderChanged)
+            (View.Common.sortOrderText m.s.samlProviderSortOrder)
+    ]
+
+
 
 makeSAMLProviders m =
     case m.s.samlProviders |> filter m |> sort m |> List.map makeSAMLProvider of
@@ -54,10 +79,10 @@ makeSAMLProvider a =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    div View.Common.cardInnerHeaderStyle
+                    div View.Style.cardInnerHeader
                     [ text (Util.nameFromArn a.arn) ]
               , [ Card.block <|
-                      div View.Common.cardInnerContentStyle
+                      div View.Style.cardInnerContent
                       [ Html.pre [] [ a |> cardContent |> text] ]
                 , Card.block <|
                     makeIdpMetadata a
@@ -84,7 +109,7 @@ makeIdpMetadata a =
                       "IDP Metadata"
                 ]
         d ->
-            div View.Common.cardInnerContentStyle
+            div View.Style.cardInnerContent
                 [ TextArea.outlined
                       (TextArea.config
                       |> TextArea.setLabel (Just "Metadata document")
@@ -121,7 +146,7 @@ maybeShowCreateSAMLProviderFab m =
               (Fab.config
               |> Fab.setOnClick ShowCreateSAMLProviderDialog
               |> Fab.setAttributes
-                   View.Common.createFabStyle
+                   View.Style.createFab
               )
               (Fab.icon "add")
         ]

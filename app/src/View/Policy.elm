@@ -3,6 +3,7 @@ module View.Policy exposing (makeContent)
 import Model exposing (Model, SortByField(..))
 import Msg exposing (Msg(..))
 import View.Common
+import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
@@ -21,12 +22,36 @@ import Material.Typography as Typography
 import Iso8601
 
 makeContent m =
-    div View.Common.topContentStyle
-        [ div View.Common.subTabStyle (View.Common.makeSubTab m)
-        , div View.Common.cardStyle (makePolicies m)
+    div View.Style.topContent
+        [ div View.Style.filterAndSort (makeSubTab m)
+        , div View.Style.card (makePolicies m)
         , div [] (createPolicy m)
         , div [] (maybeShowCreatePolicyFab m)
         ]
+
+makeSubTab m =
+    let n = View.Common.selectSortByString Name in
+    [ TextField.outlined
+          (TextField.config
+          |> TextField.setLabel (Just "Filter")
+          |> TextField.setValue (Just m.s.policyFilterValue)
+          |> TextField.setOnInput PolicyFilterChanged
+          )
+    , Select.outlined
+          (Select.config
+          |> Select.setLabel (Just "Sort by")
+          |> Select.setSelected (Just (View.Common.selectSortByString m.s.policySortBy))
+          |> Select.setOnChange PolicySortByFieldChanged
+          )
+          (SelectItem.selectItem (SelectItem.config { value = n }) n)
+          (List.map
+               (\i -> let j = View.Common.selectSortByString i in
+                      SelectItem.selectItem (SelectItem.config {value = j}) j)
+               [CreateDate, AttachmentCount])
+    , Button.text (Button.config |> Button.setOnClick PolicySortOrderChanged)
+            (View.Common.sortOrderText m.s.policySortOrder)
+    ]
+
 
 makePolicies m =
     case m.s.policies |> (filter m) |> (sort m) |> List.map makePolicy of
@@ -54,13 +79,13 @@ makePolicy a =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    div View.Common.cardInnerHeaderStyle
+                    div View.Style.cardInnerHeader
                     [ text a.policyName ]
               , [ Card.block <|
-                      div View.Common.cardInnerContentStyle
+                      div View.Style.cardInnerContent
                       [ Html.pre [] [ a |> cardContent |> text ] ]
                 , Card.block <|
-                    div (View.Common.cardInnerContentStyle ++
+                    div (View.Style.cardInnerContent ++
                                   [ style "scale" "0.8"
                                   , style "background-color" "lightgrey"
                                   , style "border" "thick"
@@ -105,7 +130,7 @@ maybeShowCreatePolicyFab m =
         [ Fab.fab
               (Fab.config
               |> Fab.setOnClick ShowCreatePolicyDialog
-              |> Fab.setAttributes View.Common.createFabStyle
+              |> Fab.setAttributes View.Style.createFab
               )
               (Fab.icon "add")
         ]

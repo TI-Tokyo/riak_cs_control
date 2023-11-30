@@ -451,12 +451,6 @@ update msg m =
         UsageFilterChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | usageFilterValue = s}}, Cmd.none)
-        UsageSortByFieldChanged s ->
-            let s_ = m.s in
-            ({m | s = {s_ | usageSortBy = View.Common.stringToSortBy s}}, Cmd.none)
-        UsageSortOrderChanged ->
-            let s_ = m.s in
-            ({m | s = {s_ | usageSortOrder = not s_.usageSortOrder}}, Cmd.none)
         UsageTopItemsShownChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | usageTopItemsShown = String.toInt s |> Maybe.withDefault 8}}, Cmd.none)

@@ -3,6 +3,7 @@ module View.General exposing (makeContent)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import View.Common
+import View.Style
 
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (attribute, style)
@@ -15,7 +16,7 @@ import Material.Typography as Typography
 
 
 makeContent m =
-    Html.div View.Common.topContentStyle
+    Html.div View.Style.topContent
         [ Html.div [] [ makeServerInfo m ]
         , Html.div [style "width" "max(max-content, 80%)"] (configDialog m)
         ]
@@ -30,10 +31,10 @@ serverInfoDetails m =
     Card.card Card.config
         { blocks =
               ( Card.block <|
-                    Html.div View.Common.cardInnerHeaderStyle
+                    Html.div View.Style.cardInnerHeader
                     [ text "Riak CS node" ]
               , [ Card.block <|
-                      Html.div View.Common.cardInnerContentStyle
+                      Html.div View.Style.cardInnerContent
                       [ Html.pre [] [ m |> cardContent |> text ] ]
                 ]
               )

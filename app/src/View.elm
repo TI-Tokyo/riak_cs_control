@@ -54,9 +54,9 @@ makeTopAppBar m =
                     , text (activeTabName m)
                     ]
               , TopAppBar.section [ TopAppBar.alignEnd ]
-                  [ Html.span [ TopAppBar.alignEnd ]
+                  [ Html.span [ TopAppBar.alignEnd, style "padding" "0 1em" ]
                         [ text m.c.csUrl ]
-                  , Html.span [ TopAppBar.title ]
+                  , Html.span [ TopAppBar.alignEnd ]
                       [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
                   ]
               ]
