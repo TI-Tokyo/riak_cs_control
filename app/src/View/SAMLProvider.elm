@@ -106,7 +106,7 @@ makeIdpMetadata a =
                 ]
                 [ Button.text
                       (Button.config |> Button.setOnClick (GetSAMLProvider a.arn))
-                      "IDP Metadata"
+                      "Fetch IDP Metadata"
                 ]
         d ->
             div View.Style.cardInnerContent

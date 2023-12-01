@@ -36,7 +36,7 @@ init f =
                     "" ["Name"] Name True
                     False "" "/" Nothing "" []
                     "" Name True
-                    False "" "/" Nothing "" Nothing 3600 []
+                    False "" "/" Nothing "" Nothing 3600 [] Nothing
                     "" Name True
                     False "" "" []
                     "" CreateDate True

@@ -86,10 +86,12 @@ makeRole a =
                     [ text a.roleName ]
               , [ Card.block <|
                       div View.Style.cardInnerContent
-                      [ Html.pre [] [ a |> cardContent |>text] ]
+                      [ cardContent a |> text ]
                 , Card.block <|
                     div (View.Style.cardInnerContent ++ View.Style.jsonInset)
                         [ a |> cardPolicyDocument |> text ]
+                , Card.block <|
+                    makeAttachedPolicies a
                 ]
               )
         , actions = roleCardActions a
@@ -108,6 +110,20 @@ cardPolicyDocument a =
     Util.pprintJson
         (Maybe.withDefault "" a.assumeRolePolicyDocument)
 
+makeAttachedPolicies a =
+    if a.attachedPoliciesFetched == False then
+        div [ style "display" "grid"
+            , style "align-items" "center"
+            , style "justify-content" "center"
+            ]
+        [ Button.text
+              (Button.config |> Button.setOnClick (ListAttachedRolePolicies a.roleName))
+              "Fetch Attached policies"
+        ]
+    else
+        div View.Style.cardInnerContent
+            [ Util.maybeItems (List.map .policyName a.attachedPolicies) "AttachedPolicies: " |> text
+            ]
 
 roleCardActions a =
     Just <|
@@ -116,6 +132,9 @@ roleCardActions a =
                   [ Card.button (Button.config
                                 |> Button.setOnClick (DeleteRole a.roleName)
                                 ) "Delete"
+                  , Card.button (Button.config
+--                                |> Button.setOnClick (ShowEditRolePoliciesDialog a.roleName)
+                                ) "Policies"
                   ]
             , icons = []
             }

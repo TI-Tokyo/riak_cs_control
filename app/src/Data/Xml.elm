@@ -11,6 +11,7 @@ module Data.Xml exposing
     , decodeEmptySuccessResponse
     , decodeBucketContents
     , decodeTempSessionList
+    , decodeListAttachedRolePolicies
     )
 
 import Data.Struct exposing (..)
@@ -114,6 +115,15 @@ decodePolicyCreated =
     path ["CreatePolicyResult", "Policy"] (single policy)
 
 
+decodeListAttachedRolePolicies : D.Decoder (List AttachedPolicy)
+decodeListAttachedRolePolicies =
+    path [ "ListAttachedRolePoliciesResult", "AttachedPolicies" ] (list attachedPolicy)
+
+attachedPolicy =
+    succeed AttachedPolicy
+        |> requiredPath ["PolicyArn"] (single string)
+        |> requiredPath ["PolicyName"] (single string)
+
 -- Roles
 
 decodeRoles : D.Decoder (List Role)
@@ -132,9 +142,9 @@ role =
         |> possiblePath ["PermissionsBoundary"] (single permissionsBoundary)
         |> possiblePath ["RoleLastUsed"] (single roleLastUsed)
         |> possiblePath ["MaxSessionDuration"] (single int)
-        -- hold the place
-        |> possiblePath ["AttachedPolicies"] (list string)
         |> optionalPath ["Tags"] (list tag) []
+        |> optionalPath ["AttachedPolicies"] (list attachedPolicy) []
+        |> optionalPath ["LearnMeSomeDecoding"] (single bool) False
 
 roleLastUsed =
     succeed RoleLastUsed

@@ -175,8 +175,14 @@ type alias Role =
     , permissionsBoundary : Maybe PermissionsBoundary
     , roleLastUsed : Maybe RoleLastUsed
     , maxSessionDuration : Maybe Int
-    , attachedPolicies : List String
     , tags : List Tag
+    , attachedPolicies : List AttachedPolicy
+    , attachedPoliciesFetched : Bool
+    }
+
+type alias AttachedPolicy =
+    { policyArn : String
+    , policyName : String
     }
 
 type alias RoleLastUsed =

@@ -160,7 +160,7 @@ listAttachedRolePolicies m a =
     iamCall m "ListAttachedRolePolicies"
         [ ("RoleName", a)
         ]
-        (Http.Xml.expectXml UserPolicyDetached Data.Xml.decodePolicies)
+        (Http.Xml.expectXml GotAttachedRolePolicyList Data.Xml.decodeListAttachedRolePolicies)
 
 
 

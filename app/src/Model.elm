@@ -7,6 +7,8 @@ module Model exposing
     , enrichSamlProvider
     , flattenUserBucketList
     , updateBucketStats
+    , populateRoleAttachedPolicies
+    , placeholderPolicy
     )
 
 import Data.Struct exposing (..)
@@ -94,6 +96,7 @@ type alias State =
     , newRolePermissionsBoundary : Maybe String
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
+    , roleNameAttachedPoliciesCollectedFor : Maybe String
 
     -- saml providers
     , samlProviderFilterValue : String
@@ -128,6 +131,29 @@ policyByName m a =
     case List.filter (\p -> p.policyName == a) m.s.policies of
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
+
+populateRoleAttachedPolicies : Model -> String -> List AttachedPolicy -> Model
+populateRoleAttachedPolicies m rn pp =
+    let
+        s_ = m.s
+        roles = List.map
+                (\r ->
+                     if r.roleName == rn then
+                         {r
+                         | attachedPolicies = pp
+                         , attachedPoliciesFetched = True
+                         }
+                     else r
+                ) s_.roles
+    in
+        { m | s = {s_ | roleNameAttachedPoliciesCollectedFor = Nothing
+                      , roles = roles} }
+
+placeholderPolicy : AttachedPolicy
+placeholderPolicy =
+    { policyName = "$$"
+    , policyArn = ""
+    }
 
 enrichSamlProvider : Model -> SAMLProvider -> Model
 enrichSamlProvider m a =

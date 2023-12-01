@@ -310,6 +310,20 @@ update msg m =
                              (Snackbar.message ("Failed to fetch roles: " ++ (explainHttpError err))) m.s.msgQueue } }
             , Cmd.none
             )
+        ListAttachedRolePolicies a ->
+            let s_ = m.s in
+            ( { m | s = {s_ | roleNameAttachedPoliciesCollectedFor = Just a}}
+            , Request.Aws.listAttachedRolePolicies m a
+            )
+        GotAttachedRolePolicyList (Ok aa) ->
+            let rn = Maybe.withDefault "beef" m.s.roleNameAttachedPoliciesCollectedFor in
+            (Model.populateRoleAttachedPolicies m rn aa, Cmd.none)
+        GotAttachedRolePolicyList (Err err) ->
+            let s_ = m.s in
+            ( { m | s = {s_ | roles = [], msgQueue = Snackbar.addMessage
+                             (Snackbar.message ("Failed to fetch role attached policies: " ++ (explainHttpError err))) m.s.msgQueue } }
+            , Cmd.none
+            )
 
         ShowCreateRoleDialog ->
             let s_ = m.s in
@@ -615,7 +629,7 @@ refreshAll m =
 explainHttpError a =
     case a of
         Http.BadBody s ->
-            "" ++ (Util.ellipsize s 50)
+            "" ++ (Util.ellipsize s 500)
         Http.Timeout ->
             "Request timed out"
         Http.NetworkError ->

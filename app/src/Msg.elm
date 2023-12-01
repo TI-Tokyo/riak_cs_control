@@ -1,7 +1,7 @@
 module Msg exposing (Msg(..), Tab(..))
 
 import Data.Struct exposing
-    ( User, Role, Policy, SAMLProvider, TempSession
+    ( User, Role, Policy, AttachedPolicy, SAMLProvider, TempSession
     , ServerInfo
     , BucketContents
     , RequestId
@@ -62,6 +62,8 @@ type Msg
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
+    | ListAttachedRolePolicies String
+    | GotAttachedRolePolicyList (Result Http.Error (List AttachedPolicy))
 
     -- SAMLProviders
     | ListSAMLProviders
