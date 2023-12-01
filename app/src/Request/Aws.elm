@@ -12,6 +12,7 @@ module Request.Aws exposing
     , deleteSAMLProvider
     , attachUserPolicy
     , detachUserPolicy
+    , listAttachedRolePolicies
     )
 
 import Model exposing (Model)
@@ -153,6 +154,13 @@ detachUserPolicy m a =
         , ("PolicyArn", a)
         ]
         (Http.Xml.expectXml UserPolicyDetached Data.Xml.decodeEmptySuccessResponse)
+
+listAttachedRolePolicies : Model -> String -> Cmd Msg
+listAttachedRolePolicies m a =
+    iamCall m "ListAttachedRolePolicies"
+        [ ("RoleName", a)
+        ]
+        (Http.Xml.expectXml UserPolicyDetached Data.Xml.decodePolicies)
 
 
 

@@ -132,6 +132,8 @@ role =
         |> possiblePath ["PermissionsBoundary"] (single permissionsBoundary)
         |> possiblePath ["RoleLastUsed"] (single roleLastUsed)
         |> possiblePath ["MaxSessionDuration"] (single int)
+        -- hold the place
+        |> possiblePath ["AttachedPolicies"] (list string)
         |> optionalPath ["Tags"] (list tag) []
 
 roleLastUsed =
