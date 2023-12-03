@@ -12,6 +12,8 @@ module Request.Aws exposing
     , deleteSAMLProvider
     , attachUserPolicy
     , detachUserPolicy
+    , attachRolePolicy
+    , detachRolePolicy
     , listAttachedRolePolicies
     )
 
@@ -100,20 +102,6 @@ getSAMLProvider m a =
         [("SAMLProviderArn", a)]
         (Http.Xml.expectXml GotSAMLProvider (Data.Xml.decodeGetSAMLProviderResponse a))
 
--- getSamlProviderResolver u a =
---     case a of
---         Http.GoodStatus_ _ body ->
---             case Xml.Decode.run (Data.Xml.decodeGetSAMLProviderResponse u) body of
---                 Ok b ->
---                     Ok b
---                 Err err ->
---                     Err (Http.BadBody "Bad XML")
---         Http.BadStatus_ md _ ->
---             Err (Http.BadStatus md.statusCode)
---         _ ->
---             Err (Http.NetworkError)
-
-
 createSAMLProvider : Model -> Cmd Msg
 createSAMLProvider m =
     iamCall m "CreateSAMLProvider"
@@ -135,7 +123,7 @@ attachUserPolicy : Model -> String -> Cmd Msg
 attachUserPolicy m a =
     let
         u = Model.userBy m .arn
-            (Maybe.withDefault "" m.s.openAttachUserPoliciesDialogFor)
+            (Maybe.withDefault "" m.s.openEditUserPoliciesDialogFor)
     in
     iamCall m "AttachUserPolicy"
         [ ("UserName", u.userName)
@@ -154,6 +142,31 @@ detachUserPolicy m a =
         , ("PolicyArn", a)
         ]
         (Http.Xml.expectXml UserPolicyDetached Data.Xml.decodeEmptySuccessResponse)
+
+
+attachRolePolicy : Model -> String -> Cmd Msg
+attachRolePolicy m a =
+    let
+        r = Model.roleBy m .roleName (Maybe.withDefault "" m.s.openEditRolePoliciesDialogFor)
+        _ = Debug.log "r" r
+    in
+    iamCall m "AttachRolePolicy"
+        [ ("RoleName", r.roleName)
+        , ("PolicyArn", a)
+        ]
+        (Http.Xml.expectXml RolePolicyAttached Data.Xml.decodeEmptySuccessResponse)
+
+detachRolePolicy : Model -> String -> Cmd Msg
+detachRolePolicy m a =
+    let
+        r = Model.roleBy m .roleName (Maybe.withDefault "" m.s.openEditRolePoliciesDialogFor)
+    in
+    iamCall m "DetachRolePolicy"
+        [ ("RoleName", r.roleName)
+        , ("PolicyArn", a)
+        ]
+        (Http.Xml.expectXml RolePolicyDetached Data.Xml.decodeEmptySuccessResponse)
+
 
 listAttachedRolePolicies : Model -> String -> Cmd Msg
 listAttachedRolePolicies m a =

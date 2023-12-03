@@ -252,6 +252,22 @@ dummyUser =
     , attachedPolicies = []
     }
 
+dummyRole =
+    { arn = ""
+    , path = ""
+    , roleId = ""
+    , roleName = ""
+    , createDate = Time.millisToPosix 0
+    , description = Nothing
+    , assumeRolePolicyDocument = Nothing
+    , permissionsBoundary = Nothing
+    , roleLastUsed = Nothing
+    , maxSessionDuration = Nothing
+    , tags = []
+    , attachedPolicies = []
+    , attachedPoliciesFetched = False
+    }
+
 dummyPolicy =
     { arn = ""
     , path = ""

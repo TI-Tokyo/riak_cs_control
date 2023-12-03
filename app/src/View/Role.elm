@@ -3,6 +3,7 @@ module View.Role exposing (makeContent)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import View.Common exposing (SortByField(..))
+import View.Shared exposing (policiesAsList)
 import View.Style
 import Util
 
@@ -17,6 +18,8 @@ import Material.TextArea as TextArea
 import Material.IconButton as IconButton
 import Material.Dialog as Dialog
 import Material.Typography as Typography
+import Material.List as List
+import Material.List.Item as ListItem
 import Material.Select as Select
 import Material.Select.Item as SelectItem
 import Iso8601
@@ -26,6 +29,8 @@ makeContent m =
         [ div View.Style.filterAndSort (makeSubTab m)
         , div View.Style.card (makeRoles m)
         , div [] (createRole m)
+        , div [] (makeEditRolePoliciesDialog m)
+        , div [] (makeAttachRolePolicyDialog m)
         , div [] (maybeShowCreateRoleFab m)
         ]
 
@@ -112,18 +117,19 @@ cardPolicyDocument a =
 
 makeAttachedPolicies a =
     if a.attachedPoliciesFetched == False then
-        div [ style "display" "grid"
-            , style "align-items" "center"
-            , style "justify-content" "center"
-            ]
+        div View.Style.center
         [ Button.text
               (Button.config |> Button.setOnClick (ListAttachedRolePolicies a.roleName))
               "Fetch Attached policies"
         ]
     else
-        div View.Style.cardInnerContent
-            [ Util.maybeItems (List.map .policyName a.attachedPolicies) "AttachedPolicies: " |> text
-            ]
+        if List.length a.attachedPolicies == 0 then
+                div View.Style.cardInnerContent
+                    [ text "(no attached policies)" ]
+            else
+                div View.Style.cardInnerContent
+                    [ Util.maybeItems (List.map .policyName a.attachedPolicies) "AttachedPolicies: " |> text
+                    ]
 
 roleCardActions a =
     Just <|
@@ -133,11 +139,100 @@ roleCardActions a =
                                 |> Button.setOnClick (DeleteRole a.roleName)
                                 ) "Delete"
                   , Card.button (Button.config
---                                |> Button.setOnClick (ShowEditRolePoliciesDialog a.roleName)
+                                |> Button.setOnClick (ShowEditRolePoliciesDialog a.roleName)
                                 ) "Policies"
                   ]
             , icons = []
             }
+
+makeEditRolePoliciesDialog m =
+    case m.s.openEditRolePoliciesDialogFor of
+        Just roleName ->
+            let
+                r = Model.roleBy m .roleName roleName
+                attachedPolicyArns = List.map .policyArn r.attachedPolicies
+            in
+            [ Dialog.confirmation
+                  (Dialog.config
+                  |> Dialog.setOpen True
+                  |> Dialog.setOnClose EditRolePoliciesDialogDismissed
+                  )
+                  { title = ("Policies attached to role " ++ r.roleName)
+                  , content =
+                        [ div [ style "display" "grid"
+                              , style "grid-template-columns" "1"
+                              , style "row-gap" "0.3em"
+                              ]
+                              ([ policiesAsList m
+                                     attachedPolicyArns
+                                     m.s.selectedPoliciesForDetach
+                                     SelectOrUnselectPolicyToDetach ]
+                                   ++ [ div []
+                                            [IconButton.iconButton
+                                                 (IconButton.config
+                                                 |> IconButton.setOnClick (ShowAttachPolicyDialog r.arn))
+                                                 (IconButton.icon "add")
+                                            ,  IconButton.iconButton
+                                                 (IconButton.config
+                                                 |> IconButton.setOnClick DetachRolePolicyBatch
+                                                 |> IconButton.setDisabled (m.s.selectedPoliciesForDetach == []))
+                                                 (IconButton.icon "delete")
+                                            ]
+                                      ]
+                              )
+                        ]
+                  , actions =
+                        [ Button.text
+                              (Button.config
+                              |> Button.setOnClick EditRolePoliciesDialogDismissed
+                              |> Button.setAttributes [ Dialog.defaultAction ]
+                              )
+                              "Dismiss"
+                        ]
+                  }
+            ]
+        Nothing ->
+            []
+
+makeAttachRolePolicyDialog m =
+    case m.s.openAttachPoliciesDialogFor of
+        Just arn ->
+            let
+                r = Model.roleBy m .arn arn
+                attachedPolicyArns = List.map .policyArn r.attachedPolicies
+                pp = List.map .arn m.s.policies
+            in
+            [ Dialog.confirmation
+                  (Dialog.config
+                  |> Dialog.setOpen True
+                  |> Dialog.setOnClose AttachPolicyDialogCancelled
+                  )
+                  { title = "Available policies"
+                  , content =
+                        [ div [ style "display" "grid"
+                              , style "grid-template-columns" "1"
+                              , style "row-gap" "0.3em"
+                              ]
+                              [ policiesAsList m
+                                    (Util.subtract pp attachedPolicyArns)
+                                    m.s.selectedPoliciesForAttach
+                                    SelectOrUnselectPolicyToAttach]
+                        ]
+                  , actions =
+                        [ Button.text
+                              (Button.config |> Button.setOnClick AttachPolicyDialogCancelled)
+                              "Cancel"
+                        , Button.text
+                              (Button.config
+                              |> Button.setOnClick AttachRolePolicyBatch
+                              |> Button.setDisabled (m.s.selectedPoliciesForAttach == [])
+                              |> Button.setAttributes [ Dialog.defaultAction ])
+                              "Attach"
+                        ]
+                  }
+            ]
+        Nothing ->
+            []
 
 
 maybeShowCreateRoleFab m =

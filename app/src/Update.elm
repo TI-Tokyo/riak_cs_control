@@ -55,7 +55,7 @@ update msg m =
             ({m | s = {s_ | userFilterValue = s}}, Cmd.none)
         UserFilterInItemClicked s ->
             let s_ = m.s in
-            ({m | s = {s_ | userFilterIn = addOrDeleteElement s_.userFilterIn s}}, Cmd.none)
+            ({m | s = {s_ | userFilterIn = Util.addOrDeleteElement s_.userFilterIn s}}, Cmd.none)
         UserSortByFieldChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | userSortBy = View.Common.stringToSortBy s}}, Cmd.none)
@@ -185,31 +185,22 @@ update msg m =
         ShowEditUserPoliciesDialog a ->
             let s_ = m.s in
             ({m | s = {s_ | openEditUserPoliciesDialogFor = Just a}}, Cmd.none)
-        ShowAttachUserPolicyDialog a ->
-            let s_ = m.s in
-            ({m | s = {s_ | openAttachUserPoliciesDialogFor = Just a}}, Cmd.none)
-        AttachUserPolicyDialogCancelled ->
-            let s_ = m.s in
-            ({m | s = {s_ | openAttachUserPoliciesDialogFor = Nothing}}, Cmd.none)
         EditUserPoliciesDialogDismissed ->
             let s_ = m.s in
             ({m | s = {s_ | openEditUserPoliciesDialogFor = Nothing}}, Cmd.none)
-        SelectOrUnselectPolicyToAttach a ->
-            let s_ = m.s in
-            ({m | s = {s_ | selectedPoliciesForAttach = addOrDeleteElement s_.selectedPoliciesForAttach a}}, Cmd.none)
-        SelectOrUnselectPolicyToDetach a ->
-            let s_ = m.s in
-            ({m | s = {s_ | selectedPoliciesForDetach = addOrDeleteElement s_.selectedPoliciesForDetach a}}, Cmd.none)
+
         AttachUserPolicyBatch ->
             let s_ = m.s in
-            ( {m | s = {s_ | openAttachUserPoliciesDialogFor = Nothing
+            ( {m | s = { s_
+                       | openEditUserPoliciesDialogFor = Nothing
                        , selectedPoliciesForAttach = []
                        , selectedPoliciesForDetach = []}}
             , Cmd.batch (List.map (Request.Aws.attachUserPolicy m) s_.selectedPoliciesForAttach)
             )
         DetachUserPolicyBatch ->
             let s_ = m.s in
-            ( {m | s = {s_ | selectedPoliciesForAttach = []
+            ( {m | s = { s_
+                       | selectedPoliciesForAttach = []
                        , selectedPoliciesForDetach = []}}
             , Cmd.batch (List.map (Request.Aws.detachUserPolicy m) s_.selectedPoliciesForDetach)
             )
@@ -226,7 +217,7 @@ update msg m =
             ({m | s = {s_ | policyFilterValue = s}}, Cmd.none)
         PolicyFilterInItemClicked s ->
             let s_ = m.s in
-            ({m | s = {s_ | policyFilterIn = addOrDeleteElement s_.policyFilterIn s}}, Cmd.none)
+            ({m | s = {s_ | policyFilterIn = Util.addOrDeleteElement s_.policyFilterIn s}}, Cmd.none)
         PolicySortByFieldChanged s ->
             let s_ = m.s in
             ({m | s = {s_ | policySortBy = View.Common.stringToSortBy s}}, Cmd.none)
@@ -316,7 +307,10 @@ update msg m =
             , Request.Aws.listAttachedRolePolicies m a
             )
         GotAttachedRolePolicyList (Ok aa) ->
-            let rn = Maybe.withDefault "beef" m.s.roleNameAttachedPoliciesCollectedFor in
+            let
+                rn = Maybe.withDefault "beef" m.s.roleNameAttachedPoliciesCollectedFor
+                _ = Debug.log "is it beef?" rn
+            in
             (Model.populateRoleAttachedPolicies m rn aa, Cmd.none)
         GotAttachedRolePolicyList (Err err) ->
             let s_ = m.s in
@@ -372,6 +366,54 @@ update msg m =
             , Cmd.none
             )
 
+        ShowEditRolePoliciesDialog a ->
+            let s_ = m.s in
+            ({m | s = {s_ | openEditRolePoliciesDialogFor = Just a}}, Cmd.none)
+        EditRolePoliciesDialogDismissed ->
+            let s_ = m.s in
+            ({m | s = {s_ | openEditRolePoliciesDialogFor = Nothing}}, Cmd.none)
+
+        AttachRolePolicyBatch ->
+            let s_ = m.s in
+            ( {m | s = { s_
+                       | openEditRolePoliciesDialogFor = Nothing
+                       , openAttachPoliciesDialogFor = Nothing
+                       -- need to do ListAttachedRolePolicies. tried
+                       -- making a task out of Aws.iamCall for
+                       -- "ListRoles" (then to combine it with
+                       -- ListAttachedRolePolicies), saw 415 from
+                       -- webmachine, backed off
+                       , selectedPoliciesForAttach = []
+                       , selectedPoliciesForDetach = []}}
+            , Cmd.batch (List.map (Request.Aws.attachRolePolicy m) s_.selectedPoliciesForAttach)
+            )
+        DetachRolePolicyBatch ->
+            let s_ = m.s in
+            ( {m | s = { s_
+                       | openEditRolePoliciesDialogFor = Nothing
+                       , openAttachPoliciesDialogFor = Nothing
+                       , selectedPoliciesForAttach = []
+                       , selectedPoliciesForDetach = []}}
+            , Cmd.batch (List.map (Request.Aws.detachRolePolicy m) s_.selectedPoliciesForDetach)
+            )
+        RolePolicyAttached _ ->
+            (m, Cmd.batch [Request.Aws.listRoles m, Request.Aws.listPolicies m])
+        RolePolicyDetached _ ->
+            (m, Cmd.batch [Request.Aws.listRoles m, Request.Aws.listPolicies m])
+
+        -- shared dialog messages (User and Role)
+        ShowAttachPolicyDialog a ->
+            let s_ = m.s in
+            ({m | s = {s_ | openAttachPoliciesDialogFor = Just a}}, Cmd.none)
+        AttachPolicyDialogCancelled ->
+            let s_ = m.s in
+            ({m | s = {s_ | openAttachPoliciesDialogFor = Nothing}}, Cmd.none)
+        SelectOrUnselectPolicyToAttach a ->
+            let s_ = m.s in
+            ({m | s = {s_ | selectedPoliciesForAttach = Util.addOrDeleteElement s_.selectedPoliciesForAttach a}}, Cmd.none)
+        SelectOrUnselectPolicyToDetach a ->
+            let s_ = m.s in
+            ({m | s = {s_ | selectedPoliciesForDetach = Util.addOrDeleteElement s_.selectedPoliciesForDetach a}}, Cmd.none)
 
         -- SAMLProvider
         ------------------------------
@@ -643,12 +685,3 @@ toggleStatus a =
     case a of
         "enabled" -> "disabled"
         _ -> "enabled"
-
-addOrDeleteElement l a =
-    if List.member a l then
-        delElement l a
-    else
-        a :: l
-
-delElement l a =
-    List.filter (\x -> x /= a) l

@@ -117,6 +117,7 @@ makeIdpMetadata a =
                       |> TextArea.setCols (Just 77)
                       |> TextArea.setRows (Just 15)
                       |> TextArea.setDisabled True
+                         |> TextArea.setAttributes [ style "" "" ]
                       )
                 ]
 

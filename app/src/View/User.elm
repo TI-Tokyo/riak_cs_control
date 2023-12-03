@@ -4,6 +4,7 @@ import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Data.Struct
 import View.Common exposing (SortByField(..))
+import View.Shared exposing (policiesAsList)
 import View.Style
 import Util
 
@@ -359,9 +360,9 @@ makeEditUserPoliciesDialog m =
                   { title = ("Policies attached to user " ++ u.userName)
                   , content =
                         [ div [ style "display" "grid"
-                                   , style "grid-template-columns" "1"
-                                   , style "row-gap" "0.3em"
-                                   ]
+                              , style "grid-template-columns" "1"
+                              , style "row-gap" "0.3em"
+                              ]
                               ([ policiesAsList m
                                      u.attachedPolicies
                                      m.s.selectedPoliciesForDetach
@@ -369,7 +370,7 @@ makeEditUserPoliciesDialog m =
                                    ++ [ div []
                                             [IconButton.iconButton
                                                  (IconButton.config
-                                                 |> IconButton.setOnClick (ShowAttachUserPolicyDialog arn))
+                                                 |> IconButton.setOnClick (ShowAttachPolicyDialog arn))
                                                  (IconButton.icon "add")
                                             ,  IconButton.iconButton
                                                  (IconButton.config
@@ -395,7 +396,7 @@ makeEditUserPoliciesDialog m =
 
 
 makeAttachUserPolicyDialog m =
-    case m.s.openAttachUserPoliciesDialogFor of
+    case m.s.openAttachPoliciesDialogFor of
         Just arn ->
             let
                 u = Model.userBy m .arn arn
@@ -404,22 +405,22 @@ makeAttachUserPolicyDialog m =
             [ Dialog.confirmation
                   (Dialog.config
                   |> Dialog.setOpen True
-                  |> Dialog.setOnClose AttachUserPolicyDialogCancelled
+                  |> Dialog.setOnClose AttachPolicyDialogCancelled
                   )
                   { title = "Available policies"
                   , content =
                         [ div [ style "display" "grid"
-                                   , style "grid-template-columns" "1"
-                                   , style "row-gap" "0.3em"
-                                   ]
+                              , style "grid-template-columns" "1"
+                              , style "row-gap" "0.3em"
+                              ]
                               [ policiesAsList m
-                                    (subtract pp u.attachedPolicies)
+                                    (Util.subtract pp u.attachedPolicies)
                                     m.s.selectedPoliciesForAttach
                                     SelectOrUnselectPolicyToAttach]
                         ]
                   , actions =
                         [ Button.text
-                              (Button.config |> Button.setOnClick AttachUserPolicyDialogCancelled)
+                              (Button.config |> Button.setOnClick AttachPolicyDialogCancelled)
                               "Cancel"
                         , Button.text
                               (Button.config
@@ -432,39 +433,6 @@ makeAttachUserPolicyDialog m =
             ]
         Nothing ->
             []
-
-
-policiesAsList m pp selected msg =
-    let
-        selectArg =
-            \p ->
-                if List.member p selected then
-                    Just ListItem.selected
-                else
-                    Nothing
-        element =
-            case pp of
-                [] ->
-                    text "(no policies)"
-                p0 :: pn ->
-                    List.list List.config
-                        (ListItem.listItem
-                             (ListItem.config
-                             |> ListItem.setSelected (selectArg p0)
-                             |> ListItem.setOnClick (msg p0))
-                             [ text (Util.nameFromArn p0) ])
-                        (List.map (\p ->
-                                       (ListItem.listItem
-                                            (ListItem.config
-                                            |> ListItem.setSelected (selectArg p)
-                                            |> ListItem.setOnClick (msg p))
-                                            [ text (Util.nameFromArn p) ]))
-                             pn)
-    in
-        div [] [element]
-
-subtract l1 l2 =
-    List.filter (\a -> not (List.member a l2)) l1
 
 checkboxStateFromBool a =
     if a then

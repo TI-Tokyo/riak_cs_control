@@ -58,3 +58,9 @@ filterAndSort =
     , style "opacity" "0.9"
     , style "z-index" "20"
     ]
+
+center =
+    [ style "display" "grid"
+    , style "align-items" "center"
+    , style "justify-content" "center"
+    ]

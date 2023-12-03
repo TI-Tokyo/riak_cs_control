@@ -1,9 +1,5 @@
 module View.Common exposing (..)
 
-import Msg exposing (Msg(..))
-
-import Html.Attributes exposing (style)
-
 type SortByField
     = Name
     | Email
@@ -40,3 +36,4 @@ stringToSortBy a =
         "Attachment count" -> AttachmentCount
         "Role last used" -> RoleLastUsed
         _ -> Unsorted
+

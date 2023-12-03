@@ -31,16 +31,23 @@ init f =
                     Snackbar.initialQueue Msg.General True
                     { version = "---", systemVersion = "---", uptime = "---" }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
+                    -- User
                     "" ["Name", "Email"] Name True
-                    False "" "/" "" Nothing False Nothing Nothing [] []
+                    False "" "/" "" Nothing False  Nothing
+                    -- Policy
                     "" ["Name"] Name True
                     False "" "/" Nothing "" []
+                    -- Role
                     "" Name True
-                    False "" "/" Nothing "" Nothing 3600 [] Nothing
+                    False "" "/" Nothing "" Nothing 3600 [] Nothing Nothing
+                    -- SAML Provider
                     "" Name True
                     False "" "" []
+                    -- temp sessions
                     "" CreateDate True
                     "" 8
+                    -- attach policy dialog
+                    Nothing [] []
         model = Model config state (Time.millisToPosix 0)
     in
         ( model

@@ -106,3 +106,17 @@ compareByPosixTime f a b =
     case (a |> f |> Time.posixToMillis) < (b |> f |> Time.posixToMillis) of
         True -> LT
         False -> GT
+
+subtract : List a -> List a -> List a
+subtract l1 l2 =
+    List.filter (\a -> not (List.member a l2)) l1
+
+addOrDeleteElement : List a -> a -> List a
+addOrDeleteElement l a =
+    if List.member a l then
+        delElement l a
+    else
+        a :: l
+
+delElement l a =
+    List.filter (\x -> x /= a) l

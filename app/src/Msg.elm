@@ -64,6 +64,10 @@ type Msg
     | RoleDeleted (Result Http.Error RequestId)
     | ListAttachedRolePolicies String
     | GotAttachedRolePolicyList (Result Http.Error (List AttachedPolicy))
+    | AttachRolePolicyBatch
+    | DetachRolePolicyBatch
+    | RolePolicyAttached (Result Http.Error RequestId)
+    | RolePolicyDetached (Result Http.Error RequestId)
 
     -- SAMLProviders
     | ListSAMLProviders
@@ -113,12 +117,7 @@ type Msg
     | EditedUserStatusChanged
     | EditedUserRegenerateKeyChanged
     | EditUserCancelled
-
     | ShowEditUserPoliciesDialog String
-    | ShowAttachUserPolicyDialog String
-    | SelectOrUnselectPolicyToAttach String
-    | SelectOrUnselectPolicyToDetach String
-    | AttachUserPolicyDialogCancelled
     | EditUserPoliciesDialogDismissed
 
     -- policies
@@ -145,6 +144,8 @@ type Msg
     | NewRolePermissionsBoundaryChanged String
     | NewRoleMaxSessionDurationChanged Int
     | CreateRoleCancelled
+    | ShowEditRolePoliciesDialog String
+    | EditRolePoliciesDialogDismissed
 
     -- saml providers
     | SAMLProviderFilterChanged String
@@ -155,7 +156,7 @@ type Msg
     | NewSAMLProviderSAMLMetadataDocumentChanged String
     | CreateSAMLProviderCancelled
 
-    -- saml providers
+    -- temp sessions
     | TempSessionFilterChanged String
     | TempSessionSortByFieldChanged String
     | TempSessionSortOrderChanged
@@ -167,6 +168,13 @@ type Msg
     -- | UsageDateFromChanged String
     -- | UsageDateToChanged String
 
+    -- policy attach/detach dialog (shared between User and Role)
+    | ShowAttachPolicyDialog String
+    | SelectOrUnselectPolicyToAttach String
+    | SelectOrUnselectPolicyToDetach String
+    | AttachPolicyDialogCancelled
+
     -- misc
     | SnackbarClosed Snackbar.MessageId
+
     | Tick Time.Posix

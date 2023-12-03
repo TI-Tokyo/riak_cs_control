@@ -3,6 +3,7 @@ module Model exposing
     , Config
     , State
     , userBy
+    , roleBy
     , policyByName
     , enrichSamlProvider
     , flattenUserBucketList
@@ -65,10 +66,7 @@ type alias State =
     , newUserEmail : String
     , openEditUserDialogFor : Maybe User
     , generateNewCredsForEditedUser : Bool
-    , openEditUserPoliciesDialogFor : Maybe String     -- these are arns
-    , openAttachUserPoliciesDialogFor : Maybe String
-    , selectedPoliciesForAttach : List String
-    , selectedPoliciesForDetach : List String
+    , openEditUserPoliciesDialogFor : Maybe String
 
     -- policies
     , policyFilterValue : String
@@ -96,6 +94,7 @@ type alias State =
     , newRolePermissionsBoundary : Maybe String
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
+    , openEditRolePoliciesDialogFor : Maybe String
     , roleNameAttachedPoliciesCollectedFor : Maybe String
 
     -- saml providers
@@ -117,14 +116,25 @@ type alias State =
     -- bucket stats/usage
     , usageFilterValue : String
     , usageTopItemsShown : Int
+
+    -- attach/detach policies dialog (shared between User and Role)
+    , openAttachPoliciesDialogFor : Maybe String
+    , selectedPoliciesForAttach : List String
+    , selectedPoliciesForDetach : List String
     }
 
 
-userBy : Model -> (User -> String) -> String -> Data.Struct.User
+userBy : Model -> (User -> String) -> String -> User
 userBy m by a =
     case List.filter (\u -> a == by u) m.s.users of
         [] -> Data.Struct.dummyUser
         u :: _ -> u
+
+roleBy : Model -> (Role -> String) -> String -> Role
+roleBy m by a =
+    case List.filter (\r -> a == by r) m.s.roles of
+        [] -> Data.Struct.dummyRole
+        r :: _ -> r
 
 policyByName : Model -> String -> Data.Struct.Policy
 policyByName m a =
