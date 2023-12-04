@@ -93,8 +93,10 @@ makeRole a =
                       div View.Style.cardInnerContent
                       [ cardContent a |> text ]
                 , Card.block <|
-                    div (View.Style.cardInnerContent ++ View.Style.jsonInset)
-                        [ a |> cardPolicyDocument |> text ]
+                    div []
+                        [ div (View.Style.cardInnerContent) [ text "AssumeRolePolicyDocument:" ]
+                        , div (View.Style.cardInnerContent ++ View.Style.jsonInset) [ a |> cardPolicyDocument |> text ]
+                        ]
                 , Card.block <|
                     makeAttachedPolicies a
                 ]
@@ -103,12 +105,12 @@ makeRole a =
         }
 
 cardContent a =
-    "               Arn: " ++ a.arn ++ "\n" ++
-    "              Path: " ++ a.path ++ "\n" ++
-    "       Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
-    "                Id: " ++ a.roleId ++ "\n" ++
-    "           Created: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
-    "MaxSessionDuration: " ++ (String.fromInt (Maybe.withDefault 3600 a.maxSessionDuration))
+    "                     Arn: " ++ a.arn ++ "\n" ++
+    "                    Path: " ++ a.path ++ "\n" ++
+    "             Description: " ++ (Maybe.withDefault "" a.description) ++ "\n" ++
+    "                      Id: " ++ a.roleId ++ "\n" ++
+    "                 Created: " ++ (Iso8601.fromTime a.createDate) ++ "\n" ++
+    "      MaxSessionDuration: " ++ (String.fromInt (Maybe.withDefault 3600 a.maxSessionDuration))
         ++ Util.maybeTags a.tags "\nTags: "
 
 cardPolicyDocument a =
