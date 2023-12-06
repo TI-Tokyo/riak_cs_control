@@ -63,7 +63,7 @@ type Msg
     | DeleteRole String
     | RoleDeleted (Result Http.Error RequestId)
     | ListAttachedRolePolicies String
-    | GotAttachedRolePolicyList (Result Http.Error (List AttachedPolicy))
+    | GotAttachedRolePolicyList String (Result Http.Error (List AttachedPolicy))
     | AttachRolePolicyBatch
     | DetachRolePolicyBatch
     | RolePolicyAttached (Result Http.Error RequestId)
@@ -177,4 +177,5 @@ type Msg
     -- misc
     | SnackbarClosed Snackbar.MessageId
 
+    | Chain (List Msg)
     | Tick Time.Posix

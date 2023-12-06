@@ -119,11 +119,7 @@ cardPolicyDocument a =
 
 makeAttachedPolicies a =
     if a.attachedPoliciesFetched == False then
-        div View.Style.center
-        [ Button.text
-              (Button.config |> Button.setOnClick (ListAttachedRolePolicies a.roleName))
-              "Fetch Attached policies"
-        ]
+        div View.Style.center [ text "..." ]
     else
         if List.length a.attachedPolicies == 0 then
                 div View.Style.cardInnerContent

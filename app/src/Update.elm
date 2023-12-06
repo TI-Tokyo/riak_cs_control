@@ -9,9 +9,9 @@ import Data.Json
 import View.Common
 import Util
 
-
 import Time
 import Task
+import Process
 import Dict exposing (Dict)
 import Iso8601
 import Json.Decode
@@ -302,17 +302,10 @@ update msg m =
             , Cmd.none
             )
         ListAttachedRolePolicies a ->
-            let s_ = m.s in
-            ( { m | s = {s_ | roleNameAttachedPoliciesCollectedFor = Just a}}
-            , Request.Aws.listAttachedRolePolicies m a
-            )
-        GotAttachedRolePolicyList (Ok aa) ->
-            let
-                rn = Maybe.withDefault "beef" m.s.roleNameAttachedPoliciesCollectedFor
-                _ = Debug.log "is it beef?" rn
-            in
+            (m, Request.Aws.listAttachedRolePolicies m a)
+        GotAttachedRolePolicyList rn (Ok aa) ->
             (Model.populateRoleAttachedPolicies m rn aa, Cmd.none)
-        GotAttachedRolePolicyList (Err err) ->
+        GotAttachedRolePolicyList _ (Err err) ->
             let s_ = m.s in
             ( { m | s = {s_ | roles = [], msgQueue = Snackbar.addMessage
                              (Snackbar.message ("Failed to fetch role attached policies: " ++ (explainHttpError err))) m.s.msgQueue } }
@@ -374,32 +367,39 @@ update msg m =
             ({m | s = {s_ | openEditRolePoliciesDialogFor = Nothing}}, Cmd.none)
 
         AttachRolePolicyBatch ->
-            let s_ = m.s in
+            let
+                s_ = m.s
+                roleNeedRefresh = s_.openEditRolePoliciesDialogFor
+            in
+            -- need to do ListAttachedRolePolicies. tried
+            -- making a task out of Aws.iamCall for
+            -- "ListRoles" (then to combine it with
+            -- ListAttachedRolePolicies), saw 415 from
+            -- webmachine, backed off
             ( {m | s = { s_
-                       | openEditRolePoliciesDialogFor = Nothing
-                       , openAttachPoliciesDialogFor = Nothing
-                       -- need to do ListAttachedRolePolicies. tried
-                       -- making a task out of Aws.iamCall for
-                       -- "ListRoles" (then to combine it with
-                       -- ListAttachedRolePolicies), saw 415 from
-                       -- webmachine, backed off
+                       | openAttachPoliciesDialogFor = Nothing
                        , selectedPoliciesForAttach = []
                        , selectedPoliciesForDetach = []}}
             , Cmd.batch (List.map (Request.Aws.attachRolePolicy m) s_.selectedPoliciesForAttach)
             )
         DetachRolePolicyBatch ->
-            let s_ = m.s in
+            let
+                s_ = m.s
+                roleNeedRefresh = s_.openEditRolePoliciesDialogFor
+            in
             ( {m | s = { s_
-                       | openEditRolePoliciesDialogFor = Nothing
-                       , openAttachPoliciesDialogFor = Nothing
-                       , selectedPoliciesForAttach = []
+                       | selectedPoliciesForAttach = []
                        , selectedPoliciesForDetach = []}}
             , Cmd.batch (List.map (Request.Aws.detachRolePolicy m) s_.selectedPoliciesForDetach)
             )
         RolePolicyAttached _ ->
-            (m, Cmd.batch [Request.Aws.listRoles m, Request.Aws.listPolicies m])
+            ( m
+            , Request.Aws.listRoles m
+            )
         RolePolicyDetached _ ->
-            (m, Cmd.batch [Request.Aws.listRoles m, Request.Aws.listPolicies m])
+            ( Model.markRoleForRefresh m
+            , Cmd.none
+            )
 
         -- shared dialog messages (User and Role)
         ShowAttachPolicyDialog a ->
@@ -619,7 +619,17 @@ update msg m =
                     , refreshAll m_
                     )
             else
-                ({ m | t = a}, Cmd.none)
+                ({ m | t = a}, maybeRefreshRolePolicies m)
+
+        -- internal
+        Chain aa ->
+            let
+                chain msgi (m0, cmds) =
+                    let (m1, c) = update msgi m0 in
+                    (m1, cmds ++ [c])
+                (m9, cmd9) = List.foldl chain (m, []) aa
+            in
+                (m9, Cmd.batch cmd9)
 
         NoOp ->
             (m, Cmd.none)
@@ -667,6 +677,15 @@ refreshAll m =
               , Request.Rcs.listTempSessions m
               ]
 
+maybeRefreshRolePolicies m =
+    let
+        nn = List.filterMap (\{attachedPoliciesFetched, roleName} ->
+                                 case attachedPoliciesFetched of
+                                     True -> Nothing
+                                     False -> Just roleName
+                            ) m.s.roles
+    in
+        Cmd.batch <| List.map (Request.Aws.listAttachedRolePolicies m) nn
 
 explainHttpError a =
     case a of

@@ -148,7 +148,6 @@ attachRolePolicy : Model -> String -> Cmd Msg
 attachRolePolicy m a =
     let
         r = Model.roleBy m .roleName (Maybe.withDefault "" m.s.openEditRolePoliciesDialogFor)
-        _ = Debug.log "r" r
     in
     iamCall m "AttachRolePolicy"
         [ ("RoleName", r.roleName)
@@ -173,7 +172,7 @@ listAttachedRolePolicies m a =
     iamCall m "ListAttachedRolePolicies"
         [ ("RoleName", a)
         ]
-        (Http.Xml.expectXml GotAttachedRolePolicyList Data.Xml.decodeListAttachedRolePolicies)
+        (Http.Xml.expectXml (GotAttachedRolePolicyList a) Data.Xml.decodeListAttachedRolePolicies)
 
 
 

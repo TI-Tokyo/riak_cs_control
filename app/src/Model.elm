@@ -9,6 +9,7 @@ module Model exposing
     , flattenUserBucketList
     , updateBucketStats
     , populateRoleAttachedPolicies
+    , markRoleForRefresh
     , placeholderPolicy
     )
 
@@ -95,7 +96,6 @@ type alias State =
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
     , openEditRolePoliciesDialogFor : Maybe String
-    , roleNameAttachedPoliciesCollectedFor : Maybe String
 
     -- saml providers
     , samlProviderFilterValue : String
@@ -142,6 +142,23 @@ policyByName m a =
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
 
+markRoleForRefresh m =
+    let
+        s_ = m.s
+        roles =
+            case s_.openEditRolePoliciesDialogFor of
+                Just s ->
+                    List.map (\r ->
+                                  if r.roleName == s then
+                                      {r | attachedPoliciesFetched = False}
+                                  else
+                                      r
+                             ) s_.roles
+                Nothing ->
+                    s_.roles
+    in
+        {m | s = { s_ | roles = roles}}
+
 populateRoleAttachedPolicies : Model -> String -> List AttachedPolicy -> Model
 populateRoleAttachedPolicies m rn pp =
     let
@@ -156,8 +173,7 @@ populateRoleAttachedPolicies m rn pp =
                      else r
                 ) s_.roles
     in
-        { m | s = {s_ | roleNameAttachedPoliciesCollectedFor = Nothing
-                      , roles = roles} }
+        { m | s = {s_ | roles = roles} }
 
 placeholderPolicy : AttachedPolicy
 placeholderPolicy =

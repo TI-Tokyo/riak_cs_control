@@ -39,7 +39,7 @@ init f =
                     False "" "/" Nothing "" []
                     -- Role
                     "" Name True
-                    False "" "/" Nothing "" Nothing 3600 [] Nothing Nothing
+                    False "" "/" Nothing "" Nothing 3600 [] Nothing
                     -- SAML Provider
                     "" Name True
                     False "" "" []
