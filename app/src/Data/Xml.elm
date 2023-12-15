@@ -117,7 +117,7 @@ decodePolicyCreated =
 
 decodeListAttachedRolePolicies : D.Decoder (List AttachedPolicy)
 decodeListAttachedRolePolicies =
-    path [ "ListAttachedRolePoliciesResult", "AttachedPolicies" ] (list attachedPolicy)
+    path [ "ListAttachedRolePoliciesResult", "AttachedPolicies", "member" ] (list attachedPolicy)
 
 attachedPolicy =
     succeed AttachedPolicy
