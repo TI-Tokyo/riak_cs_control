@@ -639,7 +639,10 @@ update msg m =
                     , refreshAll m_
                     )
             else
-                ({ m | t = a}, maybeRefreshRolePolicies m)
+                if m.s.activeTab == Msg.Roles then
+                    ({ m | t = a}, maybeRefreshRolePolicies m)
+                else
+                    (m, Cmd.none)
 
         -- internal
         Chain aa ->
