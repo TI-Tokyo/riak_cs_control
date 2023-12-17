@@ -190,7 +190,7 @@ userCardActions m u =
             { buttons =
                   [ Card.button (Button.config
                                 |> Button.setOnClick (DeleteUser u.keyId)
-                                |> Button.setDisabled (isAdmin m u)
+                                |> Button.setDisabled ((isAdmin m u) || (0 < List.length u.attachedPolicies))
                                 ) "Delete"
                   , Card.button (Button.config
                                 |> Button.setOnClick (ShowEditUserDialog u)
