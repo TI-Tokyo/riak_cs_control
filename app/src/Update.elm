@@ -212,7 +212,7 @@ update msg m =
         AttachUserPolicyBatch ->
             let s_ = m.s in
             ( {m | s = { s_
-                       | openEditUserPoliciesDialogFor = Nothing
+                       | openAttachPoliciesDialogFor = Nothing
                        , selectedPoliciesForAttach = []
                        , selectedPoliciesForDetach = []}}
             , Cmd.batch (List.map (Request.Aws.attachUserPolicy m) s_.selectedPoliciesForAttach)
