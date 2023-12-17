@@ -18,7 +18,7 @@
 --
 -- ---------------------------------------------------------------------
 
-module View.User exposing (makeContent)
+module View.User exposing (makeContent, makeFilterControls)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -50,8 +50,7 @@ import Iso8601
 
 makeContent m =
     div View.Style.topContent
-        [ div View.Style.filterAndSort (makeSubTab m)
-        , div View.Style.card (makeUsers m)
+        [ div View.Style.card (makeUsers m)
         , div [] (makeCreateUserDialog m)
         , div [] (makeEditUserDialog m)
         , div [] (makeEditUserPoliciesDialog m)
@@ -59,7 +58,7 @@ makeContent m =
         , div [] (maybeShowCreateUserFab m)
         ]
 
-makeSubTab m =
+makeFilterControls m =
     let n = View.Common.selectSortByString Name in
     [ TextField.outlined
           (TextField.config

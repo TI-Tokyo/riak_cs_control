@@ -71,12 +71,16 @@ createFab =
     ]
 
 filterAndSort =
-    [ style "position" "fixed"
-    , style "bottom" "2rem"
-    , style "left" "2rem"
+    [ style "display" "flex"
+    , style "flex-wrap" "nowrap"
     , style "scale" "0.6"
-    , style "opacity" "0.9"
-    , style "z-index" "20"
+    , style "opacity" "0.95"
+    , style "padding" "0.5em 1.5em"
+    , style "height" "5em"
+    , style "background" "white"
+    , style "z-index" "21"
+    , style "align-items" "center"
+    , style "justify-content" "center"
     ]
 
 center =

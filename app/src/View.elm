@@ -27,10 +27,11 @@ import View.Policy
 import View.Role
 import View.SAMLProvider
 import View.TempSession
+import View.Style
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 
-import Html exposing (Html, text, div, img)
+import Html exposing (Html, text, div, img, span)
 import Html.Attributes exposing (style, attribute, src)
 import Material.Drawer.Dismissible as DismissibleDrawer
 import Material.TopAppBar as TopAppBar
@@ -44,9 +45,9 @@ import Material.Typography as Typography
 
 view : Model -> Html Msg
 view m =
-    Html.div [ Typography.typography ]
-        [ Html.div [] [makeTopAppBar m]
-        , Html.div [TopAppBar.fixedAdjust] [makeDrawer m]
+    div [ Typography.typography ]
+        [ div [] [makeTopAppBar m]
+        , div [TopAppBar.fixedAdjust] [makeDrawer m]
         , Snackbar.snackbar
               (Snackbar.config { onClosed = SnackbarClosed })
                   m.s.msgQueue
@@ -73,10 +74,12 @@ makeTopAppBar m =
                           (IconButton.icon "refresh")
                     , text (activeTabName m)
                     ]
+              , TopAppBar.section [ TopAppBar.alignStart ]
+                  [ makeFilterControls m ]
               , TopAppBar.section [ TopAppBar.alignEnd ]
-                  [ Html.span [ TopAppBar.alignEnd, style "padding" "0 1em" ]
+                  [ span [ TopAppBar.alignEnd, style "padding" "0 1em" ]
                         [ text m.c.csUrl ]
-                  , Html.span [ TopAppBar.alignEnd ]
+                  , span [ TopAppBar.alignEnd ]
                       [ img [src "images/logo.png", style "object-fit" "contain"] [] ]
                   ]
               ]
@@ -95,7 +98,7 @@ listWhat m =
 
 
 makeDrawer m =
-    Html.div
+    div
         [ style "display" "flex"
         , style "flex-flow" "row nowrap"
         ]
@@ -144,7 +147,7 @@ makeDrawer m =
                           ]
                     ]
               ]
-        , Html.div [ DismissibleDrawer.appContent ]
+        , div [ DismissibleDrawer.appContent ]
             [ makeContents m ]
         ]
 
@@ -161,6 +164,16 @@ makeContents m =
         Msg.SAMLProviders -> View.SAMLProvider.makeContent m
         Msg.TempSessions -> View.TempSession.makeContent m
 
+makeFilterControls m =
+    case m.s.activeTab of
+        Msg.General -> div [] []
+        Msg.Users -> div View.Style.filterAndSort (View.User.makeFilterControls m)
+        Msg.Roles -> div View.Style.filterAndSort (View.Role.makeFilterControls m)
+        Msg.Policies -> div View.Style.filterAndSort (View.Policy.makeFilterControls m)
+        Msg.Usage -> div View.Style.filterAndSort (View.Usage.makeFilterControls m)
+        Msg.SAMLProviders -> div View.Style.filterAndSort (View.SAMLProvider.makeFilterControls m)
+        Msg.TempSessions -> div View.Style.filterAndSort (View.TempSession.makeFilterControls m)
+
 activeTabName m =
     case m.s.activeTab of
         Msg.General -> ""
@@ -169,4 +182,4 @@ activeTabName m =
         Msg.Policies -> "Policies"
         Msg.Usage -> "Disk usage & bucket stats"
         Msg.SAMLProviders -> "SAML providers"
-        Msg.TempSessions -> "Temp sessions for federated users"
+        Msg.TempSessions -> "Federated users"

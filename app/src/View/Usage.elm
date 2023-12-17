@@ -18,7 +18,7 @@
 --
 -- ---------------------------------------------------------------------
 
-module View.Usage exposing (makeContent)
+module View.Usage exposing (makeContent, makeFilterControls)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -46,11 +46,10 @@ import Filesize
 
 makeContent m =
     div View.Style.topContent
-        [ div View.Style.filterAndSort (makeSubTab m)
-        , div View.Style.card (makeUsage m)
+        [ div View.Style.card (makeUsage m)
         ]
 
-makeSubTab m =
+makeFilterControls m =
     [ TextField.outlined
           (TextField.config
           |> TextField.setLabel (Just "Filter")

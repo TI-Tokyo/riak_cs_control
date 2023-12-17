@@ -18,7 +18,7 @@
 --
 -- ---------------------------------------------------------------------
 
-module View.TempSession exposing (makeContent)
+module View.TempSession exposing (makeContent, makeFilterControls)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -44,11 +44,10 @@ import Time
 
 makeContent m =
     div View.Style.topContent
-        [ div View.Style.filterAndSort (makeSubTab m)
-        , div View.Style.card (makeTempSessions m)
+        [ div View.Style.card (makeTempSessions m)
         ]
 
-makeSubTab m =
+makeFilterControls m =
     let n = View.Common.selectSortByString Name in
     [ TextField.outlined
           (TextField.config

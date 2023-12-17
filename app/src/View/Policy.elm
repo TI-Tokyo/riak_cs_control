@@ -18,7 +18,7 @@
 --
 -- ---------------------------------------------------------------------
 
-module View.Policy exposing (makeContent)
+module View.Policy exposing (makeContent, makeFilterControls)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -45,13 +45,12 @@ import Iso8601
 
 makeContent m =
     div View.Style.topContent
-        [ div View.Style.filterAndSort (makeSubTab m)
-        , div View.Style.card (makePolicies m)
+        [ div View.Style.card (makePolicies m)
         , div [] (createPolicy m)
         , div [] (maybeShowCreatePolicyFab m)
         ]
 
-makeSubTab m =
+makeFilterControls m =
     let n = View.Common.selectSortByString Name in
     [ TextField.outlined
           (TextField.config
