@@ -146,10 +146,10 @@ updateUser m  =
             , ("content-md5", cmd5)
             , ("x-amz-date", date)
             ]
-        sig = Signature.v2 m.c.csAdminSecret cmd5 "PUT" ct date (extractAmzHeaders stdHeaders) "/riak-cs/user"
+        sig = Signature.v2 m.c.csAdminSecret cmd5 "PUT" ct date (extractAmzHeaders stdHeaders) ("/riak-cs/user/" ++ u.keyId)
         authHeader = ("Authorization", makeAuthHeader m.c.csAdminKey sig)
     in
-       Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "user" ] []
+       Url.Builder.crossOrigin m.c.csUrl [ "riak-cs", "user", u.keyId ] []
             |> HttpBuilder.put
             |> HttpBuilder.withHeaders (authHeader :: stdHeaders)
             |> HttpBuilder.withExpect (Http.expectWhatever UserCreated)
