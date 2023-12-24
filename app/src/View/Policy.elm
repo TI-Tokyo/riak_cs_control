@@ -27,7 +27,7 @@ import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (attribute, style, src)
 import Html.Events exposing (onClick, onInput)
 import Material.Card as Card
 import Material.Fab as Fab
@@ -209,17 +209,20 @@ createPolicy m =
                                 |> TextField.setLabel (Just "Name")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewPolicyNameChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Path")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewPolicyPathChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Description")
                                 |> TextField.setOnChange NewPolicyDescriptionChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextArea.outlined
                                 (TextArea.config
@@ -228,6 +231,7 @@ createPolicy m =
                                 |> TextArea.setOnChange NewPolicyPolicyDocumentChanged
                                 |> TextArea.setRows (Just 12)
                                 |> TextArea.setCols (Just 82)
+                                |> TextArea.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           ]
                     ]

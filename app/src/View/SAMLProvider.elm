@@ -27,7 +27,7 @@ import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (attribute, style, src)
 import Html.Events exposing (onClick, onInput)
 import Material.Card as Card
 import Material.Fab as Fab
@@ -136,7 +136,7 @@ makeIdpMetadata a =
                       |> TextArea.setCols (Just 77)
                       |> TextArea.setRows (Just 15)
                       |> TextArea.setDisabled True
-                         |> TextArea.setAttributes [ style "" "" ]
+                      |> TextArea.setAttributes [ attribute "spellCheck" "false" ]
                       )
                 ]
 
@@ -189,6 +189,7 @@ createSAMLProvider m =
                                 |> TextField.setLabel (Just "Name")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewSAMLProviderNameChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextArea.outlined
                                 (TextArea.config
@@ -196,6 +197,7 @@ createSAMLProvider m =
                                 |> TextArea.setRequired True
                                 |> TextArea.setOnChange NewSAMLProviderSAMLMetadataDocumentChanged
                                 |> TextArea.setRows (Just 12)
+                                |> TextArea.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           ]
                     ]

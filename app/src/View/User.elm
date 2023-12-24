@@ -29,7 +29,7 @@ import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (attribute, style, src)
 import Material.Card as Card
 import Material.Fab as Fab
 import Material.Button as Button
@@ -263,18 +263,21 @@ makeCreateUserDialog m =
                                 |> TextField.setLabel (Just "Name")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserNameChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Email")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserEmailChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Path")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserPathChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           ]
                     ]
@@ -314,6 +317,7 @@ makeEditUserDialog m =
                                     |> TextField.setRequired True
                                     |> TextField.setValue (Just u.userName)
                                     |> TextField.setOnInput EditedUserNameChanged
+                                    |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                     )
                               , TextField.filled
                                     (TextField.config
@@ -321,6 +325,7 @@ makeEditUserDialog m =
                                     |> TextField.setRequired True
                                     |> TextField.setValue (Just u.email)
                                     |> TextField.setOnInput EditedUserEmailChanged
+                                    |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                     )
                               , TextField.filled
                                     (TextField.config
@@ -328,6 +333,7 @@ makeEditUserDialog m =
                                     |> TextField.setRequired True
                                     |> TextField.setValue (Just u.path)
                                     |> TextField.setOnInput EditedUserPathChanged
+                                    |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                     )
                               , div [ style "display" "grid"
                                          , style "grid-template-columns" "repeat(2, 1fr)"
