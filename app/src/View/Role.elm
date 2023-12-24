@@ -28,7 +28,7 @@ import View.Style
 import Util
 
 import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (attribute, style, src)
 import Html.Events exposing (onClick, onInput)
 import Material.Card as Card
 import Material.Fab as Fab
@@ -287,11 +287,13 @@ createRole m =
                                 |> TextField.setLabel (Just "Name")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewRoleNameChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Description")
                                 |> TextField.setOnChange NewRoleDescriptionChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextArea.outlined
                                 (TextArea.config
@@ -300,11 +302,13 @@ createRole m =
                                 |> TextArea.setOnChange NewRoleAssumeRolePolicyDocumentChanged
                                 |> TextArea.setRows (Just 12)
                                 |> TextArea.setCols (Just 82)
+                                |> TextArea.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Permissions boundary")
                                 |> TextField.setOnChange NewRolePermissionsBoundaryChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled
                                 (TextField.config
@@ -316,6 +320,7 @@ createRole m =
                                 |> TextField.setEndAligned True
                                 |> TextField.setLabel (Just "Max session duration")
                                 |> TextField.setOnChange (NewRoleMaxSessionDurationChanged << Maybe.withDefault -1 << String.toInt)
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           ]
                     ]
