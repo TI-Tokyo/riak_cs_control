@@ -1,0 +1,45 @@
+#!/bin/env python3
+
+import os, base64, argparse
+import boto3
+from botocore.client import Config
+import pprint
+
+config = Config(signature_version = 's3v4')
+
+key_id = os.environ.get('AWS_KEY_ID')
+key_secret = os.environ.get('AWS_KEY_SECRET')
+
+os.environ['http_proxy'] = 'http://127.0.0.1:%d' % (int(os.environ.get('CS_HTTP_PORT')))
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-r", "--role_arn", help = "role arn")
+parser.add_argument("-s", "--saml_provider_arn", help = "SAML provider arn")
+args = parser.parse_args()
+
+
+client = boto3.client('sts',
+                      use_ssl = False,
+                      aws_access_key_id = key_id,
+                      aws_secret_access_key = key_secret,
+                      config = config)
+
+def from_file(fname):
+    with open(fname, 'r') as f:
+        return str(f.read())
+SAMLAssertion = from_file("saml_assertion.xml")
+
+resp = client.assume_role_with_saml(
+    RoleArn = args.role_arn,
+    PrincipalArn = args.saml_provider_arn,
+    SAMLAssertion = str(base64.b64encode(bytes(SAMLAssertion, 'utf-8')))[2:-1],
+    PolicyArns = [
+        {
+            'arn': 'arn:aws:iam::123456789012:policy/ExtraPolicyThis'
+        }, {
+            'arn': 'arn:aws:iam::123456789013:policy/ExtraPolicyThat'
+        },
+    ],
+    DurationSeconds = 12300)
+
+pprint.pp(resp)
