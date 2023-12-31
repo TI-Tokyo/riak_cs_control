@@ -31,6 +31,10 @@ module Model exposing
     , populateRoleAttachedPolicies
     , markRoleForRefresh
     , placeholderPolicy
+    , resetCreateUserDialogFields
+    , resetCreatePolicyDialogFields
+    , resetCreateRoleDialogFields
+    , resetCreateSAMLProviderDialogFields
     )
 
 import Data.Struct exposing (..)
@@ -244,3 +248,40 @@ updateBucketStats m bc =
     in
         {m | s = {s_ | bucketStats = bucketStats9}}
 
+
+resetCreateUserDialogFields : Model -> Model
+resetCreateUserDialogFields m =
+    let s_ = m.s in
+    {m | s = {s_ | createUserDialogShown = False
+                 , newUserName = ""
+                 , newUserPath = ""
+                 , newUserEmail = ""}}
+
+
+resetCreatePolicyDialogFields : Model -> Model
+resetCreatePolicyDialogFields m =
+    let s_ = m.s in
+    {m | s = {s_ | createPolicyDialogShown = False
+                 , newPolicyName = ""
+                 , newPolicyPath = ""
+                 , newPolicyDescription = Nothing}}
+
+
+resetCreateRoleDialogFields : Model -> Model
+resetCreateRoleDialogFields m =
+    let s_ = m.s in
+    {m | s = {s_ | createRoleDialogShown = False
+                 , newRoleName = ""
+                 , newRolePath = ""
+                 , newRoleAssumeRolePolicyDocument = ""
+                 , newRoleDescription = Nothing
+                 , newRolePermissionsBoundary = Nothing
+                 , newRoleMaxSessionDuration = 3600}}
+
+
+resetCreateSAMLProviderDialogFields : Model -> Model
+resetCreateSAMLProviderDialogFields m =
+    let s_ = m.s in
+    {m | s = {s_ | createSAMLProviderDialogShown = False
+                 , newSAMLProviderName = ""
+                 , newSAMLProviderSAMLMetadataDocument = ""}}

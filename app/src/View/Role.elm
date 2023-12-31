@@ -297,7 +297,7 @@ createRole m =
                                 )
                           , TextArea.outlined
                                 (TextArea.config
-                                |> TextArea.setLabel (Just "Policy document")
+                                |> TextArea.setLabel (Just "Assume role policy document")
                                 |> TextArea.setRequired True
                                 |> TextArea.setOnChange NewRoleAssumeRolePolicyDocumentChanged
                                 |> TextArea.setRows (Just 12)

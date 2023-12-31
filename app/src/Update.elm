@@ -122,11 +122,9 @@ update msg m =
         CreateUser ->
             (m, Request.Rcs.createUser m)
         CreateUserCancelled ->
-            let s_ = m.s in
-            ({m | s = {s_ | createUserDialogShown = False}}, Cmd.none)
+            (Model.resetCreateUserDialogFields m, Cmd.none)
         UserCreated (Ok ()) ->
-            let s_ = m.s in
-            ({m | s = {s_ | createUserDialogShown = False}}, Request.Rcs.listUsers m)
+            (Model.resetCreateUserDialogFields m, Request.Rcs.listUsers m)
         UserCreated (Err err) ->
             let s_ = m.s in
             ( {m | s = {s_ | msgQueue = Snackbar.addMessage
@@ -275,11 +273,9 @@ update msg m =
         CreatePolicy ->
             (m, Request.Aws.createPolicy m)
         CreatePolicyCancelled ->
-            let s_ = m.s in
-            ({m | s = {s_ | createPolicyDialogShown = False}}, Cmd.none)
+            (Model.resetCreatePolicyDialogFields m, Cmd.none)
         PolicyCreated (Ok _) ->
-            let s_ = m.s in
-            ({m | s = {s_ | createPolicyDialogShown = False}}, Request.Aws.listPolicies m)
+            (Model.resetCreatePolicyDialogFields m, Request.Aws.listPolicies m)
         PolicyCreated (Err err) ->
             let s_ = m.s in
             ( {m | s = {s_ | msgQueue = Snackbar.addMessage
@@ -356,11 +352,9 @@ update msg m =
         CreateRole ->
             (m, Request.Aws.createRole m)
         CreateRoleCancelled ->
-            let s_ = m.s in
-            ({m | s = {s_ | createRoleDialogShown = False}}, Cmd.none)
+            (Model.resetCreateRoleDialogFields m, Cmd.none)
         RoleCreated (Ok _) ->
-            let s_ = m.s in
-            ({m | s = {s_ | createRoleDialogShown = False}}, Request.Aws.listRoles m)
+            (Model.resetCreateRoleDialogFields m, Request.Aws.listRoles m)
         RoleCreated (Err err) ->
             let s_ = m.s in
             ( {m | s = {s_ | msgQueue = Snackbar.addMessage
@@ -482,10 +476,9 @@ update msg m =
             (m, Request.Aws.createSAMLProvider m)
         CreateSAMLProviderCancelled ->
             let s_ = m.s in
-            ({m | s = {s_ | createSAMLProviderDialogShown = False}}, Cmd.none)
+            (Model.resetCreateSAMLProviderDialogFields m, Cmd.none)
         SAMLProviderCreated (Ok _) ->
-            let s_ = m.s in
-            ({m | s = {s_ | createSAMLProviderDialogShown = False}}, Request.Aws.listSAMLProviders m)
+            (Model.resetCreateSAMLProviderDialogFields m, Request.Aws.listSAMLProviders m)
         SAMLProviderCreated (Err err) ->
             let s_ = m.s in
             ( {m | s = {s_ | msgQueue = Snackbar.addMessage
