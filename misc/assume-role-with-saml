@@ -7,9 +7,6 @@ import pprint
 
 config = Config(signature_version = 's3v4')
 
-key_id = os.environ.get('AWS_KEY_ID')
-key_secret = os.environ.get('AWS_KEY_SECRET')
-
 os.environ['http_proxy'] = 'http://127.0.0.1:%d' % (int(os.environ.get('CS_HTTP_PORT')))
 
 parser = argparse.ArgumentParser()
@@ -20,8 +17,8 @@ args = parser.parse_args()
 
 client = boto3.client('sts',
                       use_ssl = False,
-                      aws_access_key_id = key_id,
-                      aws_secret_access_key = key_secret,
+                      aws_access_key_id = "key_id",
+                      aws_secret_access_key = "key_secret",
                       config = config)
 
 def from_file(fname):
