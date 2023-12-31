@@ -18,7 +18,10 @@
 --
 -- ---------------------------------------------------------------------
 
-module View.Shared exposing (policiesAsList)
+module View.Shared exposing
+    ( policiesAsList
+    , makeDeleteThingConfirmDialog
+    )
 
 import Msg exposing (..)
 import Model exposing (Model)
@@ -28,6 +31,8 @@ import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Material.List as List
 import Material.List.Item as ListItem
+import Material.Dialog as Dialog
+import Material.Button as Button
 
 
 --policiesAsList : Model -> List String -> String -> Msg -> Html Msg
@@ -60,3 +65,33 @@ policiesAsList m pp selected msg =
     in
         div [] [element]
 
+
+
+
+makeDeleteThingConfirmDialog m d g t confirmedMsg notConfirmedMsg =
+    case d m.s of
+        Just a ->
+            [ Dialog.confirmation
+                  (Dialog.config
+                  |> Dialog.setOpen True
+                  |> Dialog.setOnClose notConfirmedMsg
+                  )
+                  { title = "Confirm"
+                  , content =
+                        [ text ("Delete " ++ t ++ " \"" ++ g a ++ "\"?") ]
+                  , actions =
+                        [ Button.text
+                              ( Button.config |> Button.setOnClick notConfirmedMsg
+                              |> Button.setAttributes [ Dialog.defaultAction ]
+                              )
+                              "No"
+                        , Button.text
+                              ( Button.config
+                              |> Button.setOnClick confirmedMsg
+                              )
+                              "Yes"
+                        ]
+                  }
+            ]
+        Nothing ->
+            []

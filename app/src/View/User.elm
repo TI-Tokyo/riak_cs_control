@@ -55,6 +55,10 @@ makeContent m =
         , div [] (makeEditUserDialog m)
         , div [] (makeEditUserPoliciesDialog m)
         , div [] (makeAttachUserPolicyDialog m)
+        , div [] (View.Shared.makeDeleteThingConfirmDialog
+                      m .confirmDeleteUserDialogShownFor
+                      (.userName << (Model.userBy m .keyId)) "user"
+                      DeleteUserConfirmed DeleteUserNotConfirmed)
         , div [] (maybeShowCreateUserFab m)
         ]
 
@@ -275,6 +279,7 @@ makeCreateUserDialog m =
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Path")
+                                |> TextField.setValue (Just m.s.newUserPath)
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewUserPathChanged
                                 |> TextField.setAttributes [ attribute "spellCheck" "false" ]

@@ -53,16 +53,16 @@ init f =
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     -- User
                     "" ["Name", "Email"] Name True
-                    False "" "/" "" Nothing False  Nothing
+                    False "" "/" "" Nothing False  Nothing Nothing
                     -- Policy
                     "" ["Name"] Name True
-                    False "" "/" Nothing "" []
+                    False "" "/" Nothing "" [] Nothing
                     -- Role
                     "" Name True
-                    False "" "/" Nothing "" Nothing 3600 [] Nothing
+                    False "" "/" Nothing "" Nothing 3600 [] Nothing Nothing
                     -- SAML Provider
                     "" Name True
-                    False "" "" []
+                    False "" "" [] Nothing
                     -- temp sessions
                     "" CreateDate True
                     "" 8

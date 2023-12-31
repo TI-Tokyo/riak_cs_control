@@ -304,6 +304,16 @@ dummyPolicy =
     , tags = []
     }
 
+
+dummySAMLProvider =
+    { arn = ""
+    , name = ""
+    , createDate = Time.millisToPosix 0
+    , validUntil = Time.millisToPosix 0
+    , samlMetadataDocument = ""
+    , tags = []
+    }
+
 dummyRoleLastUsed =
     { lastUsedDate = ""
     , region = ""

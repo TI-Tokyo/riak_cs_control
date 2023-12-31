@@ -23,6 +23,7 @@ module View.Policy exposing (makeContent, makeFilterControls)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import View.Common exposing (SortByField(..))
+import View.Shared
 import View.Style
 import Util
 
@@ -47,6 +48,10 @@ makeContent m =
     div View.Style.topContent
         [ div View.Style.card (makePolicies m)
         , div [] (createPolicy m)
+        , div [] (View.Shared.makeDeleteThingConfirmDialog
+                      m .confirmDeletePolicyDialogShownFor
+                      (Model.policyBy m .arn >> .policyName) "policy"
+                      DeletePolicyConfirmed DeletePolicyNotConfirmed)
         , div [] (maybeShowCreatePolicyFab m)
         ]
 
@@ -214,6 +219,7 @@ createPolicy m =
                           , TextField.filled
                                 (TextField.config
                                 |> TextField.setLabel (Just "Path")
+                                |> TextField.setValue (Just m.s.newPolicyPath)
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewPolicyPathChanged
                                 |> TextField.setAttributes [ attribute "spellCheck" "false" ]
@@ -250,3 +256,4 @@ createPolicy m =
         ]
     else
         []
+

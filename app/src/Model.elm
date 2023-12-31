@@ -23,8 +23,9 @@ module Model exposing
     , Config
     , State
     , userBy
+    , policyBy
     , roleBy
-    , policyByName
+    , samlProviderBy
     , enrichSamlProvider
     , flattenUserBucketList
     , updateBucketStats
@@ -92,6 +93,7 @@ type alias State =
     , openEditUserDialogFor : Maybe User
     , generateNewCredsForEditedUser : Bool
     , openEditUserPoliciesDialogFor : Maybe String
+    , confirmDeleteUserDialogShownFor : Maybe String
 
     -- policies
     , policyFilterValue : String
@@ -105,6 +107,7 @@ type alias State =
     , newPolicyDescription : Maybe String
     , newPolicyPolicyDocument : String
     , newPolicyTags : List Tag
+    , confirmDeletePolicyDialogShownFor : Maybe String
 
     -- roles
     , roleFilterValue : String
@@ -120,6 +123,7 @@ type alias State =
     , newRoleMaxSessionDuration : Int
     , newRoleTags : List Tag
     , openEditRolePoliciesDialogFor : Maybe String
+    , confirmDeleteRoleDialogShownFor : Maybe String
 
     -- saml providers
     , samlProviderFilterValue : String
@@ -130,6 +134,7 @@ type alias State =
     , newSAMLProviderName : String
     , newSAMLProviderSAMLMetadataDocument : String
     , newSAMLProviderTags : List Tag
+    , confirmDeleteSAMLProviderDialogShownFor : Maybe String
 
     -- temp sessions
     , tempSessionFilterValue : String
@@ -160,11 +165,18 @@ roleBy m by a =
         [] -> Data.Struct.dummyRole
         r :: _ -> r
 
-policyByName : Model -> String -> Data.Struct.Policy
-policyByName m a =
-    case List.filter (\p -> p.policyName == a) m.s.policies of
+samlProviderBy : Model -> (SAMLProvider -> String) -> String -> SAMLProvider
+samlProviderBy m by a =
+    case List.filter (\r -> a == by r) m.s.samlProviders of
+        [] -> Data.Struct.dummySAMLProvider
+        r :: _ -> r
+
+policyBy : Model -> (Policy -> String) -> String -> Policy
+policyBy m by a =
+    case List.filter (\p -> a == by p) m.s.policies of
         [] -> Data.Struct.dummyPolicy
         p :: _ -> p
+
 
 markRoleForRefresh m =
     let
@@ -254,7 +266,7 @@ resetCreateUserDialogFields m =
     let s_ = m.s in
     {m | s = {s_ | createUserDialogShown = False
                  , newUserName = ""
-                 , newUserPath = ""
+                 , newUserPath = "/"
                  , newUserEmail = ""}}
 
 
@@ -263,7 +275,7 @@ resetCreatePolicyDialogFields m =
     let s_ = m.s in
     {m | s = {s_ | createPolicyDialogShown = False
                  , newPolicyName = ""
-                 , newPolicyPath = ""
+                 , newPolicyPath = "/"
                  , newPolicyDescription = Nothing}}
 
 
@@ -272,7 +284,7 @@ resetCreateRoleDialogFields m =
     let s_ = m.s in
     {m | s = {s_ | createRoleDialogShown = False
                  , newRoleName = ""
-                 , newRolePath = ""
+                 , newRolePath = "/"
                  , newRoleAssumeRolePolicyDocument = ""
                  , newRoleDescription = Nothing
                  , newRolePermissionsBoundary = Nothing

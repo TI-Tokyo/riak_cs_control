@@ -132,8 +132,20 @@ update msg m =
             , Cmd.none
             )
 
-        DeleteUser u ->
-            (m, Request.Rcs.deleteUser m u)
+        DeleteUser a ->
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteUserDialogShownFor = Just a}}, Cmd.none )
+        DeleteUserConfirmed ->
+            let
+                s_ = m.s
+                a = Maybe.withDefault "" m.s.confirmDeleteUserDialogShownFor
+            in
+                ( {m | s = {s_ | confirmDeleteUserDialogShownFor = Nothing}}
+                , Request.Rcs.deleteUser m a
+                )
+        DeleteUserNotConfirmed ->
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteUserDialogShownFor = Nothing}}, Cmd.none )
         UserDeleted (Ok ()) ->
             (m, Request.Rcs.listUsers m)
         UserDeleted (Err err) ->
@@ -284,7 +296,19 @@ update msg m =
             )
 
         DeletePolicy a ->
-            (m, Request.Aws.deletePolicy m a)
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeletePolicyDialogShownFor = Just a}}, Cmd.none )
+        DeletePolicyConfirmed ->
+            let
+                s_ = m.s
+                a = Maybe.withDefault "" m.s.confirmDeletePolicyDialogShownFor
+            in
+                ( {m | s = {s_ | confirmDeletePolicyDialogShownFor = Nothing}}
+                , Request.Aws.deletePolicy m a
+                )
+        DeletePolicyNotConfirmed ->
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeletePolicyDialogShownFor = Nothing}}, Cmd.none )
         PolicyDeleted (Ok _) ->
             (m, Request.Aws.listPolicies m)
         PolicyDeleted (Err err) ->
@@ -363,7 +387,19 @@ update msg m =
             )
 
         DeleteRole a ->
-            (m, Request.Aws.deleteRole m a)
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteRoleDialogShownFor = Just a}}, Cmd.none )
+        DeleteRoleConfirmed ->
+            let
+                s_ = m.s
+                a = Maybe.withDefault "" m.s.confirmDeleteRoleDialogShownFor
+            in
+                ( {m | s = {s_ | confirmDeleteRoleDialogShownFor = Nothing}}
+                , Request.Aws.deleteRole m a
+                )
+        DeleteRoleNotConfirmed ->
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteRoleDialogShownFor = Nothing}}, Cmd.none )
         RoleDeleted (Ok _) ->
             (m, Request.Aws.listRoles m)
         RoleDeleted (Err err) ->
@@ -487,7 +523,19 @@ update msg m =
             )
 
         DeleteSAMLProvider a ->
-            (m, Request.Aws.deleteSAMLProvider m a)
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteSAMLProviderDialogShownFor = Just a}}, Cmd.none )
+        DeleteSAMLProviderConfirmed ->
+            let
+                s_ = m.s
+                a = Maybe.withDefault "" m.s.confirmDeleteSAMLProviderDialogShownFor
+            in
+                ( {m | s = {s_ | confirmDeleteSAMLProviderDialogShownFor = Nothing}}
+                , Request.Aws.deleteSAMLProvider m a
+                )
+        DeleteSAMLProviderNotConfirmed ->
+            let s_ = m.s in
+            ( {m | s = {s_ | confirmDeleteSAMLProviderDialogShownFor = Nothing}}, Cmd.none )
         SAMLProviderDeleted (Ok _) ->
             (m, Request.Aws.listSAMLProviders m)
         SAMLProviderDeleted (Err err) ->

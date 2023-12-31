@@ -56,6 +56,8 @@ type Msg
     | CreateUser
     | UserCreated (Result Http.Error ())
     | DeleteUser String
+    | DeleteUserConfirmed
+    | DeleteUserNotConfirmed
     | UserDeleted (Result Http.Error ())
     | UpdateUser
     | ClearBucketsStats
@@ -73,6 +75,8 @@ type Msg
     | CreatePolicy
     | PolicyCreated (Result Http.Error Policy)
     | DeletePolicy String
+    | DeletePolicyConfirmed
+    | DeletePolicyNotConfirmed
     | PolicyDeleted (Result Http.Error RequestId)
 
     -- Roles
@@ -81,6 +85,8 @@ type Msg
     | CreateRole
     | RoleCreated (Result Http.Error Role)
     | DeleteRole String
+    | DeleteRoleConfirmed
+    | DeleteRoleNotConfirmed
     | RoleDeleted (Result Http.Error RequestId)
     | ListAttachedRolePolicies String
     | GotAttachedRolePolicyList String (Result Http.Error (List AttachedPolicy))
@@ -97,6 +103,8 @@ type Msg
     | CreateSAMLProvider
     | SAMLProviderCreated (Result Http.Error SAMLProvider)
     | DeleteSAMLProvider String
+    | DeleteSAMLProviderConfirmed
+    | DeleteSAMLProviderNotConfirmed
     | SAMLProviderDeleted (Result Http.Error RequestId)
 
     -- TempSessions

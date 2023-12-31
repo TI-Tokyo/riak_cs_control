@@ -50,6 +50,10 @@ makeContent m =
         , div [] (createRole m)
         , div [] (makeEditRolePoliciesDialog m)
         , div [] (makeAttachRolePolicyDialog m)
+        , div [] (View.Shared.makeDeleteThingConfirmDialog
+                      m .confirmDeleteRoleDialogShownFor
+                      identity "role"
+                      DeleteRoleConfirmed DeleteRoleNotConfirmed)
         , div [] (maybeShowCreateRoleFab m)
         ]
 
@@ -287,6 +291,14 @@ createRole m =
                                 |> TextField.setLabel (Just "Name")
                                 |> TextField.setRequired True
                                 |> TextField.setOnChange NewRoleNameChanged
+                                |> TextField.setAttributes [ attribute "spellCheck" "false" ]
+                                )
+                          , TextField.filled
+                                (TextField.config
+                                |> TextField.setLabel (Just "Path")
+                                |> TextField.setRequired True
+                                |> TextField.setOnChange NewRolePathChanged
+                                |> TextField.setValue (Just m.s.newRolePath)
                                 |> TextField.setAttributes [ attribute "spellCheck" "false" ]
                                 )
                           , TextField.filled

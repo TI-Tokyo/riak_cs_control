@@ -23,6 +23,7 @@ module View.SAMLProvider exposing (makeContent, makeFilterControls)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import View.Common exposing (SortByField(..))
+import View.Shared
 import View.Style
 import Util
 
@@ -45,6 +46,10 @@ makeContent m =
     div View.Style.topContent
         [ div View.Style.card (makeSAMLProviders m)
         , div [] (createSAMLProvider m)
+        , div [] (View.Shared.makeDeleteThingConfirmDialog
+                      m .confirmDeleteSAMLProviderDialogShownFor
+                      Util.nameFromArn "SAML provider"
+                      DeleteSAMLProviderConfirmed DeleteSAMLProviderNotConfirmed)
         , div [] (maybeShowCreateSAMLProviderFab m)
         ]
 
@@ -196,6 +201,7 @@ createSAMLProvider m =
                                 |> TextArea.setLabel (Just "SAML Metadata Document")
                                 |> TextArea.setRequired True
                                 |> TextArea.setOnChange NewSAMLProviderSAMLMetadataDocumentChanged
+                                |> TextArea.setCols (Just 77)
                                 |> TextArea.setRows (Just 12)
                                 |> TextArea.setAttributes [ attribute "spellCheck" "false" ]
                                 )
