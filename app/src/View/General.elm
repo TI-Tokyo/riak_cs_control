@@ -34,7 +34,6 @@ import Material.Dialog as Dialog
 import Material.TextField as TextField
 import Material.Typography as Typography
 
-
 makeContent m =
     Html.div View.Style.topContent
         [ Html.div [] [ makeServerInfo m ]
@@ -67,7 +66,7 @@ cardContent m =
     "Admin key secret: " ++ (withStars m.c.csAdminSecret) ++ "\n" ++
     "         Version: " ++ m.s.serverInfo.version ++ "\n" ++
     "  System Version: " ++ m.s.serverInfo.systemVersion ++ "\n" ++
-    "          Uptime: " ++ m.s.serverInfo.uptime
+    "          Uptime: " ++ m.s.serverInfo.uptime ++ "\n"
 
 withStars s =
     let l = String.length s in

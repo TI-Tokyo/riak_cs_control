@@ -38,6 +38,8 @@ decodeServerInfo =
         |> required "version" string
         |> required "system_version" string
         |> required "uptime" string
+        |> required "df_available" int
+        |> required "df_total" int
 
 
 seriallyDecodeMultipartUsers s =

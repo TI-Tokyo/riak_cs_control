@@ -42,12 +42,25 @@ import Chart.Item as CI
 import Svg.Attributes as SA
 import Material.Card as Card
 import Filesize
+import Numeral
 
 
 makeContent m =
     div View.Style.topContent
-        [ div View.Style.card (makeUsage m)
+        [ div [ style "align" "center" ] [text (makeDfLine m)]
+        , div View.Style.card (makeUsage m)
         ]
+
+
+makeDfLine m =
+    let
+        used_pc = 100 - m.s.serverInfo.df_available * 100 // m.s.serverInfo.df_total
+    in
+        "Disk: total " ++ (Numeral.format "000,00 b" (1024 * toFloat m.s.serverInfo.df_total))
+            ++ ", available " ++ (Numeral.format "000,00 b" (1024 * toFloat m.s.serverInfo.df_available))
+            ++ " (" ++ (String.fromInt used_pc) ++ "% used)"
+
+
 
 makeFilterControls m =
     [ TextField.outlined

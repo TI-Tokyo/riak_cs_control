@@ -49,7 +49,7 @@ init f =
         state = State
                     [] [] [] [] [] Dict.empty
                     Snackbar.initialQueue Msg.General True
-                    { version = "---", systemVersion = "---", uptime = "---" }
+                    { version = "---", systemVersion = "---", uptime = "---", df_available = round -1, df_total = round -1 }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     -- User
                     "" ["Name", "Email"] Name True

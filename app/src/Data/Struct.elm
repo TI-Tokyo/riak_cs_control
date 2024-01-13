@@ -28,6 +28,8 @@ type alias ServerInfo =
     { version : String
     , systemVersion : String
     , uptime : String
+    , df_available : Int
+    , df_total : Int
     }
 
 
