@@ -1,3 +1,18 @@
+# Riak CS 3.2.4 Release Notes
+
+Released February 2, 2024.
+
+## General
+
+Incremetal feature and bugfix release.
+
+## New features
+
+* _Disk usage_ section now reports, per riak node, the following
+  items: total filesystem size, used %, space available and total size of leveldb
+  backend data files (*.sst).
+
+
 # Riak CS 3.2.3 Release Notes
 
 Released December 24, 2023.

@@ -1,6 +1,6 @@
 -- ---------------------------------------------------------------------
 --
--- Copyright (c) 2023 TI Tokyo    All Rights Reserved.
+-- Copyright (c) 2023-2024 TI Tokyo    All Rights Reserved.
 --
 -- This file is provided to you under the Apache License,
 -- Version 2.0 (the "License"); you may not use this file
@@ -49,7 +49,7 @@ init f =
         state = State
                     [] [] [] [] [] Dict.empty
                     Snackbar.initialQueue Msg.General True
-                    { version = "---", systemVersion = "---", uptime = "---", df_available = round -1, df_total = round -1 }
+                    { version = "---", systemVersion = "---", uptime = "---", storageInfo = [] }
                     (not haveCreds) f.csUrl f.csAdminKey f.csAdminSecret
                     -- User
                     "" ["Name", "Email"] Name True

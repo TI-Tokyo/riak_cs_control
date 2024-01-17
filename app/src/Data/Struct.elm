@@ -1,6 +1,6 @@
 -- ---------------------------------------------------------------------
 --
--- Copyright (c) 2023 TI Tokyo    All Rights Reserved.
+-- Copyright (c) 2023-2024 TI Tokyo    All Rights Reserved.
 --
 -- This file is provided to you under the Apache License,
 -- Version 2.0 (the "License"); you may not use this file
@@ -24,12 +24,19 @@ import Dict exposing (Dict)
 import Time
 
 
+type alias StorageInfo =
+    { node : String
+    , dfTotal : Int
+    , dfAvailable : Int
+    , nVal : Int
+    , backendDataTotalSize : Int
+    }
+
 type alias ServerInfo =
     { version : String
     , systemVersion : String
     , uptime : String
-    , df_available : Int
-    , df_total : Int
+    , storageInfo : List StorageInfo
     }
 
 

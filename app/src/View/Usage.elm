@@ -1,6 +1,6 @@
 -- ---------------------------------------------------------------------
 --
--- Copyright (c) 2023 TI Tokyo    All Rights Reserved.
+-- Copyright (c) 2023-2024 TI Tokyo    All Rights Reserved.
 --
 -- This file is provided to you under the Apache License,
 -- Version 2.0 (the "License"); you may not use this file
@@ -47,17 +47,25 @@ import Numeral
 
 makeContent m =
     div View.Style.topContent
-        [ div [ style "align" "center" ] [text (makeDfLine m)]
+        [ div [ style "align" "center"
+              , style "background-color" "yellow"
+              , style "font-family" "monospace"
+              , style "font-size" "small"
+              , style "white-space" "pre"
+              , style "padding" "1em"
+              ] [text (makeStorageInfo m)]
         , div View.Style.card (makeUsage m)
         ]
 
-
-makeDfLine m =
+makeStorageInfo m =
+    String.join "\n" (List.map makeNodeStorageInfo m.s.serverInfo.storageInfo)
+makeNodeStorageInfo a =
     let
-        used_pc = 100 - m.s.serverInfo.df_available * 100 // m.s.serverInfo.df_total
+        used_pc = 100 - a.dfAvailable * 100 // a.dfTotal
     in
-        "Disk: total " ++ (Numeral.format "000,00 b" (1024 * toFloat m.s.serverInfo.df_total))
-            ++ ", available " ++ (Numeral.format "000,00 b" (1024 * toFloat m.s.serverInfo.df_available))
+        a.node ++ ": total " ++ (Numeral.format "000,00 b" (1024 * toFloat a.dfTotal))
+            ++ ", SST total " ++ (Numeral.format "000,00 b" (toFloat a.backendDataTotalSize))
+            ++ ", available " ++ (Numeral.format "000,00 b" (1024 * toFloat a.dfAvailable))
             ++ " (" ++ (String.fromInt used_pc) ++ "% used)"
 
 

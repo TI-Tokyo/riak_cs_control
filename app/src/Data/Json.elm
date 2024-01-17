@@ -1,6 +1,6 @@
 -- ---------------------------------------------------------------------
 --
--- Copyright (c) 2023 TI Tokyo    All Rights Reserved.
+-- Copyright (c) 2023-2024 TI Tokyo    All Rights Reserved.
 --
 -- This file is provided to you under the Apache License,
 -- Version 2.0 (the "License"); you may not use this file
@@ -38,9 +38,15 @@ decodeServerInfo =
         |> required "version" string
         |> required "system_version" string
         |> required "uptime" string
-        |> required "df_available" int
-        |> required "df_total" int
+        |> required "storage_info" (list storageInfoItem)
 
+storageInfoItem =
+    succeed StorageInfo
+        |> required "node" string
+        |> required "df_total" int
+        |> required "df_available" int
+        |> required "n_val" int
+        |> required "backend_data_total_size" int
 
 seriallyDecodeMultipartUsers s =
     List.concat

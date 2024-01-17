@@ -160,7 +160,9 @@ update msg m =
             ({m | s = {s_ | bucketStats = Dict.empty}}, Cmd.none)
         ListAllBuckets ->
             let s_ = m.s in
-            ({m | s = {s_ | bucketStats = Dict.empty}}, listAllBucketsCmd m)
+            ( {m | s = {s_ | bucketStats = Dict.empty}}
+            , Cmd.batch [ Request.Rcs.getServerInfo m, listAllBucketsCmd m ]
+            )
         ListBucket u b ->
             (m, Request.Rcs.listBucket m u b)
         GotBucketList (Ok a) ->
@@ -724,7 +726,9 @@ refreshTabMsg m t =
         Msg.Roles -> Request.Aws.listRoles m
         Msg.SAMLProviders -> Request.Aws.listSAMLProviders m -- getAllSamlProvidersCmd m
         Msg.TempSessions -> Request.Rcs.listTempSessions m
-        Msg.Usage -> listAllBucketsCmd m
+        Msg.Usage -> Cmd.batch [ Request.Rcs.getServerInfo m
+                               , listAllBucketsCmd m
+                               ]
 
 refreshEssentials m =
     Cmd.batch [ Request.Rcs.getServerInfo m
