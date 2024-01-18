@@ -7,7 +7,9 @@ import pprint
 
 config = Config(signature_version = 's3v4')
 
-os.environ['http_proxy'] = 'http://127.0.0.1:%d' % (int(os.environ.get('CS_HTTP_PORT')))
+cs_url = os.environ.get('CS_URL')
+cs_port = int(os.environ.get('CS_HTTP_PORT'))
+os.environ['http_proxy'] = '%s:%d' % (cs_url, cs_port)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-r", "--role_arn", help = "role arn")
@@ -26,6 +28,7 @@ def from_file(fname):
         return str(f.read())
 SAMLAssertion = from_file("saml_assertion.xml")
 
+#boto3.set_stream_logger('')
 resp = client.assume_role_with_saml(
     RoleArn = args.role_arn,
     PrincipalArn = args.saml_provider_arn,
@@ -37,6 +40,6 @@ resp = client.assume_role_with_saml(
             'arn': 'arn:aws:iam::123456789013:policy/ExtraPolicyThat'
         },
     ],
-    DurationSeconds = 12300)
+    DurationSeconds = 900)
 
 pprint.pp(resp)
